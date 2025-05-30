@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 105df9b236a3548429456284aaf6b1fe
+guid: d1e0d073044fdcd42bfaaa41174f1ccc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2327396177459264094
-    second: Captura de tela 2025-05-18 011240_0
+      213: 3214696200571729635
+    second: E.E grass placeholder-Sheet_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Captura de tela 2025-05-18 011240_0
+      name: E.E grass placeholder-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1365
-        height: 767
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e5abf090e729c4020800000000000000
-      internalID: 2327396177459264094
+      spriteID: 3e630e78925ec9c20800000000000000
+      internalID: 3214696200571729635
       vertices: []
       indices: 
       edges: []
@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      E.E grass placeholder-Sheet_0: 3214696200571729635
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

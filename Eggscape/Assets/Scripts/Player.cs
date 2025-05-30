@@ -59,6 +59,7 @@ public class Player : MonoBehaviour
         float moveInput = Input.GetAxisRaw("Horizontal"); 
         transform.position += new Vector3(moveInput, 0, 0) * moveSpeed * Time.deltaTime;
 
+        
         if (moveInput > 0)
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
