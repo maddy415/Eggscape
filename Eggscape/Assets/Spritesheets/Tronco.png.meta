@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b15e6795d1f72184495b505ff31f0a05
+guid: 21395d1286d682f4ea41d892949d8cf0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2217250007566146341
-    second: Tronco 32x32_0
+      213: 4217216532376576400
+    second: Tronco 32xa32_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -48,7 +48,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Tronco 32x32_0
+      name: Tronco 32xa32_0
       rect:
         serializedVersion: 2
-        x: 2
+        x: 3
         y: 0
-        width: 28
-        height: 26
+        width: 56
+        height: 51
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bd4a9c89ddeba31e0800000000000000
-      internalID: -2217250007566146341
+      spriteID: 091e539a710968a30800000000000000
+      internalID: 4217216532376576400
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Tronco 32x32_0: -2217250007566146341
+      Tronco 32xa32_0: 4217216532376576400
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
