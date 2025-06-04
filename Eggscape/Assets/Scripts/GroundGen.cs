@@ -17,7 +17,7 @@ public class GroundGen : MonoBehaviour
         cam = Camera.main;
 
         float larguraVisivel = 2f * cam.orthographicSize * cam.aspect;
-        float x = genPos.position.x;
+        //float x = genPos.position.x;
 
         
         int numBlocos = Mathf.CeilToInt(larguraVisivel / larguraDoChao) + 2;
@@ -36,11 +36,11 @@ public class GroundGen : MonoBehaviour
     {
         foreach (GameObject bloco in blocos)
         {
-            bloco.transform.Translate(Vector3.left * velocidade * Time.deltaTime);
+            bloco.transform.Translate(Vector3.left * velocidade * Time.deltaTime, Space.World);
         }
-
+        
         GameObject primeiro = blocos[0];
-         float bordaEsquerda = cam.transform.position.x - cam.orthographicSize * cam.aspect;
+        float bordaEsquerda = cam.transform.position.x - cam.orthographicSize * cam.aspect;
 
         if (primeiro.transform.position.x + larguraDoChao < bordaEsquerda)
         {

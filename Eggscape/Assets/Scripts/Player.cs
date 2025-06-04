@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     
     private bool isGrounded = false;
     private bool isJumping = false;
+    public  bool isAlive = true;
     private float jumpTimer = 0;
     public float jumpTime = 0.5f;
 
@@ -25,7 +26,6 @@ public class Player : MonoBehaviour
         Jump();
         Move();
     }
-
     private void Jump()
     {
         isGrounded = Physics2D.OverlapCircle(feetPos.position, groundDistance, groundLayer);
@@ -50,10 +50,9 @@ public class Player : MonoBehaviour
                 jumpTimer = 0;
             }
             
-            Debug.Log($"isGrounded: {isGrounded}, isJumping: {isJumping}, jumpTimer: {jumpTimer}");
+            //Debug.Log($"isGrounded: {isGrounded}, isJumping: {isJumping}, jumpTimer: {jumpTimer}");
         }
     }
-
     private void Move()
     {
         float moveInput = Input.GetAxisRaw("Horizontal"); 
@@ -69,6 +68,19 @@ public class Player : MonoBehaviour
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
     }
-   
-    
+
+    private void Death()
+    {
+        
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Obstacle"))
+        {
+            //isAlive = false;
+            Debug.Log("morreu burro");
+            GameManager.Instance.StopScene();
+        }
+    }
 }
