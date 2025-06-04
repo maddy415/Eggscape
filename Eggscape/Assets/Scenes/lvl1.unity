@@ -852,7 +852,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabChao: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
   genPos: {fileID: 881868769}
-  larguraDoChao: 25
+  larguraDoChao: 32
   velocidade: 8
 --- !u!4 &881868769
 Transform:
@@ -1030,6 +1030,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1723841630}
+  - component: {fileID: 1723841631}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1052,6 +1053,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1723841631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723841629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70421f22aabc4d40b35a78f770ca0aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vicCanvas: {fileID: 682906393}
+  playerAlive: 1
 --- !u!1 &1792852742
 GameObject:
   m_ObjectHideFlags: 0
