@@ -4,9 +4,14 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject vicCanvas;
     public static GameManager Instance;
-    public bool playerAlive = true;
+    
+    public GameObject vicCanvas;
+    public GameObject spawner;
+    public GameObject tronco;
+    public GameObject ground;
+    
+    public static bool playerAlive = true;
 
     void Awake()
     {
@@ -18,6 +23,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject); 
         }
+        playerAlive = true;
     }
 
     private void Update()
@@ -31,9 +37,13 @@ public class GameManager : MonoBehaviour
         if (playerAlive == false)
         {
             Debug.Log("Player is dead");
-            vicCanvas.SetActive(true);
+            vicCanvas.SetActive(true); //Mostra a tela de game over
+
+            spawner.GetComponent<ObstacleGen>().canSpawn = false;
+            ground.GetComponent<GroundGen>().enabled = false;
+
             
-            Time.timeScale = 0f; //Congelar tudo q depende de fisica
+            
         }
     }
 
@@ -44,7 +54,11 @@ public class GameManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.R))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-                Time.timeScale = 1f;
+                ObstacleGen.logObstacle.RemoveAll(item => item == null);
+                foreach (GameObject troncoClone in ObstacleGen.logObstacle)
+                {
+                    troncoClone.GetComponent<ObstacleMove>().enabled = false;
+                }
             }
         }
     }

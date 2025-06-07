@@ -8,4 +8,6 @@ public class GroundMove : MonoBehaviour
     {
         transform.Translate(Vector3.left * gSpeed * Time.deltaTime, Space.World);
     }
+
+    
 }
