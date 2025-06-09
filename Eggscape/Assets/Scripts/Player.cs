@@ -8,16 +8,23 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     public Rigidbody2D rb;
+    public SpriteRenderer sprite;
     public Transform feetPos;
     public LayerMask groundLayer;
     public float jumpForce = 10;
     public float groundDistance = 0.25f;
     public float moveSpeed;
- 
+    public float impForce = 4f;
+    public GameObject impulsePos;
     
+
+    private void Start()
+    { 
+        sprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
+    }
+
     private bool isGrounded = false;
     private bool isJumping = false;
-    public  bool isAlive = true;
     private float jumpTimer = 0;
     public float jumpTime = 0.5f;
 
@@ -61,16 +68,29 @@ public class Player : MonoBehaviour
         
         if (moveInput > 0)
         {
-            transform.eulerAngles = new Vector3(0, 0, 0);
+            sprite.flipX = false;
+
         }
         else if (moveInput < 0)
         {
-            transform.eulerAngles = new Vector3(0, 180, 0);
+            sprite.flipX = true;
         }
     }
 
     private void Death()
     {
+        Player player = GetComponent<Player>();
+       
+        
+        player.moveSpeed = 0f;
+        player.jumpForce = 0f;
+        Vector2 direcao = Vector2.left;
+        
+        rb.AddForce(Vector2.left * impForce, ForceMode2D.Impulse);
+        
+        rb.linearVelocity = new Vector2(0f, 25f); //tentar aplicar no x e y de um msm obj
+        //rb.AddForce(new Vector3(0f, impForce, 3f));
+        
         
     }
 
@@ -78,9 +98,10 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Obstacle"))
         {
-            //isAlive = false;
+            GameManager.Instance.playerAlive = false;
             Debug.Log("morreu burro");
             GameManager.Instance.StopScene();
+            Death();
         }
     }
 }

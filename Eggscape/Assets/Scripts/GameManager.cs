@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public GameObject tronco;
     public GameObject ground;
     
-    public static bool playerAlive = true;
+    public bool playerAlive = true;
 
     void Awake()
     {
@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject); 
         }
-        playerAlive = true;
+        //playerAlive = true;
     }
 
     private void Update()
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
 
     public void StopScene()
     {
-        playerAlive = false;
+        //playerAlive = false;
         if (playerAlive == false)
         {
             Debug.Log("Player is dead");
@@ -55,10 +55,10 @@ public class GameManager : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 ObstacleGen.logObstacle.RemoveAll(item => item == null);
-                foreach (GameObject troncoClone in ObstacleGen.logObstacle)
+                /*foreach (GameObject troncoClone in ObstacleGen.logObstacle)
                 {
                     troncoClone.GetComponent<ObstacleMove>().enabled = false;
-                }
+                }*/
             }
         }
     }

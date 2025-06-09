@@ -18,6 +18,7 @@ public class ObstacleGen : MonoBehaviour
     private void Start()
     {
         canSpawn = true;
+        GameObject[] troncosCena = GameObject.FindGameObjectsWithTag("Obstacle");
 
     }
 
@@ -36,17 +37,20 @@ public class ObstacleGen : MonoBehaviour
             spawned = false;
         }
         
-        if (GameManager.playerAlive == false)
+        if (GameManager.Instance.playerAlive == false)
         {
             canSpawn = false;
-
             foreach (GameObject troncoClone in logObstacle)
             {
                 if (troncoClone != null)
                 {
                     troncoClone.GetComponent<ObstacleMove>().enabled = false;
-                    Debug.Log("quantia" + logObstacle.Count);
+                    
+                    //Debug.Log("quantia" + logObstacle.Count);
+                    
                 }
+                
+                
             }
 
 
