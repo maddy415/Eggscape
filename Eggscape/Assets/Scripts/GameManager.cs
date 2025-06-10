@@ -7,9 +7,11 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     
     public GameObject vicCanvas;
-    public GameObject spawner;
-    public GameObject tronco;
+    public GameObject spawner; 
     public GameObject ground;
+    public GameObject fence;
+    
+    public float score = 0;
     
     public bool playerAlive = true;
 
@@ -23,17 +25,17 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject); 
         }
-        //playerAlive = true;
     }
 
     private void Update()
     {
         ResetScene();
+        score += Time.deltaTime;
+        Debug.Log(score);
     }
 
     public void StopScene()
     {
-        //playerAlive = false;
         if (playerAlive == false)
         {
             Debug.Log("Player is dead");
@@ -41,6 +43,7 @@ public class GameManager : MonoBehaviour
 
             spawner.GetComponent<ObstacleGen>().canSpawn = false;
             ground.GetComponent<GroundGen>().enabled = false;
+            fence.GetComponent<GroundGen>().enabled = false;
 
             
             
@@ -55,10 +58,7 @@ public class GameManager : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 ObstacleGen.logObstacle.RemoveAll(item => item == null);
-                /*foreach (GameObject troncoClone in ObstacleGen.logObstacle)
-                {
-                    troncoClone.GetComponent<ObstacleMove>().enabled = false;
-                }*/
+              
             }
         }
     }

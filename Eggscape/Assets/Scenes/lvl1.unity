@@ -1254,8 +1254,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vicCanvas: {fileID: 682906393}
   spawner: {fileID: 304386134}
-  tronco: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
   ground: {fileID: 881868767}
+  fence: {fileID: 1007758266}
+  score: 0
   playerAlive: 1
 --- !u!1 &1792852742
 GameObject:
