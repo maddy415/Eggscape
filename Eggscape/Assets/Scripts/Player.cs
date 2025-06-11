@@ -26,12 +26,19 @@ public class Player : MonoBehaviour
     private bool isGrounded = false;
     private bool isJumping = false;
     private float jumpTimer = 0;
+    private bool canMove = true;
+    
     public float jumpTime = 0.5f;
 
     private void Update()
     {
         Jump();
         Move();
+        if (isGrounded && GameManager.Instance.victoryAchieved)
+        {
+            canMove = false;
+            transform.position += Vector3.right * Time.deltaTime * 10f;
+        }
     }
     private void Jump()
     {
@@ -55,6 +62,7 @@ public class Player : MonoBehaviour
             {
                 isJumping = false;
                 jumpTimer = 0;
+                
             }
             
             //Debug.Log($"isGrounded: {isGrounded}, isJumping: {isJumping}, jumpTimer: {jumpTimer}");
@@ -62,19 +70,23 @@ public class Player : MonoBehaviour
     }
     private void Move()
     {
-        float moveInput = Input.GetAxisRaw("Horizontal"); 
-        transform.position += new Vector3(moveInput, 0, 0) * moveSpeed * Time.deltaTime;
+        if (canMove)
+        {
+            float moveInput = Input.GetAxisRaw("Horizontal"); 
+            transform.position += new Vector3(moveInput, 0, 0) * moveSpeed * Time.deltaTime;
 
         
-        if (moveInput > 0)
-        {
-            sprite.flipX = false;
+            if (moveInput > 0)
+            {
+                sprite.flipX = false;
 
+            }
+            else if (moveInput < 0)
+            {
+                sprite.flipX = true;
+            }
         }
-        else if (moveInput < 0)
-        {
-            sprite.flipX = true;
-        }
+        
     }
 
     private void Death()

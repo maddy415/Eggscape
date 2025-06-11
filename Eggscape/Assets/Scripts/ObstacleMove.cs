@@ -13,10 +13,9 @@ public class ObstacleMove : MonoBehaviour
     {
         if (other.CompareTag("Destroyer"))
         {
-            
             Destroy(gameObject);
             ObstacleGen.logObstacle.Remove(gameObject);
-            Debug.Log("removeu");
+            GameManager.Instance.objsOnScene.Remove(gameObject);
         }
     }
     

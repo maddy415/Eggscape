@@ -25,10 +25,12 @@ public class ObstacleGen : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
-        if (timer >= spawnTime && canSpawn == true)
+        if (timer >= spawnTime && canSpawn)
         {
             GameObject troncoClone = Instantiate(tronco, spawner.transform.position, Quaternion.identity);
             logObstacle.Add(troncoClone);
+            GameManager.Instance.objsOnScene.Add(troncoClone);
+            
             spawned = true;
         }
         if (spawned)

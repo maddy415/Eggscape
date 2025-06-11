@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,10 +11,16 @@ public class GameManager : MonoBehaviour
     public GameObject spawner; 
     public GameObject ground;
     public GameObject fence;
+    public List<GameObject> objsOnScene = new List<GameObject>();
     
     public float score = 0;
     
     public bool playerAlive = true;
+    private bool victoryTriggered = false;
+    private bool waitingForVictory = false;
+    
+    public bool victoryAchieved = false;
+
 
     void Awake()
     {
@@ -29,9 +36,29 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        //Debug.Log(objsOnScene.Count);
+        if (!victoryTriggered && score >= 5)
+        {
+            Victory();
+        }
+        
+        if (waitingForVictory && objsOnScene.Count <= 0)
+        {
+            Debug.Log("cabo os bixo ganhou");
+            waitingForVictory = false;
+            victoryAchieved = true;
+        }
+        
+        
+        
         ResetScene();
-        score += Time.deltaTime;
-        Debug.Log(score);
+        
+        if (playerAlive)
+        {
+            score += Time.deltaTime;
+        }
+        
+        //Debug.Log(score);
     }
 
     public void StopScene()
@@ -62,7 +89,15 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    
-    
+
+    void Victory()
+    {
+        victoryTriggered = true;
+        waitingForVictory = true;
+
+        spawner.GetComponent<ObstacleGen>().canSpawn = false;
+        Debug.Log("Vitória iniciada. Esperando limpar a cena...");
+    }
+
     
 }
