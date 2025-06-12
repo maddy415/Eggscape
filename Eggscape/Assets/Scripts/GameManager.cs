@@ -13,7 +13,8 @@ public class GameManager : MonoBehaviour
     public GameObject fence;
     public List<GameObject> objsOnScene = new List<GameObject>();
     
-    public float score = 0;
+    public float sceneTime = 0;
+    public float timeGoal;
     
     public bool playerAlive = true;
     private bool victoryTriggered = false;
@@ -37,7 +38,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         //Debug.Log(objsOnScene.Count);
-        if (!victoryTriggered && score >= 5)
+        if (!victoryTriggered && sceneTime >= timeGoal)
         {
             Victory();
         }
@@ -55,7 +56,7 @@ public class GameManager : MonoBehaviour
         
         if (playerAlive)
         {
-            score += Time.deltaTime;
+            sceneTime += Time.deltaTime;
         }
         
         //Debug.Log(score);

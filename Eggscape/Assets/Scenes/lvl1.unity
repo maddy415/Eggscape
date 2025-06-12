@@ -922,6 +922,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1209102115 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 4560781891439897506, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+  m_PrefabInstance: {fileID: 3655688236464903742}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1211596590
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1256,8 +1261,11 @@ MonoBehaviour:
   spawner: {fileID: 304386134}
   ground: {fileID: 881868767}
   fence: {fileID: 1007758266}
-  score: 0
+  objsOnScene: []
+  sceneTime: 0
+  timeGoal: 20
   playerAlive: 1
+  victoryAchieved: 0
 --- !u!1 &1792852742
 GameObject:
   m_ObjectHideFlags: 0
@@ -1489,7 +1497,7 @@ GameObject:
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &2124651353
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1554,7 +1562,7 @@ Transform:
   m_GameObject: {fileID: 2124651352}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.87, y: 1.71, z: -0.04691901}
+  m_LocalPosition: {x: -2.32, y: 1.83, z: -0.04691901}
   m_LocalScale: {x: 3.1832, y: 3.1832, z: 3.1832}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1707,8 +1715,12 @@ PrefabInstance:
       value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: bc
+      value: 
+      objectReference: {fileID: 1209102115}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: impForce
-      value: 8
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: moveSpeed

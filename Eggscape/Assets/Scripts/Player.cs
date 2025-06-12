@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     public Rigidbody2D rb;
+    public BoxCollider2D bc;
     public SpriteRenderer sprite;
     public Transform feetPos;
     public LayerMask groundLayer;
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
     public float moveSpeed;
     public float impForce = 4f;
     public GameObject impulsePos;
+    private bool playerDead = false;
     
 
     private void Start()
@@ -32,8 +34,16 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        Jump();
-        Move();
+        if (playerDead)
+        {
+            
+        }
+        if (canMove)
+        {
+            Move();
+            Jump();
+        }
+
         if (isGrounded && GameManager.Instance.victoryAchieved)
         {
             canMove = false;
@@ -70,39 +80,42 @@ public class Player : MonoBehaviour
     }
     private void Move()
     {
-        if (canMove)
-        {
-            float moveInput = Input.GetAxisRaw("Horizontal"); 
-            transform.position += new Vector3(moveInput, 0, 0) * moveSpeed * Time.deltaTime;
+        
+        float moveInput = Input.GetAxisRaw("Horizontal"); 
+        transform.position += new Vector3(moveInput, 0, 0) * moveSpeed * Time.deltaTime;
 
         
-            if (moveInput > 0)
-            {
-                sprite.flipX = false;
+        if (moveInput > 0)
+        {
+            sprite.flipX = false;
 
-            }
-            else if (moveInput < 0)
-            {
-                sprite.flipX = true;
-            }
+        }
+        else if (moveInput < 0)
+        {
+            sprite.flipX = true;
         }
         
     }
 
     private void Death()
     {
+        playerDead = true;
         Player player = GetComponent<Player>();
        
         
         player.moveSpeed = 0f;
         player.jumpForce = 0f;
-        Vector2 direcao = Vector2.left;
+
+
         
-        rb.AddForce(Vector2.left * impForce, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector2(-10f, 25f) * impForce * Time.deltaTime; 
+        bc.enabled = false;
+        //bc.isTrigger = true;
+        rb.freezeRotation = false;
+        rb.AddTorque(40f);
         
-        rb.linearVelocity = new Vector2(0f, 25f); //tentar aplicar no x e y de um msm obj
-        //rb.AddForce(new Vector3(0f, impForce, 3f));
         
+ 
         
     }
 
@@ -110,10 +123,13 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Obstacle"))
         {
+            //other.gameObject.GetComponent<BoxCollider2D>().enabled = false;
             GameManager.Instance.playerAlive = false;
             Debug.Log("morreu burro");
             GameManager.Instance.StopScene();
             Death();
         }
     }
+
+  
 }
