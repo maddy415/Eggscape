@@ -8,7 +8,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     
     public GameObject vicCanvas;
-    public GameObject spawner; 
+    public GameObject spawnerLog; 
+    public GameObject spawnerBird; 
     public GameObject ground;
     public GameObject fence;
     public List<GameObject> objsOnScene = new List<GameObject>();
@@ -69,7 +70,8 @@ public class GameManager : MonoBehaviour
             Debug.Log("Player is dead");
             vicCanvas.SetActive(true); //Mostra a tela de game over
 
-            spawner.GetComponent<ObstacleGen>().canSpawn = false;
+            StopSpawners();
+            
             ground.GetComponent<GroundGen>().enabled = false;
             fence.GetComponent<GroundGen>().enabled = false;
 
@@ -96,8 +98,14 @@ public class GameManager : MonoBehaviour
         victoryTriggered = true;
         waitingForVictory = true;
 
-        spawner.GetComponent<ObstacleGen>().canSpawn = false;
+        StopSpawners();
         Debug.Log("Vitória iniciada. Esperando limpar a cena...");
+    }
+
+    void StopSpawners()
+    {
+        spawnerLog.GetComponent<ObstacleGen>().canSpawn = false;
+        spawnerBird.GetComponent<ObstacleGen>().canSpawn = false;
     }
 
     

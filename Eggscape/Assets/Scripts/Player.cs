@@ -7,11 +7,13 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    
     public Rigidbody2D rb;
     public BoxCollider2D bc;
     public SpriteRenderer sprite;
     public Transform feetPos;
     public LayerMask groundLayer;
+    
     public float jumpForce = 10;
     public float groundDistance = 0.25f;
     public float moveSpeed;
