@@ -1385,7 +1385,7 @@ MonoBehaviour:
   fence: {fileID: 1007758266}
   objsOnScene: []
   sceneTime: 0
-  timeGoal: 5
+  timeGoal: 20
   playerAlive: 1
   victoryAchieved: 0
 --- !u!1 &1792852742
@@ -1845,6 +1845,10 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: defaultGS
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: moveSpeed
       value: 6
       objectReference: {fileID: 0}
@@ -1852,6 +1856,14 @@ PrefabInstance:
       propertyPath: impulsePos
       value: 
       objectReference: {fileID: 2124651352}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: attackForce
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: attackAirTime
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 5942189237180508342, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: m_LocalPosition.x
       value: -18.36
