@@ -25,19 +25,25 @@ public class Player : MonoBehaviour
     public float attackCD;
     public float defaultGS;
     public float attackForce;
+    private float attackCDtimer;
+    
     
     private bool playerDead = false;
     private bool isGrounded = false;
     private bool isJumping = false;
     private bool canMove = true;
     private bool isAttacking = false;
+    private bool canAttack = true;
     
 
     private void Start()
     { 
         sprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
         rb.gravityScale = defaultGS;
+        
     }
+    
+    
 
     private void Update()
     {
@@ -48,8 +54,8 @@ public class Player : MonoBehaviour
 
         if (isAttacking)
         {
-            transform.position += Vector3.right * Time.deltaTime * attackForce;
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, 0);
+            //transform.position += Vector3.right * Time.deltaTime * attackForce;
+            rb.linearVelocity = new Vector2(attackForce, 0);
         }
         if (canMove)
         {
@@ -134,8 +140,10 @@ public class Player : MonoBehaviour
 
     void Attack()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && canAttack)
         {
+            canAttack = false;
+            
             attackTimer = 0f;
             isAttacking = true;
             rb.gravityScale = 0;
@@ -145,6 +153,18 @@ public class Player : MonoBehaviour
             
             /*Se deixar sem nenhum codigo pra mexer a galinha, vira basicamente uma feature nova q ela fica
              descendo lento e pulando alto qnd ataca*/
+        }
+
+        if (canAttack==false)
+        {
+            attackCDtimer += Time.deltaTime;
+            
+            if (attackCDtimer >= attackCD)
+            {
+                canAttack = true;
+                attackCDtimer = 0f;
+            }
+            
         }
 
         if (isAttacking)
