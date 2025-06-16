@@ -18,27 +18,38 @@ public class Player : MonoBehaviour
     public float groundDistance = 0.25f;
     public float moveSpeed;
     public float impForce = 4f;
-    public GameObject impulsePos;
+    public float jumpTime = 0.5f;
+    private float jumpTimer = 0;
+    public float attackAirTime;
+    private float attackTimer;
+    public float attackCD;
+    public float defaultGS;
+    public float attackForce;
+    
     private bool playerDead = false;
+    private bool isGrounded = false;
+    private bool isJumping = false;
+    private bool canMove = true;
+    private bool isAttacking = false;
     
 
     private void Start()
     { 
         sprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        rb.gravityScale = defaultGS;
     }
-
-    private bool isGrounded = false;
-    private bool isJumping = false;
-    private float jumpTimer = 0;
-    private bool canMove = true;
-    
-    public float jumpTime = 0.5f;
 
     private void Update()
     {
         if (playerDead)
         {
             
+        }
+
+        if (isAttacking)
+        {
+            transform.position += Vector3.right * Time.deltaTime * attackForce;
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, 0);
         }
         if (canMove)
         {
@@ -51,6 +62,7 @@ public class Player : MonoBehaviour
             canMove = false;
             transform.position += Vector3.right * Time.deltaTime * 10f;
         }
+        Attack();
     }
     private void Jump()
     {
@@ -98,7 +110,6 @@ public class Player : MonoBehaviour
         }
         
     }
-
     private void Death()
     {
         playerDead = true;
@@ -118,6 +129,36 @@ public class Player : MonoBehaviour
         
         
  
+        
+    }
+
+    void Attack()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            attackTimer = 0f;
+            isAttacking = true;
+            rb.gravityScale = 0;
+            //rb.linearVelocity = Vector2.right * 8f;
+            
+            
+            
+            /*Se deixar sem nenhum codigo pra mexer a galinha, vira basicamente uma feature nova q ela fica
+             descendo lento e pulando alto qnd ataca*/
+        }
+
+        if (isAttacking)
+        {
+            attackTimer += Time.deltaTime;
+            if (attackTimer >= attackAirTime)
+            {
+                rb.gravityScale = defaultGS;
+                Debug.Log("passou o tempo");
+                attackTimer = 0f;
+                isAttacking = false;
+            }
+            
+        }
         
     }
 
