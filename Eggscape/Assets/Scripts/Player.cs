@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     public SpriteRenderer sprite;
     public Transform feetPos;
     public LayerMask groundLayer;
+    public BoxCollider2D attackHB;
     
     public float jumpForce = 10;
     public float groundDistance = 0.25f;
@@ -143,6 +144,7 @@ public class Player : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && canAttack)
         {
             canAttack = false;
+            attackHB.enabled = true;
             
             attackTimer = 0f;
             isAttacking = true;
@@ -155,19 +157,20 @@ public class Player : MonoBehaviour
              descendo lento e pulando alto qnd ataca*/
         }
 
-        if (canAttack==false)
+        if (canAttack==false) //Cooldown do ataque
         {
             attackCDtimer += Time.deltaTime;
             
             if (attackCDtimer >= attackCD)
             {
-                canAttack = true;
+                canAttack = true; //Libera pra atacar novamente
                 attackCDtimer = 0f;
+                
             }
             
         }
 
-        if (isAttacking)
+        if (isAttacking) //Lógica pra fazer o player cair de volta dps de X segundos no ar
         {
             attackTimer += Time.deltaTime;
             if (attackTimer >= attackAirTime)
@@ -176,6 +179,9 @@ public class Player : MonoBehaviour
                 Debug.Log("passou o tempo");
                 attackTimer = 0f;
                 isAttacking = false;
+                rb.linearVelocity = Vector3.zero;
+                
+                attackHB.enabled = false;
             }
             
         }
@@ -192,6 +198,8 @@ public class Player : MonoBehaviour
             GameManager.Instance.StopScene();
             Death();
         }
+        
+        
     }
 
   

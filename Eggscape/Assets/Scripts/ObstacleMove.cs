@@ -17,6 +17,12 @@ public class ObstacleMove : MonoBehaviour
             ObstacleGen.logObstacle.Remove(gameObject);
             GameManager.Instance.objsOnScene.Remove(gameObject);
         }
+
+        if (other.gameObject.CompareTag("Attack"))
+        {
+            Destroy(gameObject);
+            Debug.Log("tocou");
+        }
     }
     
 }
