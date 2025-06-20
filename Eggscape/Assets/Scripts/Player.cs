@@ -44,12 +44,15 @@ public class Player : MonoBehaviour
         rb.gravityScale = defaultGS;
         
     }
-    
-    
+
+
 
     private void Update()
     {
-        if (playerDead)
+        
+
+
+    if (playerDead)
         {
             
         }
@@ -71,12 +74,32 @@ public class Player : MonoBehaviour
             transform.position += Vector3.right * Time.deltaTime * 15f;
         }
         Attack();
+        
     }
+    
+    public float jumpBufferTime = 0.2f; // Tempo que o jogo "lembra" do pulo
+    private float jumpBufferCounter = 0f;
     private void Jump()
     {
-        isGrounded = Physics2D.OverlapCircle(feetPos.position, groundDistance, groundLayer);
+        Debug.Log($"Buffer: {jumpBufferCounter}, isGrounded: {isGrounded}");
 
-        if (isGrounded && Input.GetButtonDown("Jump"))
+        isGrounded = Physics2D.OverlapCircle(feetPos.position, groundDistance, groundLayer);
+        
+        if (Input.GetButtonDown("Jump")) //Lógica do timer do jump buffer
+        {
+            jumpBufferCounter = jumpBufferTime; 
+            /*No frame q apertar o pulo, o contador recebe o valor de buffertime
+            jumpBufferTime é o tempo que o jogo vai lembrar do input de pulo do jogador*/
+            
+        }
+        else
+        {
+            jumpBufferCounter -= Time.deltaTime; //Se o pulo n for pressionado no próx frame, ele inicia o contador
+        }
+        
+        
+
+        if (isGrounded && jumpBufferCounter > 0f)
         {
             isJumping = true;
             rb.linearVelocity = Vector2.up * jumpForce;
@@ -99,7 +122,14 @@ public class Player : MonoBehaviour
             
             //Debug.Log($"isGrounded: {isGrounded}, isJumping: {isJumping}, jumpTimer: {jumpTimer}");
         }
+        if (Input.GetButtonUp("Jump"))
+        {
+            isJumping = false;
+        }
     }
+    
+  
+    
     private void Move()
     {
         
@@ -115,6 +145,16 @@ public class Player : MonoBehaviour
         else if (moveInput < 0)
         {
             sprite.flipX = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.S) && isGrounded==false)
+        {
+            rb.linearVelocity = new Vector2(0f, -20f);
+            
+        }
+        else if (isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         }
         
     }
@@ -211,7 +251,6 @@ public class Player : MonoBehaviour
 
     public void Knockback()
     {
-        //rb.AddForce(Vector2.left * 10f, ForceMode2D.Impulse);
         rb.linearVelocity = new Vector3(-kbForce, rb.linearVelocity.y, 0f);
         Debug.Log("knockback");
         chamouKB = true;
