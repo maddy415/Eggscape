@@ -49,19 +49,18 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        
 
-
-    if (playerDead)
-        {
-            
-        }
-
-        if (isAttacking && chamouKB==false)
+        if (isAttacking && chamouKB==false) //Ataque
         {
             //transform.position += Vector3.right * Time.deltaTime * attackForce;
             rb.linearVelocity = new Vector2(attackForce, 0);
+            
+            if (!isGrounded && Input.GetKeyDown(KeyCode.S))
+            {
+                CancelarAtaque();
+            }
         }
+        
         if (canMove)
         {
             Move();
@@ -73,7 +72,10 @@ public class Player : MonoBehaviour
             canMove = false;
             transform.position += Vector3.right * Time.deltaTime * 15f;
         }
+        
         Attack();
+        
+        
         
     }
     
@@ -129,9 +131,10 @@ public class Player : MonoBehaviour
     }
     
   
-    
+    private bool isFalling = false;
     private void Move()
     {
+        if (playerDead) return;
         
         float moveInput = Input.GetAxisRaw("Horizontal"); 
         transform.position += new Vector3(moveInput, 0, 0) * moveSpeed * Time.deltaTime;
@@ -150,14 +153,17 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.S) && isGrounded==false)
         {
             rb.linearVelocity = new Vector2(0f, -20f);
-            
+            isFalling = true;
+
         }
         else if (isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+            isFalling = false;
         }
         
     }
+    
     private void Death()
     {
         playerDead = true;
@@ -217,21 +223,28 @@ public class Player : MonoBehaviour
             attackTimer += Time.deltaTime;
             if (attackTimer >= attackAirTime)
             {
-                rb.gravityScale = defaultGS;
-                Debug.Log("passou o tempo");
-                attackTimer = 0f;
-                isAttacking = false;
-                if (chamouKB == false)
-                {
-                    rb.linearVelocity = Vector3.zero;
-                }
-                
-                attackHB.enabled = false;
+                CancelarAtaque();
             }
-            
+           
         }
         
     }
+    
+    void CancelarAtaque()
+    {
+        Debug.Log("passou o tempo");
+        rb.gravityScale = defaultGS;
+        attackTimer = 0f;
+        isAttacking = false;
+
+        if (chamouKB == false)
+        {
+            rb.linearVelocity = Vector3.zero;
+        }
+
+        attackHB.enabled = false;
+    }
+
 
     private void OnCollisionEnter2D(Collision2D other)
     {
