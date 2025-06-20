@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     public LayerMask groundLayer;
     public BoxCollider2D attackHB;
     
+    
     public float jumpForce = 10;
     public float groundDistance = 0.25f;
     public float moveSpeed;
@@ -53,7 +54,7 @@ public class Player : MonoBehaviour
             
         }
 
-        if (isAttacking)
+        if (isAttacking && chamouKB==false)
         {
             //transform.position += Vector3.right * Time.deltaTime * attackForce;
             rb.linearVelocity = new Vector2(attackForce, 0);
@@ -67,7 +68,7 @@ public class Player : MonoBehaviour
         if (isGrounded && GameManager.Instance.victoryAchieved)
         {
             canMove = false;
-            transform.position += Vector3.right * Time.deltaTime * 10f;
+            transform.position += Vector3.right * Time.deltaTime * 15f;
         }
         Attack();
     }
@@ -165,6 +166,7 @@ public class Player : MonoBehaviour
             {
                 canAttack = true; //Libera pra atacar novamente
                 attackCDtimer = 0f;
+                chamouKB = false;
                 
             }
             
@@ -179,7 +181,10 @@ public class Player : MonoBehaviour
                 Debug.Log("passou o tempo");
                 attackTimer = 0f;
                 isAttacking = false;
-                rb.linearVelocity = Vector3.zero;
+                if (chamouKB == false)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                }
                 
                 attackHB.enabled = false;
             }
@@ -201,6 +206,15 @@ public class Player : MonoBehaviour
         
         
     }
+    public bool chamouKB = false;
+    public float kbForce;
 
-  
+    public void Knockback()
+    {
+        //rb.AddForce(Vector2.left * 10f, ForceMode2D.Impulse);
+        rb.linearVelocity = new Vector3(-kbForce, rb.linearVelocity.y, 0f);
+        Debug.Log("knockback");
+        chamouKB = true;
+    }
+    
 }

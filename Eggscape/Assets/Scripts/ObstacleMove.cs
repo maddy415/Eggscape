@@ -4,6 +4,9 @@ using UnityEngine;
 public class ObstacleMove : MonoBehaviour
 {
     public float speed = 5f;
+    private Rigidbody2D playerRB;
+
+   
     void Update()
     {
         transform.Translate(Vector3.left * speed * Time.deltaTime, Space.World);
@@ -18,11 +21,17 @@ public class ObstacleMove : MonoBehaviour
             GameManager.Instance.objsOnScene.Remove(gameObject);
         }
 
-        if (other.gameObject.CompareTag("Attack"))
+        /*if (other.gameObject.CompareTag("Attack"))
         {
+            
             Destroy(gameObject);
             Debug.Log("tocou");
-        }
+            GameManager.Instance.objsOnScene.Remove(gameObject);
+            
+            
+            
+            
+        }*/
     }
     
 }
