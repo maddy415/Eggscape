@@ -50,7 +50,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
 
-        if (isAttacking && chamouKB==false) //Ataque
+        if (isAttacking && isKnockbacking==false) //Ataque
         {
             //transform.position += Vector3.right * Time.deltaTime * attackForce;
             rb.linearVelocity = new Vector2(attackForce, 0);
@@ -98,8 +98,6 @@ public class Player : MonoBehaviour
         {
             jumpBufferCounter -= Time.deltaTime; //Se o pulo n for pressionado no próx frame, ele inicia o contador
         }
-        
-        
 
         if (isGrounded && jumpBufferCounter > 0f)
         {
@@ -212,7 +210,7 @@ public class Player : MonoBehaviour
             {
                 canAttack = true; //Libera pra atacar novamente
                 attackCDtimer = 0f;
-                chamouKB = false;
+                isKnockbacking = false;
                 
             }
             
@@ -237,7 +235,7 @@ public class Player : MonoBehaviour
         attackTimer = 0f;
         isAttacking = false;
 
-        if (chamouKB == false)
+        if (isKnockbacking == false)
         {
             rb.linearVelocity = Vector3.zero;
         }
@@ -259,14 +257,14 @@ public class Player : MonoBehaviour
         
         
     }
-    public bool chamouKB = false;
+    public bool isKnockbacking = false;
     public float kbForce;
 
     public void Knockback()
     {
         rb.linearVelocity = new Vector3(-kbForce, rb.linearVelocity.y, 0f);
         Debug.Log("knockback");
-        chamouKB = true;
+        isKnockbacking = true;
     }
     
 }
