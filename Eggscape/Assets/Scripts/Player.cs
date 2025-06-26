@@ -83,7 +83,7 @@ public class Player : MonoBehaviour
     private float jumpBufferCounter = 0f;
     private void Jump()
     {
-        Debug.Log($"Buffer: {jumpBufferCounter}, isGrounded: {isGrounded}");
+        //Debug.Log($"Buffer: {jumpBufferCounter}, isGrounded: {isGrounded}");
 
         isGrounded = Physics2D.OverlapCircle(feetPos.position, groundDistance, groundLayer);
         

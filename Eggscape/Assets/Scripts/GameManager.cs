@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public GameObject ground;
     public GameObject fence;
     public List<GameObject> objsOnScene = new List<GameObject>();
+    public GameObject groundRef;
     
     public float sceneTime = 0;
     public float timeGoal;
@@ -34,6 +35,11 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject); 
         }
+    }
+
+    private void Start()
+    {
+        groundRef.SetActive(false);
     }
 
     private void Update()
