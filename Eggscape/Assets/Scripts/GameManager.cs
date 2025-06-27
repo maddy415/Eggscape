@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public GameObject fence;
     public List<GameObject> objsOnScene = new List<GameObject>();
     public GameObject groundRef;
+    public Player player;
     
     public float sceneTime = 0;
     public float timeGoal;
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
     public bool playerAlive = true;
     private bool victoryTriggered = false;
     private bool waitingForVictory = false;
+    public bool isCheatOn = false;
     
     public bool victoryAchieved = false;
 
@@ -65,8 +67,16 @@ public class GameManager : MonoBehaviour
         {
             sceneTime += Time.deltaTime;
         }
-        
-        //Debug.Log(score);
+
+        if (Input.GetKeyDown(KeyCode.J) && isCheatOn==false)
+        {
+            CheatOn();
+        }
+        else if (Input.GetKeyDown(KeyCode.J) && isCheatOn)
+        {
+            isCheatOn = false;
+            Debug.Log("Cheat desativado");
+        }
     }
 
     public void StopScene()
@@ -97,6 +107,12 @@ public class GameManager : MonoBehaviour
               
             }
         }
+        
+        if(Input.GetKeyDown(KeyCode.H))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        }
     }
 
     void Victory()
@@ -114,5 +130,11 @@ public class GameManager : MonoBehaviour
         spawnerBird.GetComponent<ObstacleGen>().canSpawn = false;
     }
 
+    void CheatOn() //Desativa a detecção de colisão no OnCollisionEnter2d do Player
+    {
+        isCheatOn = true;
+        Debug.Log("Cheat ativado");
+        
+    }
     
 }

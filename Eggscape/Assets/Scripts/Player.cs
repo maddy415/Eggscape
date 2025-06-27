@@ -246,7 +246,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Obstacle"))
+        if (other.gameObject.CompareTag("Obstacle") && GameManager.Instance.isCheatOn==false)
         {
             //other.gameObject.GetComponent<BoxCollider2D>().enabled = false;
             GameManager.Instance.playerAlive = false;

@@ -9,6 +9,7 @@ TagManager:
   - Destroyer
   - ObstacleDestroyer
   - Attack
+  - SpawnNextTrigger
   layers:
   - Default
   - TransparentFX
