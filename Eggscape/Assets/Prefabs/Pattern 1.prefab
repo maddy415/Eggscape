@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1640202005191020181}
   - component: {fileID: 329358769179873979}
   - component: {fileID: 6400032807160066892}
+  - component: {fileID: 8912621665330939221}
   m_Layer: 0
   m_Name: SpawnTrigger
   m_TagString: SpawnNextTrigger
@@ -28,11 +29,11 @@ Transform:
   m_GameObject: {fileID: 2169013933593605675}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.077778146, y: 0.6037037, z: 0}
-  m_LocalScale: {x: 0.3703704, y: 0.3703704, z: 0}
+  m_LocalPosition: {x: 27.730003, y: -0.24000001, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1561202156776411682}
+  m_Father: {fileID: 1608420909277122594}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1640202005191020181
 SpriteRenderer:
@@ -162,6 +163,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &8912621665330939221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2169013933593605675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb0a43bd92878d8438658ceff4c065e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 8
 --- !u!1 &8232251528394940728
 GameObject:
   m_ObjectHideFlags: 0
@@ -199,6 +213,7 @@ Transform:
   - {fileID: 7590275511838498520}
   - {fileID: 2438391300347491717}
   - {fileID: 4842427325042266805}
+  - {fileID: 4390147219183807959}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &110267510426148747
@@ -693,10 +708,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 7553008177597202771, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4390147219183807959}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
 --- !u!4 &1561202156776411682 stripped
