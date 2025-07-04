@@ -12,6 +12,7 @@ public class AttackCollisionHandler : MonoBehaviour
          GameManager.Instance.objsOnScene.Remove(other.gameObject);
          
          GetComponentInParent<Player>().Knockback();
+         AudioManager.audioInstance.LogSFX();
       }
       
    }

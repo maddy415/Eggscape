@@ -93,6 +93,8 @@ public class Player : MonoBehaviour
             /*No frame q apertar o pulo, o contador recebe o valor de buffertime
             jumpBufferTime é o tempo que o jogo vai lembrar do input de pulo do jogador*/
             
+            
+            
         }
         else
         {
@@ -103,6 +105,13 @@ public class Player : MonoBehaviour
         {
             isJumping = true;
             rb.linearVelocity = Vector2.up * jumpForce;
+
+            
+        }
+
+        if (isGrounded && Input.GetButtonDown("Jump"))
+        {
+            AudioManager.audioInstance.JumpSFX();
         }
 
         if (isJumping && Input.GetButton("Jump"))
@@ -164,6 +173,7 @@ public class Player : MonoBehaviour
     
     private void Death()
     {
+        AudioManager.audioInstance.DeathSFX();
         playerDead = true;
         Player player = GetComponent<Player>();
        
