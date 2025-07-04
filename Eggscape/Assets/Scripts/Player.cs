@@ -244,6 +244,7 @@ public class Player : MonoBehaviour
         rb.gravityScale = defaultGS;
         attackTimer = 0f;
         isAttacking = false;
+        jumpTimer = 0f;
 
         if (isKnockbacking == false)
         {
