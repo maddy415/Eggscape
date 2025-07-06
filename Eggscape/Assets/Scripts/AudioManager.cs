@@ -11,7 +11,7 @@ public class AudioManager : MonoBehaviour
     
     
     
-    AudioSource audioSource;
+    public AudioSource audioSource;
     
     void Awake()
     {
