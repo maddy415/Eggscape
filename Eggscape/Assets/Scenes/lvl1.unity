@@ -231,6 +231,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tronco: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
   spawner: {fileID: 304386134}
+  onTutorial: 0
   spawnTime: 1
   canSpawn: 1
 --- !u!1 &471556213
@@ -1548,6 +1549,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tronco: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
   spawner: {fileID: 1338882167}
+  onTutorial: 0
   spawnTime: 3
   canSpawn: 1
 --- !u!212 &1338882170
@@ -1724,6 +1726,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tronco: {fileID: 996071509807926308, guid: b9777708a591d05498c4dd5b9ba3bdbb, type: 3}
   spawner: {fileID: 1411324291}
+  onTutorial: 0
   spawnTime: 3
   canSpawn: 1
 --- !u!1 &1478210184
@@ -2321,6 +2324,7 @@ MonoBehaviour:
   jumpSFX: {fileID: 8300000, guid: 849ff2e04f6f12344bf9d764f9100ceb, type: 3}
   logSFX: {fileID: 8300000, guid: e83c34a649e1af549ae4aa8813c26d0e, type: 3}
   deathSFX: {fileID: 8300000, guid: 2bbba8330c5685e488dd2552ac6b7288, type: 3}
+  explosionSFX: {fileID: 8300000, guid: 210bc3f1e643b1c43953f56ab6468dff, type: 3}
   audioSource: {fileID: 0}
 --- !u!4 &1941320289
 Transform:
@@ -2687,6 +2691,10 @@ PrefabInstance:
       propertyPath: defaultGS
       value: 4.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: explosion
+      value: 
+      objectReference: {fileID: 6665745316554304104, guid: 40ca9d35ab54cd747a9e6553dcf44720, type: 3}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: moveSpeed
       value: 6
