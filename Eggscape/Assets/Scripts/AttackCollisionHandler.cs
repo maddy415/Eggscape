@@ -10,8 +10,6 @@ public class AttackCollisionHandler : MonoBehaviour
       {
 
          Destroy(other.gameObject);
-         GameObject explosionClone = Instantiate(explosion, other.transform.position, other.transform.rotation);
-         Destroy(explosionClone, 0.9f);
          
          GameManager.Instance.objsOnScene.Remove(other.gameObject);
          

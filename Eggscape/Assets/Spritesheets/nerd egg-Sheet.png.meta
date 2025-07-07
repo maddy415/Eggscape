@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 21395d1286d682f4ea41d892949d8cf0
+guid: 17c4947f3650a7e47827b88309a2df86
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4217216532376576400
-    second: Tronco 32xa32_0
+      213: -5409755506759027159
+    second: nerd egg-Sheet_0
+  - first:
+      213: 9134270577454440691
+    second: nerd egg-Sheet_1
+  - first:
+      213: 8587134497917834532
+    second: nerd egg-Sheet_2
+  - first:
+      213: 5469288057087219201
+    second: nerd egg-Sheet_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -48,7 +57,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -100,23 +109,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Tronco_0
+      name: nerd egg-Sheet_0
       rect:
         serializedVersion: 2
-        x: 4
+        x: 45
         y: 0
-        width: 54
-        height: 50
+        width: 75
+        height: 115
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 10d367de42ea96f44a41653bf1e056df
-      internalID: -896616862
+      spriteID: 9263ae95700bce4b0800000000000000
+      internalID: -5409755506759027159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nerd egg-Sheet_1
+      rect:
+        serializedVersion: 2
+        x: 205
+        y: 0
+        width: 75
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f0697bd1b273ce70800000000000000
+      internalID: 9134270577454440691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nerd egg-Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 365
+        y: 0
+        width: 75
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42515ea4451ab2770800000000000000
+      internalID: 8587134497917834532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: nerd egg-Sheet_3
+      rect:
+        serializedVersion: 2
+        x: 525
+        y: 0
+        width: 75
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10658f8a280d6eb40800000000000000
+      internalID: 5469288057087219201
       vertices: []
       indices: 
       edges: []
@@ -125,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: cec8aff9866a8c14c9fac04445a838c5
+    spriteID: 8dfea72f3f5a83b4d80d18ac55406c69
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +210,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Tronco_0: -896616862
+      nerd egg-Sheet_0: -5409755506759027159
+      nerd egg-Sheet_1: 9134270577454440691
+      nerd egg-Sheet_2: 8587134497917834532
+      nerd egg-Sheet_3: 5469288057087219201
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
