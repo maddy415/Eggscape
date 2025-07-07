@@ -6,13 +6,14 @@ public class TutorialEgg : MonoBehaviour
     
     public float walkTime;
     private float walkTimer;
-    bool isWalkingCutscene = true;
+    public bool isWalkingCutscene = true;
     private SpriteRenderer sprite;
 
 
     private void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
+
     }
 
     private void Update()

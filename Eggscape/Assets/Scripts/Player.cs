@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
     private bool playerDead = false;
     private bool isGrounded = false;
     private bool isJumping = false;
-    private bool canMove = true;
+    public bool canMove = true;
     private bool isAttacking = false;
     private bool canAttack = true;
     
