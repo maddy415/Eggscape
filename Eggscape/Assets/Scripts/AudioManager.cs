@@ -7,6 +7,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip jumpSFX;
     public AudioClip logSFX;
     public AudioClip deathSFX;
+    public AudioClip explosionSFX;
 
     
     
@@ -52,6 +53,14 @@ public class AudioManager : MonoBehaviour
         if (jumpSFX != null)
         {
             audioSource.PlayOneShot(deathSFX);   
+        }
+    }
+
+    public void ExplodeSFX()
+    {
+        if (explosionSFX != null)
+        {
+            audioSource.PlayOneShot(explosionSFX);   
         }
     }
 }

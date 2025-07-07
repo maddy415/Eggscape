@@ -8,6 +8,7 @@ public class TutorialEgg : MonoBehaviour
     private float walkTimer;
     public bool isWalkingCutscene = true;
     private SpriteRenderer sprite;
+    public GameObject explosion;
 
 
     private void Start()
@@ -32,5 +33,17 @@ public class TutorialEgg : MonoBehaviour
             sprite.flipX = true;
         }
         
+    }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Obstacle"))
+        {
+            GameObject explosionA = Instantiate(explosion, other.transform.position, other.transform.rotation);
+            Destroy(explosionA, 2f);
+            Destroy(gameObject);
+            AudioManager.audioInstance.ExplodeSFX();
+            
+        }
     }
 }

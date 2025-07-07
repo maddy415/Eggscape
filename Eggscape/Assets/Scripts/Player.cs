@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
     public bool canMove = true;
     private bool isAttacking = false;
     private bool canAttack = true;
-    
+    public GameObject explosion;
 
     private void Start()
     { 
@@ -173,7 +173,12 @@ public class Player : MonoBehaviour
     
     private void Death()
     {
-        AudioManager.audioInstance.DeathSFX();
+        
+        GameObject explosionA = Instantiate(explosion, transform.position, Quaternion.identity);
+        AudioManager.audioInstance.ExplodeSFX();
+
+        Destroy(explosionA, 2f);
+        //AudioManager.audioInstance.DeathSFX();
         playerDead = true;
         Player player = GetComponent<Player>();
        

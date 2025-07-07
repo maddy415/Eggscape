@@ -10,6 +10,8 @@ public class TutorialManager : MonoBehaviour
 
     public Player player;
     public TutorialEgg nerdEgg;
+    public ObstacleGen obsGen;
+    public GameObject objectGen;
     public float walkTime;
     private float walkTimer;
     private bool onCutscene = true;
@@ -23,6 +25,7 @@ public class TutorialManager : MonoBehaviour
     {
         player = GameObject.FindWithTag("Player").GetComponent<Player>();
         nerdEgg = GameObject.FindWithTag("TutorialEgg").GetComponent<TutorialEgg>();
+        obsGen = objectGen.GetComponent<ObstacleGen>();
         textCanvas.SetActive(false);
 
     }
@@ -33,6 +36,12 @@ public class TutorialManager : MonoBehaviour
         {
             player.canMove = false;
         }
+        else
+        {
+            player.canMove = true;
+
+        }
+        
         walkTimer += Time.deltaTime;
         
         if (isWalkingCutscene)
@@ -58,7 +67,8 @@ public class TutorialManager : MonoBehaviour
     }
 
     private string[] dialogues = {
-        "Primeiro, vou te ensinar a pular troncos. Tem um vindo aí!",
+        "Chicken, sou o TutoriOvo e vou te ensinar como sobreviver a este mundo cruel.",
+        "Primeiro, vou te ensinar a pular troncos. Tem um vindo aí, aperte 'Espaço' para pular!",
         "Mandou ver. Você tbm pode quebrar os troncos atacando-os"
     };
 
@@ -69,14 +79,20 @@ public class TutorialManager : MonoBehaviour
         {
             dialogueText.text = dialogues[currentIndex];
         }
-        else 
-        {
-            Debug.Log("cabo os dialogo meu truta");
-            StopAllCoroutines();
-        }
+        
     }
+    
+    bool hasSpawned = false;
 
+    IEnumerator SpawnDelay()
+    {
+        onCutscene = false;
+        yield return new WaitForSeconds(3f);
+        obsGen.SpawnObstacle();
+        hasSpawned = true;
+        
 
+    }
     IEnumerator TextTiming()
     {
         isOnCoroutine = true;
@@ -84,12 +100,26 @@ public class TutorialManager : MonoBehaviour
 
         while (currentIndex < dialogues.Length)
         {
-            yield return new WaitForSeconds(2f);
+            if (currentIndex != 0)
+            { 
+                yield return new WaitForSeconds(2f);
+            }
             ChangeText();
-            currentIndex++;
-        }
-        
+            
+            
+            if (currentIndex == 1 && hasSpawned == false)
+            {
+                yield return StartCoroutine(SpawnDelay());
+            }
 
+            currentIndex++;
+
+            
+            
+        }
 
     }
+    
+    
+    
 }

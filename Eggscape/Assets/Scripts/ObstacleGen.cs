@@ -7,6 +7,7 @@ public class ObstacleGen : MonoBehaviour
 {
     public GameObject tronco;
     public GameObject spawner;
+    public bool onTutorial;
     
     public float spawnTime = 3f;
     private float timer = 0;
@@ -22,41 +23,60 @@ public class ObstacleGen : MonoBehaviour
 
     }
 
+    public void SpawnObstacle()
+    {
+        GameObject troncoClone = Instantiate(tronco, spawner.transform.position, Quaternion.identity);
+    }
+    
+    
     void Update()
     {
-        timer += Time.deltaTime;
-        if (timer >= spawnTime && canSpawn)
+        if (onTutorial)
         {
-            GameObject troncoClone = Instantiate(tronco, spawner.transform.position, Quaternion.identity);
-            logObstacle.Add(troncoClone);
-            GameManager.Instance.objsOnScene.Add(troncoClone);
-            
-            spawned = true;
+            return;
         }
-        if (spawned)
+        else
         {
-            timer = 0;
-            spawned = false;
-        }
-        
-        if (GameManager.Instance.playerAlive == false)
-        {
-            canSpawn = false;
-            foreach (GameObject troncoClone in logObstacle)
+            timer += Time.deltaTime;
+            if (timer >= spawnTime && canSpawn)
             {
-                if (troncoClone != null)
-                {
-                    troncoClone.GetComponent<ObstacleMove>().enabled = false;
-                    
-                    //Debug.Log("quantia" + logObstacle.Count);
-                    
-                }
-                
-                
+                GameObject troncoClone = Instantiate(tronco, spawner.transform.position, Quaternion.identity);
+                logObstacle.Add(troncoClone);
+                GameManager.Instance.objsOnScene.Add(troncoClone);
+            
+                spawned = true;
             }
+            if (spawned)
+            {
+                timer = 0;
+                spawned = false;
+            }
+        
+            if (GameManager.Instance.playerAlive == false)
+            {
+                canSpawn = false;
+                foreach (GameObject troncoClone in logObstacle)
+                {
+                    if (troncoClone != null)
+                    {
+                        troncoClone.GetComponent<ObstacleMove>().enabled = false;
+                    
+                        //Debug.Log("quantia" + logObstacle.Count);
+                    
+                    }
+                
+                
+                }
 
 
+            }
+        }
         }
         
+        
+
+
+
     }
-}
+
+

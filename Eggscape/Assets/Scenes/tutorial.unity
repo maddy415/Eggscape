@@ -146,7 +146,7 @@ GameObject:
   m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &304386135
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -211,7 +211,7 @@ Transform:
   m_GameObject: {fileID: 304386134}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 19.880226, y: -2.2109342, z: -12.208887}
+  m_LocalPosition: {x: 15.44, y: -2.2109342, z: -12.208887}
   m_LocalScale: {x: 2.7, y: 2.7, z: 2.7}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -231,6 +231,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tronco: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
   spawner: {fileID: 304386134}
+  onTutorial: 1
   spawnTime: 1
   canSpawn: 1
 --- !u!1 &471556213
@@ -512,8 +513,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Chicken, sou o TutoriOvo e vou te ensinar como sobreviver a este mundo
-    cruel
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1367,6 +1367,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tronco: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
   spawner: {fileID: 1338882167}
+  onTutorial: 0
   spawnTime: 3
   canSpawn: 1
 --- !u!212 &1338882170
@@ -1543,6 +1544,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tronco: {fileID: 996071509807926308, guid: b9777708a591d05498c4dd5b9ba3bdbb, type: 3}
   spawner: {fileID: 1411324291}
+  onTutorial: 0
   spawnTime: 3
   canSpawn: 1
 --- !u!1001 &1426985341
@@ -1609,6 +1611,10 @@ PrefabInstance:
       propertyPath: walkTime
       value: 2.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
+      propertyPath: explosion
+      value: 
+      objectReference: {fileID: 6665745316554304104, guid: 40ca9d35ab54cd747a9e6553dcf44720, type: 3}
     - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
       propertyPath: textCanvas
       value: 
@@ -2232,6 +2238,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   nerdEgg: {fileID: 0}
+  obsGen: {fileID: 0}
+  objectGen: {fileID: 304386134}
   walkTime: 2
   textCanvas: {fileID: 521779967}
   dialogueText: {fileID: 521779969}
@@ -2323,6 +2331,7 @@ MonoBehaviour:
   jumpSFX: {fileID: 8300000, guid: 849ff2e04f6f12344bf9d764f9100ceb, type: 3}
   logSFX: {fileID: 8300000, guid: e83c34a649e1af549ae4aa8813c26d0e, type: 3}
   deathSFX: {fileID: 8300000, guid: 2bbba8330c5685e488dd2552ac6b7288, type: 3}
+  explosionSFX: {fileID: 8300000, guid: 210bc3f1e643b1c43953f56ab6468dff, type: 3}
   audioSource: {fileID: 0}
 --- !u!4 &1941320289
 Transform:
@@ -2689,6 +2698,10 @@ PrefabInstance:
       propertyPath: defaultGS
       value: 4.5
       objectReference: {fileID: 0}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: explosion
+      value: 
+      objectReference: {fileID: 6665745316554304104, guid: 40ca9d35ab54cd747a9e6553dcf44720, type: 3}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: moveSpeed
       value: 6
