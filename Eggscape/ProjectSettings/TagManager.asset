@@ -11,6 +11,7 @@ TagManager:
   - Attack
   - SpawnNextTrigger
   - TutorialEgg
+  - JumpDetector
   layers:
   - Default
   - TransparentFX

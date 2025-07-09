@@ -177,7 +177,7 @@ public class Player : MonoBehaviour
         GameObject explosionA = Instantiate(explosion, transform.position, Quaternion.identity);
         AudioManager.audioInstance.ExplodeSFX();
 
-        Destroy(explosionA, 2f);
+        Destroy(explosionA, 1.2f);
         //AudioManager.audioInstance.DeathSFX();
         playerDead = true;
         Player player = GetComponent<Player>();
@@ -273,6 +273,15 @@ public class Player : MonoBehaviour
         
         
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("JumpDetector"))
+        {
+            GameManager.Instance.score++;
+        }
+    }
+
     public bool isKnockbacking = false;
     public float kbForce;
 

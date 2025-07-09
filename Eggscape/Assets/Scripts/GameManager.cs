@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class GameManager : MonoBehaviour
     public List<GameObject> objsOnScene = new List<GameObject>();
     public GameObject groundRef;
     public Player player;
+    public TextMeshProUGUI scoreText;
+    public float score;
     
     public float sceneTime = 0;
     public float timeGoal;
@@ -46,7 +49,9 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        //Debug.Log(objsOnScene.Count);
+        //score += Time.deltaTime;
+        scoreText.text = "Score: "+Convert.ToInt32(score);
+        
         if (!victoryTriggered && sceneTime >= timeGoal)
         {
             Victory();
