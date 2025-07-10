@@ -7,12 +7,13 @@ using Random = UnityEngine.Random;
 public class PatternGen : MonoBehaviour
 {
     public GameObject[] patterns;
-    private List<GameObject> patternsList = new List<GameObject>();
+    public List<GameObject> patternsList = new List<GameObject>();
     public GameObject spawnPoint;
     public GameObject SpawnTrigger;
     public GameObject nextPatternSpawn;
     private bool spawned = false;
     private SpawnTriggerHandler handler;
+    public bool canSpawn = true;
     
     //Anotações pra qnd abrir dnv:
     //Quando o spawn no SpawnTriggerHandler for true, a gnt spawna uma pattern nova por aqui
@@ -25,7 +26,7 @@ public class PatternGen : MonoBehaviour
         foreach (GameObject pattern in patterns)
         {
             patternsList.Add(pattern);
-
+        
         }
 
         //StartCoroutine(WaitToSpawn());
@@ -46,8 +47,19 @@ public class PatternGen : MonoBehaviour
 
     void SpawnPattern()
     {
-        GameObject patternClone = Instantiate(patterns[Random.Range(0, patterns.Length)], spawnPoint.transform.position, Quaternion.identity);
-        Debug.Log(patternClone);
+        if (canSpawn)
+        { 
+            GameObject patternClone = Instantiate(patterns[Random.Range(0, patterns.Length)], spawnPoint.transform.position, Quaternion.identity);
+            // GameManager.Instance.objsOnScene.Add(patternClone);
+            
+            foreach (Transform child in patternClone.transform)
+            {
+                GameManager.Instance.objsOnScene.Add(child.gameObject);
+            }
+            
+            Debug.Log(patternClone);
+
+        }
         
     }
     

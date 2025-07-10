@@ -17,7 +17,9 @@ public class GameManager : MonoBehaviour
     public GameObject groundRef;
     public Player player;
     public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI victoryText;
     public float score;
+    public PatternGen patternGen;
     
     public float sceneTime = 0;
     public float timeGoal;
@@ -45,10 +47,12 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         groundRef.SetActive(false);
+        victoryText.text = "";
     }
 
     private void Update()
     {
+        
         //score += Time.deltaTime;
         scoreText.text = "Score: "+Convert.ToInt32(score);
         
@@ -96,6 +100,14 @@ public class GameManager : MonoBehaviour
             ground.GetComponent<GroundGen>().enabled = false;
             fence.GetComponent<GroundGen>().enabled = false;
 
+            foreach (GameObject obj in GameManager.Instance.objsOnScene)
+            {
+                if (obj.layer != 8)
+                {
+                    obj.GetComponent<ObstacleMove>().enabled = false; //Isso potencialmente ta mal otimizado pra caralho
+                }
+            }
+
             
             
         }
@@ -108,7 +120,7 @@ public class GameManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.R))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-                ObstacleGen.logObstacle.RemoveAll(item => item == null);
+                // ObstacleGen.logObstacle.RemoveAll(item => item == null);
               
             }
         }
@@ -131,11 +143,10 @@ public class GameManager : MonoBehaviour
 
     void StopSpawners()
     {
-        spawnerLog.GetComponent<ObstacleGen>().canSpawn = false;
-        spawnerBird.GetComponent<ObstacleGen>().canSpawn = false;
+        patternGen.canSpawn = false;
     }
 
-    void CheatOn() //Desativa a detecção de colisão no OnCollisionEnter2d do Player
+    void CheatOn() //Desativa a detecção de colisão no OnCollisionEnter2D do Player
     {
         isCheatOn = true;
         Debug.Log("Cheat ativado");

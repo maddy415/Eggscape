@@ -8,6 +8,7 @@ public class DestroyObs : MonoBehaviour
         if (other.gameObject.tag == "Obstacle")
         {
             Destroy(other.gameObject);
+            GameManager.Instance.objsOnScene.Remove(other.gameObject);
         }
     }
 }

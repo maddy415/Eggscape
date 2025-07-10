@@ -52,7 +52,6 @@ public class Player : MonoBehaviour
 
         if (isAttacking && isKnockbacking==false) //Ataque
         {
-            //transform.position += Vector3.right * Time.deltaTime * attackForce;
             rb.linearVelocity = new Vector2(attackForce, 0);
             
             if (!isGrounded && Input.GetKeyDown(KeyCode.S))
@@ -65,15 +64,17 @@ public class Player : MonoBehaviour
         {
             Move();
             Jump();
+            Attack();
+
         }
 
         if (isGrounded && GameManager.Instance.victoryAchieved)
         {
             canMove = false;
             transform.position += Vector3.right * Time.deltaTime * 15f;
+            GameManager.Instance.victoryText.text = "Passou de fase! Aperte \"Espaço\" para continuar";
         }
         
-        Attack();
         
         
         
@@ -177,14 +178,11 @@ public class Player : MonoBehaviour
         GameObject explosionA = Instantiate(explosion, transform.position, Quaternion.identity);
         AudioManager.audioInstance.ExplodeSFX();
 
-        Destroy(explosionA, 1.2f);
-        //AudioManager.audioInstance.DeathSFX();
+        Destroy(explosionA, 1.1f);
         playerDead = true;
-        Player player = GetComponent<Player>();
-       
         
-        player.moveSpeed = 0f;
-        player.jumpForce = 0f;
+
+        canMove = false;
 
 
         
