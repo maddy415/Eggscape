@@ -86,6 +86,11 @@ public class GameManager : MonoBehaviour
             isCheatOn = false;
             Debug.Log("Cheat desativado");
         }
+
+        if (victoryAchieved && player.canMove == false && Input.GetKeyDown(KeyCode.Space))
+        {
+            LoadNextScene();
+        }
     }
 
     public void StopScene()
@@ -151,6 +156,11 @@ public class GameManager : MonoBehaviour
         isCheatOn = true;
         Debug.Log("Cheat ativado");
         
+    }
+
+    public void LoadNextScene()
+    {
+        SceneManager.LoadScene(sceneBuildIndex:+1);
     }
     
 }

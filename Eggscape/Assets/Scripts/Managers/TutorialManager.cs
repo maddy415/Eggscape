@@ -19,6 +19,8 @@ public class TutorialManager : MonoBehaviour
     private bool isOnCoroutine = false;
     public GameObject textCanvas;
     public TextMeshProUGUI dialogueText;
+    private int currentIndex = 0;
+
 
 
     private void Start()
@@ -39,7 +41,6 @@ public class TutorialManager : MonoBehaviour
         else
         {
             player.canMove = true;
-
         }
         
         walkTimer += Time.deltaTime;
@@ -57,11 +58,18 @@ public class TutorialManager : MonoBehaviour
 
         if (nerdEgg.isWalkingCutscene==false)
         {
-            if (isOnCoroutine==false)
-            {
-                StartCoroutine(TextTiming());
-            }
+            textCanvas.SetActive(true);
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            ChangeText();
+            currentIndex++;
             
+            if (currentIndex == 1 && hasSpawned == false)
+            {
+               StartCoroutine(SpawnDelay());
+            }
         }
         
     }
@@ -72,7 +80,6 @@ public class TutorialManager : MonoBehaviour
         "Mandou ver. Você tbm pode quebrar os troncos atacando-os"
     };
 
-    private int currentIndex = 0;
     void ChangeText()
     {
         if (currentIndex < dialogues.Length)
@@ -93,33 +100,33 @@ public class TutorialManager : MonoBehaviour
         
 
     }
-    IEnumerator TextTiming()
-    {
-        isOnCoroutine = true;
-        textCanvas.SetActive(true);
-
-        while (currentIndex < dialogues.Length)
-        {
-            if (currentIndex != 0)
-            { 
-                yield return new WaitForSeconds(2f);
-            }
-            ChangeText();
-            
-            
-            if (currentIndex == 1 && hasSpawned == false)
-            {
-                yield return StartCoroutine(SpawnDelay());
-            }
-
-            currentIndex++;
-
-            
-            
-        }
-
-    }
+    // IEnumerator TextTiming()
+    // {
+    //     isOnCoroutine = true;
+    //     textCanvas.SetActive(true);
+    //
+    //     while (currentIndex < dialogues.Length)
+    //     {
+    //         if (currentIndex != 0)
+    //         { 
+    //             yield return new WaitForSeconds(2f);
+    //         }
+    //         ChangeText();
+    //         
+    //         
+    //         if (currentIndex == 1 && hasSpawned == false)
+    //         {
+    //             yield return StartCoroutine(SpawnDelay());
+    //         }
+    //
+    //         currentIndex++;
+    //
+    //         
+    //         
+    //     }
+    //
+     }
     
     
     
-}
+

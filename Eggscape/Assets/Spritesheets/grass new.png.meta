@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e69c31452f2439d4fa19c2275bd5cf8f
+guid: 7292449933b9f2a4eaacd5c334eb038a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3981903682892337340
-    second: Eggscape grass 2_0
+      213: -82311525526524429
+    second: Eggscape grasss_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Eggscape grass 2_0
+      name: Eggscape grasss_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 256
-        height: 117
+        width: 192
+        height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 44fe16b82bf6db8c0800000000000000
-      internalID: -3981903682892337340
+      spriteID: 3fd22188a129bdef0800000000000000
+      internalID: -82311525526524429
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Eggscape grass 2_0: -3981903682892337340
+      Eggscape grasss_0: -82311525526524429
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
