@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 170c11544466b394f86b787b23aa014a, type: 3}
+  m_Name: Hard Tier
+  m_EditorClassIdentifier: 
+  patterns:
+  - {fileID: 8232251528394940728, guid: 8d4fb7759a4441246afd9856ec651edd, type: 3}
+  - {fileID: 7095210644065130435, guid: f4c57614a1b166c48933a7656e11b2c0, type: 3}
+  - {fileID: 3158023259207425380, guid: 45b82005893282a4bbf5b7071dfa5030, type: 3}
