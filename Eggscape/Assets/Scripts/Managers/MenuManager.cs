@@ -20,6 +20,6 @@ public class MenuManager : MonoBehaviour
 
     public void LoadGame()
     {
-        SceneManager.LoadScene("lvl1");
+        SceneManager.LoadScene("lvl_1");
     }
 }
