@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Hard Tier
   m_EditorClassIdentifier: 
   patterns:
-  - {fileID: 8232251528394940728, guid: 8d4fb7759a4441246afd9856ec651edd, type: 3}
-  - {fileID: 7095210644065130435, guid: f4c57614a1b166c48933a7656e11b2c0, type: 3}
-  - {fileID: 3158023259207425380, guid: 45b82005893282a4bbf5b7071dfa5030, type: 3}
+  - {fileID: 8232251528394940728, guid: 1925cc9c65ac7a04fae5975881d4427f, type: 3}
+  - {fileID: 8232251528394940728, guid: 20ebb0233b0a05c4dbb93520eb6b072e, type: 3}
+  - {fileID: 8232251528394940728, guid: 53128f1a315cf8944be20f43787cb7cc, type: 3}
