@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI victoryText;
     public float score;
     public PatternGen patternGen;
+    public GameObject saveData;
     
     public float sceneTime = 0;
     public float timeGoal;
@@ -48,6 +49,12 @@ public class GameManager : MonoBehaviour
     {
         groundRef.SetActive(false);
         victoryText.text = "";
+        
+        // carregar save ao iniciar
+        SaveData loaded = SaveSystem.Load();
+        //scoreText.text = "Highscore: " + data.highScore;
+        Debug.Log("Highscore carregado: " + loaded.highScore + " | levelReached: " + loaded.levelReached);
+        // opcional: aplicar loaded.highScore ao UI
     }
 
     private void Update()
@@ -143,7 +150,32 @@ public class GameManager : MonoBehaviour
         waitingForVictory = true;
 
         StopSpawners();
+        // salvar progresso ao vencer
+        SaveData data = new SaveData();
+        data.highScore = Mathf.Max((int)score, SaveSystem.Load().highScore); // manter melhor pontuação
+        data.levelReached = SceneManager.GetActiveScene().buildIndex; // ou +1 se preferir
+        SaveSystem.Save(data);
+
+        Debug.Log("Progresso salvo!");
+        
         Debug.Log("Vitória iniciada. Esperando limpar a cena...");
+    }
+    
+    public void Debug_SaveNow()
+    {
+        SaveData d = new SaveData { highScore = (int)score, levelReached = SceneManager.GetActiveScene().buildIndex };
+        SaveSystem.Save(d);
+    }
+
+    public void Debug_LoadNow()
+    {
+        SaveData d = SaveSystem.Load();
+        Debug.Log("LoadNow -> highscore: " + d.highScore);
+    }
+
+    public void Debug_DeleteSave()
+    {
+        SaveSystem.DeleteSave();
     }
 
     void StopSpawners()
@@ -160,7 +192,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadNextScene()
     {
-        SceneManager.LoadScene(sceneBuildIndex:+1);
+        SceneManager.LoadScene("lvl_2");
     }
     
 }

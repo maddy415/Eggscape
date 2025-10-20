@@ -2916,6 +2916,7 @@ MonoBehaviour:
   victoryText: {fileID: 845076227}
   score: 0
   patternGen: {fileID: 788158579}
+  saveData: {fileID: 0}
   sceneTime: 0
   timeGoal: 20
   playerAlive: 1
