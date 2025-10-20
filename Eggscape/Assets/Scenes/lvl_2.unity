@@ -1248,15 +1248,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 288cd1861deb4fc469c31bc375bdff29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  difficultyTiers: []
+  levelData: {fileID: 11400000, guid: 637c26513b4424446b4170ffc91df55f, type: 2}
+  spawnPoint: {fileID: 892812691}
+  SpawnTrigger: {fileID: 1098348600}
+  nextPatternSpawn: {fileID: 1098348600}
+  canSpawn: 1
   patterns:
   - {fileID: 8232251528394940728, guid: 8d4fb7759a4441246afd9856ec651edd, type: 3}
   - {fileID: 7095210644065130435, guid: f4c57614a1b166c48933a7656e11b2c0, type: 3}
   - {fileID: 3158023259207425380, guid: 45b82005893282a4bbf5b7071dfa5030, type: 3}
   patternsList: []
-  spawnPoint: {fileID: 892812691}
-  SpawnTrigger: {fileID: 1098348600}
-  nextPatternSpawn: {fileID: 0}
-  canSpawn: 1
 --- !u!4 &788158580
 Transform:
   m_ObjectHideFlags: 0

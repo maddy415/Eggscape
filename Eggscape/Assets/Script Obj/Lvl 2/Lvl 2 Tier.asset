@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 170c11544466b394f86b787b23aa014a, type: 3}
-  m_Name: Hard Tier
+  m_Name: Lvl 2 Tier
   m_EditorClassIdentifier: 
   patterns:
   - {fileID: 8232251528394940728, guid: 1925cc9c65ac7a04fae5975881d4427f, type: 3}

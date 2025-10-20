@@ -21,5 +21,13 @@ public class MenuManager : MonoBehaviour
     public void LoadGame()
     {
         SceneManager.LoadScene("lvl_1");
+        Debug.Log("Lvl 1 Loaded");
+    }
+    
+    public void LoadGame2()
+    {
+        SceneManager.LoadScene("lvl_2");
+        Debug.Log("Lvl 2 Loaded");
+
     }
 }

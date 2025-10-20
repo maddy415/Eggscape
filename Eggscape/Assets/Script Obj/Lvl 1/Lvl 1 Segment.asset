@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 655b405f9576c2042bee80aaa4d06398, type: 3}
-  m_Name: Level Config
+  m_Script: {fileID: 11500000, guid: d7ff8917558e6fe46bde47a87147b904, type: 3}
+  m_Name: Lvl 1 Segment
   m_EditorClassIdentifier: 
-  segments:
-  - {fileID: 11400000, guid: 002723683d3bdd34dace350366e29b82, type: 2}
-  tiers:
-  - {fileID: 11400000, guid: 3f1cae883abb4624f9a1ddd78eda4268, type: 2}
+  patternsToSpawn: 3
+  patternTier: {fileID: 11400000, guid: 3f1cae883abb4624f9a1ddd78eda4268, type: 2}
