@@ -1,293 +1,493 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Centralized player controller responsible for locomotion, combat actions,
+/// and runtime state toggles consumed by higher-level managers.
+/// </summary>
+
+[DisallowMultipleComponent]
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class Player : MonoBehaviour
 {
-    
-    public Rigidbody2D rb;
-    public BoxCollider2D bc;
-    public SpriteRenderer sprite;
-    public Transform feetPos;
-    public LayerMask groundLayer;
-    public BoxCollider2D attackHB;
-    
-    
-    public float jumpForce = 10;
-    public float groundDistance = 0.25f;
-    public float moveSpeed;
-    public float impForce = 4f;
-    public float jumpTime = 0.5f;
-    private float jumpTimer = 0;
-    public float attackAirTime;
-    private float attackTimer;
-    public float attackCD;
-    public float defaultGS;
-    public float attackForce;
-    private float attackCDtimer;
-    
-    
-    private bool playerDead = false;
-    private bool isGrounded = false;
-    private bool isJumping = false;
-    public bool canMove = true;
-    private bool isAttacking = false;
-    private bool canAttack = true;
-    public GameObject explosion;
+    [Header("Component References")]
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private BoxCollider2D bc;
+    [SerializeField] private SpriteRenderer sprite;
+    [SerializeField] private Transform feetPos;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private BoxCollider2D attackHB;
+    [SerializeField] private GameObject explosion;
 
-    private void Start()
-    { 
-        sprite = transform.GetChild(0).GetComponent<SpriteRenderer>();
-        rb.gravityScale = defaultGS;
-        
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 8f;
+    [SerializeField] private float groundDistance = 0.25f;
+    [SerializeField] private float defaultGS = 3f;
+
+    [Header("Jump Settings")]
+    [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private float jumpTime = 0.5f;
+    [SerializeField] private float jumpBufferTime = 0.2f;
+
+    [Header("Attack Settings")]
+    [SerializeField] private float attackForce = 12f;
+    [SerializeField] private float attackAirTime = 0.3f;
+    [SerializeField] private float attackCD = 0.5f;
+
+    [Header("Knockback Settings")]
+    [SerializeField] private float kbForce = 6f;
+
+    [Header("Death Settings")]
+    [SerializeField] private float impForce = 4f;
+    [SerializeField] private float deathTorque = 40f;
+
+    private bool isGrounded;
+    private bool isJumping;
+    private bool isFalling;
+    private bool isAttacking;
+    private bool isDead;
+    private bool canAttack = true;
+    private bool isKnockbacking;
+
+    private float jumpTimer;
+    private float jumpBufferCounter;
+    private float attackTimer;
+    private float attackCooldownTimer;
+
+    private PlayerInputState inputState;
+    private bool canMove = true;
+
+    public bool CanMove => canMove;
+    public bool IsKnockbacking => isKnockbacking;
+
+    private void Reset()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        bc = GetComponent<BoxCollider2D>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
+        if (feetPos == null)
+        {
+            feetPos = transform;
+        }
     }
 
+    private void Awake()
+    {
+        CacheComponentReferences();
+    }
 
+    private void Start()
+    {
+        if (rb != null)
+        {
+            rb.gravityScale = defaultGS;
+        }
+
+        if (attackHB != null)
+        {
+            attackHB.enabled = false;
+        }
+    }
 
     private void Update()
     {
-
-        if (isAttacking && isKnockbacking==false) //Ataque
+        if (isDead)
         {
-            rb.linearVelocity = new Vector2(attackForce, 0);
-            
-            if (!isGrounded && Input.GetKeyDown(KeyCode.S))
-            {
-                CancelarAtaque();
-            }
+            return;
         }
-        
+
+        UpdateGroundState();
+        HandleVictorySequence();
+        CacheInputs();
+
         if (canMove)
         {
-            Move();
-            Jump();
-            Attack();
-
+            HandleHorizontalMovement();
+            HandleFastFall();
+            HandleJump();
+            HandleAttack();
         }
 
-        if (isGrounded && GameManager.Instance.victoryAchieved)
-        {
-            canMove = false;
-            transform.position += Vector3.right * Time.deltaTime * 15f;
-            GameManager.Instance.victoryText.text = "Passou de fase! Aperte \"Espaço\" para continuar";
-        }
-        
-        
-        
-        
+        HandleAttackMotion();
+        UpdateAttackState();
     }
-    
-    public float jumpBufferTime = 0.2f; // Tempo que o jogo "lembra" do pulo
-    private float jumpBufferCounter = 0f;
-    private void Jump()
+
+    private void CacheComponentReferences()
     {
-        //Debug.Log($"Buffer: {jumpBufferCounter}, isGrounded: {isGrounded}");
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody2D>();
+        }
+
+        if (bc == null)
+        {
+            bc = GetComponent<BoxCollider2D>();
+        }
+
+        if (sprite == null)
+        {
+            sprite = GetComponentInChildren<SpriteRenderer>();
+        }
+
+        if (feetPos == null)
+        {
+            feetPos = transform;
+        }
+
+        if (attackHB == null)
+        {
+            foreach (var collider in GetComponentsInChildren<BoxCollider2D>())
+            {
+                if (collider != bc)
+                {
+                    attackHB = collider;
+                    break;
+                }
+            }
+        }
+    }
+
+    private void CacheInputs()
+    {
+        inputState.Horizontal = canMove ? Input.GetAxisRaw("Horizontal") : 0f;
+        inputState.JumpPressed = Input.GetButtonDown("Jump");
+        inputState.JumpHeld = Input.GetButton("Jump");
+        inputState.JumpReleased = Input.GetButtonUp("Jump");
+        inputState.AttackPressed = Input.GetMouseButtonDown(0);
+        inputState.FastFallPressed = Input.GetKeyDown(KeyCode.S);
+    }
+
+    private void UpdateGroundState()
+    {
+        if (feetPos == null)
+        {
+            return;
+        }
 
         isGrounded = Physics2D.OverlapCircle(feetPos.position, groundDistance, groundLayer);
-        
-        if (Input.GetButtonDown("Jump")) //Lógica do timer do jump buffer
+        if (isGrounded)
         {
-            jumpBufferCounter = jumpBufferTime; 
-            /*No frame q apertar o pulo, o contador recebe o valor de buffertime
-            jumpBufferTime é o tempo que o jogo vai lembrar do input de pulo do jogador*/
-            
-            
-            
+            isFalling = false;
+        }
+    }
+
+    private void HandleVictorySequence()
+    {
+        if (!isGrounded)
+        {
+            return;
+        }
+
+        var manager = GameManager.Instance;
+        if (manager == null || !manager.victoryAchieved)
+        {
+            return;
+        }
+
+        SetMovementEnabled(false);
+        transform.position += Vector3.right * Time.deltaTime * 15f;
+        if (manager.victoryText != null)
+        {
+            manager.victoryText.text = "Passou de fase! Aperte \"Espaço\" para continuar";
+        }
+    }
+
+    private void HandleHorizontalMovement()
+    {
+        if (Mathf.Approximately(inputState.Horizontal, 0f))
+        {
+            return;
+        }
+
+        Vector3 displacement = new Vector3(inputState.Horizontal, 0f, 0f) * moveSpeed * Time.deltaTime;
+        transform.position += displacement;
+
+        if (sprite != null)
+        {
+            sprite.flipX = inputState.Horizontal < 0f;
+        }
+    }
+
+    private void HandleFastFall()
+    {
+        if (rb == null)
+        {
+            return;
+        }
+
+        if (inputState.FastFallPressed && !isGrounded)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, -20f);
+            isFalling = true;
+        }
+        else if (isGrounded && isFalling)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, 0f);
+            isFalling = false;
+        }
+    }
+
+    private void HandleJump()
+    {
+        if (inputState.JumpPressed)
+        {
+            jumpBufferCounter = jumpBufferTime;
         }
         else
         {
-            jumpBufferCounter -= Time.deltaTime; //Se o pulo n for pressionado no próx frame, ele inicia o contador
+            jumpBufferCounter -= Time.deltaTime;
         }
 
         if (isGrounded && jumpBufferCounter > 0f)
         {
-            isJumping = true;
-            rb.linearVelocity = Vector2.up * jumpForce;
-
-            
+            StartJump();
         }
 
-        if (isGrounded && Input.GetButtonDown("Jump"))
+        if (isGrounded && inputState.JumpPressed)
         {
-            AudioManager.audioInstance.JumpSFX();
+            AudioManager.audioInstance?.JumpSFX();
         }
 
-        if (isJumping && Input.GetButton("Jump"))
+        if (isJumping && inputState.JumpHeld)
         {
             if (jumpTimer < jumpTime)
             {
-                rb.linearVelocity = Vector2.up * jumpForce;
+                if (rb != null)
+                {
+                    rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                }
 
                 jumpTimer += Time.deltaTime;
             }
             else
             {
                 isJumping = false;
-                jumpTimer = 0;
-                
+                jumpTimer = 0f;
             }
-            
-            //Debug.Log($"isGrounded: {isGrounded}, isJumping: {isJumping}, jumpTimer: {jumpTimer}");
         }
-        if (Input.GetButtonUp("Jump"))
+
+        if (inputState.JumpReleased)
         {
             isJumping = false;
         }
     }
-    
-  
-    private bool isFalling = false;
-    private void Move()
+
+    private void StartJump()
     {
-        if (playerDead) return;
-        
-        float moveInput = Input.GetAxisRaw("Horizontal"); 
-        transform.position += new Vector3(moveInput, 0, 0) * moveSpeed * Time.deltaTime;
-
-        
-        if (moveInput > 0)
+        if (rb == null)
         {
-            sprite.flipX = false;
-
-        }
-        else if (moveInput < 0)
-        {
-            sprite.flipX = true;
+            return;
         }
 
-        if (Input.GetKeyDown(KeyCode.S) && isGrounded==false)
-        {
-            rb.linearVelocity = new Vector2(0f, -20f);
-            isFalling = true;
-
-        }
-        else if (isGrounded)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-            isFalling = false;
-        }
-        
-    }
-    
-    private void Death()
-    {
-        
-        GameObject explosionA = Instantiate(explosion, transform.position, Quaternion.identity);
-        AudioManager.audioInstance.ExplodeSFX();
-
-        Destroy(explosionA, 1.1f);
-        playerDead = true;
-        
-
-        canMove = false;
-
-
-        
-        rb.linearVelocity = new Vector2(-10f, 25f) * impForce * Time.deltaTime; 
-        bc.enabled = false;
-        //bc.isTrigger = true;
-        rb.freezeRotation = false;
-        rb.AddTorque(40f);
-        
-        
- 
-        
+        isJumping = true;
+        jumpTimer = 0f;
+        jumpBufferCounter = 0f;
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     }
 
-    void Attack()
+    private void HandleAttack()
     {
-        if (Input.GetMouseButtonDown(0) && canAttack)
+        if (!inputState.AttackPressed || !canAttack)
         {
-            canAttack = false;
+            return;
+        }
+
+        BeginAttack();
+    }
+
+    private void BeginAttack()
+    {
+        canAttack = false;
+        isAttacking = true;
+        isKnockbacking = false;
+        attackTimer = 0f;
+        attackCooldownTimer = 0f;
+
+        if (rb != null)
+        {
+            rb.gravityScale = 0f;
+        }
+
+        if (attackHB != null)
+        {
             attackHB.enabled = true;
-            
-            attackTimer = 0f;
-            isAttacking = true;
-            rb.gravityScale = 0;
-            //rb.linearVelocity = Vector2.right * 8f;
-            
-            
-            
-            /*Se deixar sem nenhum codigo pra mexer a galinha, vira basicamente uma feature nova q ela fica
-             descendo lento e pulando alto qnd ataca*/
+        }
+    }
+
+    private void HandleAttackMotion()
+    {
+        if (rb == null)
+        {
+            return;
         }
 
-        if (canAttack==false) //Cooldown do ataque
+        if (isAttacking && !isKnockbacking)
         {
-            attackCDtimer += Time.deltaTime;
-            
-            if (attackCDtimer >= attackCD)
+            rb.velocity = new Vector2(attackForce, 0f);
+
+            if (!isGrounded && inputState.FastFallPressed)
             {
-                canAttack = true; //Libera pra atacar novamente
-                attackCDtimer = 0f;
-                isKnockbacking = false;
-                
+                CancelAttack();
             }
-            
         }
+    }
 
-        if (isAttacking) //Lógica pra fazer o player cair de volta dps de X segundos no ar
+    private void UpdateAttackState()
+    {
+        float deltaTime = Time.deltaTime;
+
+        if (isAttacking)
         {
-            attackTimer += Time.deltaTime;
+            attackTimer += deltaTime;
             if (attackTimer >= attackAirTime)
             {
-                CancelarAtaque();
+                CancelAttack();
             }
-           
         }
-        
+
+        if (!canAttack)
+        {
+            attackCooldownTimer += deltaTime;
+            if (attackCooldownTimer >= attackCD)
+            {
+                canAttack = true;
+                attackCooldownTimer = 0f;
+                isKnockbacking = false;
+            }
+        }
     }
-    
-    void CancelarAtaque()
+
+    private void CancelAttack()
     {
-        Debug.Log("passou o tempo");
-        rb.gravityScale = defaultGS;
-        attackTimer = 0f;
+        if (rb != null)
+        {
+            rb.gravityScale = defaultGS;
+            if (!isKnockbacking)
+            {
+                rb.velocity = Vector2.zero;
+            }
+        }
+
         isAttacking = false;
+        attackTimer = 0f;
         jumpTimer = 0f;
 
-        if (isKnockbacking == false)
+        if (attackHB != null)
         {
-            rb.linearVelocity = Vector3.zero;
+            attackHB.enabled = false;
         }
-
-        attackHB.enabled = false;
     }
 
-
-    private void OnCollisionEnter2D(Collision2D other)
+    public void SetMovementEnabled(bool enabled)
     {
-        if (other.gameObject.CompareTag("Obstacle") && GameManager.Instance.isCheatOn==false)
+        if (isDead)
         {
-            //other.gameObject.GetComponent<BoxCollider2D>().enabled = false;
-            GameManager.Instance.playerAlive = false;
-            Debug.Log("morreu burro");
-            GameManager.Instance.StopScene();
-            Death();
+            canMove = false;
+            return;
         }
-        
-        
+
+        canMove = enabled;
+
+        if (!canMove && rb != null)
+        {
+            rb.velocity = new Vector2(0f, rb.velocity.y);
+        }
+    }
+
+    public void Knockback()
+    {
+        if (rb == null)
+        {
+            return;
+        }
+
+        isKnockbacking = true;
+        rb.velocity = new Vector2(-kbForce, rb.velocity.y);
+        canAttack = false;
+        attackCooldownTimer = 0f;
+        CancelAttack();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!collision.gameObject.CompareTag("Obstacle"))
+        {
+            return;
+        }
+
+        var manager = GameManager.Instance;
+        if (manager != null && manager.isCheatOn)
+        {
+            return;
+        }
+
+        if (manager != null)
+        {
+            manager.playerAlive = false;
+            manager.StopScene();
+        }
+
+        Die();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("JumpDetector"))
+        if (!other.gameObject.CompareTag("JumpDetector"))
         {
-            GameManager.Instance.score++;
+            return;
+        }
+
+        var manager = GameManager.Instance;
+        if (manager != null)
+        {
+            manager.score++;
         }
     }
 
-    public bool isKnockbacking = false;
-    public float kbForce;
-
-    public void Knockback()
+    private void Die()
     {
-        rb.linearVelocity = new Vector3(-kbForce, rb.linearVelocity.y, 0f);
-        Debug.Log("knockback");
-        isKnockbacking = true;
+        if (isDead)
+        {
+            return;
+        }
+
+        isDead = true;
+        SetMovementEnabled(false);
+        CancelAttack();
+        canAttack = false;
+
+        GameObject explosionInstance = null;
+        if (explosion != null)
+        {
+            explosionInstance = Instantiate(explosion, transform.position, Quaternion.identity);
+            AudioManager.audioInstance?.ExplodeSFX();
+        }
+
+        if (explosionInstance != null)
+        {
+            Destroy(explosionInstance, 1.1f);
+        }
+
+        if (bc != null)
+        {
+            bc.enabled = false;
+        }
+
+        if (rb != null)
+        {
+            rb.freezeRotation = false;
+            rb.velocity = new Vector2(-10f, 25f) * impForce * Time.deltaTime;
+            rb.AddTorque(deathTorque, ForceMode2D.Impulse);
+        }
     }
-    
+
+    private struct PlayerInputState
+    {
+        public float Horizontal;
+        public bool JumpPressed;
+        public bool JumpHeld;
+        public bool JumpReleased;
+        public bool AttackPressed;
+        public bool FastFallPressed;
+    }
 }
