@@ -34,13 +34,9 @@ public class TutorialManager : MonoBehaviour
 
     private void Update()
     {
-        if (onCutscene)
+        if (player != null)
         {
-            player.canMove = false;
-        }
-        else
-        {
-            player.canMove = true;
+            player.SetMovementEnabled(!onCutscene);
         }
         
         walkTimer += Time.deltaTime;
