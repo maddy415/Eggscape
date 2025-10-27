@@ -2038,6 +2038,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
+      propertyPath: torque
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
       propertyPath: walkTime
       value: 2.5
       objectReference: {fileID: 0}
@@ -2046,9 +2050,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6665745316554304104, guid: 40ca9d35ab54cd747a9e6553dcf44720, type: 3}
     - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
+      propertyPath: spinSpeed
+      value: 900
+      objectReference: {fileID: 0}
+    - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
       propertyPath: textCanvas
       value: 
       objectReference: {fileID: 521779967}
+    - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
+      propertyPath: impactForce
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 9116005471098941904, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
       propertyPath: m_Name
       value: Nerd egg
@@ -2678,7 +2690,7 @@ MonoBehaviour:
   textCanvas: {fileID: 521779967}
   dialogueText: {fileID: 521779969}
   walkTime: 2
-  spawnTime: 4
+  spawnTime: 2.5
 --- !u!4 &1839681820
 Transform:
   m_ObjectHideFlags: 0
@@ -3150,6 +3162,10 @@ PrefabInstance:
       propertyPath: attackForce
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: bodyCollider
+      value: 
+      objectReference: {fileID: 1209102115}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: attackAirTime
       value: 0.15

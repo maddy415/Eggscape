@@ -45,6 +45,12 @@ public class Player : MonoBehaviour
     [Header("Misc.")]
     [SerializeField] private float torqueForce;
 
+    // [NEW] Controle de giro do SPRITE ao morrer (sem mexer no corpo)
+    [Header("Death Spin (Sprite Only)")] 
+    [SerializeField, Tooltip("Velocidade de rotação do SPRITE após morrer (graus/seg).")]
+    private float deathSpinSpeed = 720f; // [NEW]
+    private bool spinOnDeathActive = false; // [NEW]
+    private float currentSpriteRotation = 0f; // [NEW]
 
     // Internal state values -------------------------------------------------
     private bool playerDead;
@@ -79,19 +85,13 @@ public class Player : MonoBehaviour
     private void CacheComponents()
     {
         if (!rb)
-        {
             rb = GetComponent<Rigidbody2D>();
-        }
 
         if (!bodyCollider)
-        {
             bodyCollider = GetComponent<BoxCollider2D>();
-        }
 
         if (!sprite)
-        {
             sprite = GetComponentInChildren<SpriteRenderer>();
-        }
 
         if (!attackHB)
         {
@@ -118,13 +118,17 @@ public class Player : MonoBehaviour
         }
 
         HandleVictorySequence();
+
+        // [NEW] Rotação apenas no SPRITE quando morto (não altera o corpo/colisor)
+        if (playerDead && spinOnDeathActive && sprite != null)
+        {
+            currentSpriteRotation += deathSpinSpeed * Time.deltaTime;
+            sprite.transform.localRotation = Quaternion.Euler(0f, 0f, currentSpriteRotation);
+        }
     }
 
     #region Jump Logic
 
-    /// <summary>
-    /// Centralizes the jump sequence: buffer, start, sustain and release.
-    /// </summary>
     private void HandleJump()
     {
         RefreshGroundedStatus();
@@ -146,9 +150,6 @@ public class Player : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(feetPos.position, groundDistance, groundLayer);
     }
 
-    /// <summary>
-    /// Stores the jump input for a short time so the player can buffer a jump.
-    /// </summary>
     private void UpdateJumpBuffer(bool jumpPressed)
     {
         if (jumpPressed)
@@ -166,9 +167,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Starts the jump when grounded while a buffered input is still active.
-    /// </summary>
     private void TryConsumeJumpBuffer()
     {
         if (!isGrounded || jumpBufferCounter <= 0f)
@@ -187,9 +185,6 @@ public class Player : MonoBehaviour
         rb.linearVelocity = Vector2.up * jumpForce;
     }
 
-    /// <summary>
-    /// Extends the jump height while the button is held and the timer allows it.
-    /// </summary>
     private void ApplySustainedJump(bool jumpHeld)
     {
         if (!isJumping || !jumpHeld)
@@ -398,6 +393,9 @@ public class Player : MonoBehaviour
         bodyCollider.enabled = false;
         rb.freezeRotation = false;
         rb.AddTorque(torqueForce);
+
+        // [NEW] ativa giro apenas no SPRITE (o corpo/colisor não rotaciona)
+        spinOnDeathActive = true;
     }
 
     #endregion
