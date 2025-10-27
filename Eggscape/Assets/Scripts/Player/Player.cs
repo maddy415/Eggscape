@@ -41,6 +41,10 @@ public class Player : MonoBehaviour
 
     [Header("State Flags")]
     [SerializeField] private bool canMove = true;
+    
+    [Header("Misc.")]
+    [SerializeField] private float torqueForce;
+
 
     // Internal state values -------------------------------------------------
     private bool playerDead;
@@ -393,7 +397,7 @@ public class Player : MonoBehaviour
         rb.linearVelocity = new Vector2(-10f, 25f) * impForce * Time.deltaTime;
         bodyCollider.enabled = false;
         rb.freezeRotation = false;
-        rb.AddTorque(40f);
+        rb.AddTorque(torqueForce);
     }
 
     #endregion
