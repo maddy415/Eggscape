@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Cheat desativado");
         }
 
-        if (victoryAchieved && player.canMove == false && Input.GetKeyDown(KeyCode.Space))
+        if (victoryAchieved && player.CanMove == false && Input.GetKeyDown(KeyCode.Space))
         {
             LoadNextScene();
         }
