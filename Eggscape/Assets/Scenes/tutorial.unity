@@ -1829,15 +1829,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 288cd1861deb4fc469c31bc375bdff29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  difficultyTiers: []
+  levelData: {fileID: 0}
+  spawnPoint: {fileID: 0}
+  SpawnTrigger: {fileID: 0}
+  nextPatternSpawn: {fileID: 0}
+  canSpawn: 1
   patterns:
   - {fileID: 8232251528394940728, guid: 8d4fb7759a4441246afd9856ec651edd, type: 3}
   - {fileID: 7095210644065130435, guid: f4c57614a1b166c48933a7656e11b2c0, type: 3}
   - {fileID: 3158023259207425380, guid: 45b82005893282a4bbf5b7071dfa5030, type: 3}
   patternsList: []
-  spawnPoint: {fileID: 0}
-  SpawnTrigger: {fileID: 0}
-  nextPatternSpawn: {fileID: 0}
-  canSpawn: 1
 --- !u!4 &1368137891
 Transform:
   m_ObjectHideFlags: 0
@@ -2531,6 +2533,7 @@ MonoBehaviour:
   victoryText: {fileID: 411556923}
   score: 0
   patternGen: {fileID: 1368137890}
+  saveData: {fileID: 0}
   sceneTime: 0
   timeGoal: 120
   playerAlive: 1
@@ -2672,9 +2675,10 @@ MonoBehaviour:
   nerdEgg: {fileID: 0}
   obsGen: {fileID: 0}
   objectGen: {fileID: 304386134}
-  walkTime: 2
   textCanvas: {fileID: 521779967}
   dialogueText: {fileID: 521779969}
+  walkTime: 2
+  spawnTime: 4
 --- !u!4 &1839681820
 Transform:
   m_ObjectHideFlags: 0
