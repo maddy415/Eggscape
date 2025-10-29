@@ -283,10 +283,13 @@ public class Player : MonoBehaviour
         UpdateAirAttackTimer();
     }
 
+    //public SpriteRenderer hbSprite;
     private void BeginAttack()
     {
         canAttack = false;
         attackHB.enabled = true;
+        //hbSprite.enabled = true;
+        
 
         attackTimer = 0f;
         isAttacking = true;
@@ -357,6 +360,7 @@ public class Player : MonoBehaviour
         }
 
         attackHB.enabled = false;
+        //hbSprite.enabled = false;
     }
 
     #endregion

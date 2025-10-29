@@ -8,6 +8,9 @@ public class LevelSegment : ScriptableObject
 {
     [Tooltip("Quantos patterns vão ser instanciados nesse segmento da fase.")]
     public int patternsToSpawn = 5;
+    
+    [Tooltip("Velocidade das patterns")]
+    public float  velocidade;
 
     [Tooltip("Tier de dificuldade que esse segmento vai usar.")]
     public PatternTier patternTier;

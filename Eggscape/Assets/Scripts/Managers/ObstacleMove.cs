@@ -3,10 +3,16 @@ using UnityEngine;
 
 public class ObstacleMove : MonoBehaviour
 {
-    public float speed = 5f;
+    public float speed;
     private Rigidbody2D playerRB;
+    public LevelSegment currentSegment;
 
-   
+
+    private void Start()
+    {
+        GetComponent<ObstacleMove>().speed = currentSegment.velocidade;
+    }
+
     void Update()
     {
         transform.Translate(Vector3.left * speed * Time.deltaTime, Space.World);

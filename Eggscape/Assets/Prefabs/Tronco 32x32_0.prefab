@@ -284,6 +284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 8
+  currentSegment: {fileID: 11400000, guid: 002723683d3bdd34dace350366e29b82, type: 2}
 --- !u!50 &-90832248200795915
 Rigidbody2D:
   serializedVersion: 5
