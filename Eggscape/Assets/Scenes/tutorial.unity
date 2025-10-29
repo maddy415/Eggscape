@@ -3664,7 +3664,7 @@ MonoBehaviour:
   nameFontSize: 26
   dialogueAlignment: 257
   walkTime: 2
-  spawnTime: 2.5
+  spawnTime: 3
   spawnIndex: 1
   typingSpeed: 0.03
   allowSkipTypingWithClick: 1
@@ -3674,8 +3674,8 @@ MonoBehaviour:
   - speaker: NerdEgg
     text: "Chicken, precisamos correr, as outras galinhas est\xE3o nos esperando!"
   - speaker: NerdEgg
-    text: "Primeiro, vou te ensinar a pular troncos. Tem um vindo a\xED, aperte 'Espa\xE7o'
-      para pular!"
+    text: "N\xE3o temos muito tempo! Apenas se lembre do que sempre nos diziam: Se
+      a vida ficar dif\xEDcil, apenas *PULEEEEEEE*"
 --- !u!4 &1839681820
 Transform:
   m_ObjectHideFlags: 0
