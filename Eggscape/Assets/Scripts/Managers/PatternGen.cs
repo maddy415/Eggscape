@@ -31,8 +31,12 @@ public class PatternGen : MonoBehaviour
     [Tooltip("Se estiver falso, impede o spawn de novos patterns.")]
     public bool canSpawn = true;
 
+    [Tooltip("Se verdadeiro, os patterns serão spawnados em ordem ao invés de aleatoriamente.")]
+    public bool spawnInOrder = false;
+
     private SpawnTriggerHandler handler; // Referência ao script do trigger
     private GameObject lastPattern;      // Último padrão instanciado, pra evitar repetição
+    private int orderedPatternIndex = 0; // Índice para controle da ordem
 
     [Header("Internos")]
     public GameObject[] patterns;                    // (LEGADO) array antigo de patterns
@@ -44,30 +48,24 @@ public class PatternGen : MonoBehaviour
 
     void Start()
     {
-        // Pega o handler do trigger
         handler = SpawnTrigger.GetComponent<SpawnTriggerHandler>();
-
-        // (LEGADO) encontra objeto com tag de próximo spawn
         nextPatternSpawn = GameObject.FindWithTag("SpawnNextTrigger");
 
-        // (LEGADO) adiciona os patterns antigos à lista
         foreach (GameObject pattern in patterns)
         {
             patternsList.Add(pattern);
         }
 
-        // Spawna o primeiro padrão ao iniciar
         SpawnPattern();
     }
 
     void Update()
     {
-        // Quando o trigger de colisão indicar que devemos spawnar o próximo
         if (handler.TriggeredSpawn)
         {
             Debug.Log("TriggeredSpawn detectado!");
             SpawnPattern();
-            handler.TriggeredSpawn = false; // reseta o gatilho
+            handler.TriggeredSpawn = false;
         }
     }
 
@@ -75,7 +73,8 @@ public class PatternGen : MonoBehaviour
     {
         Debug.Log("SpawnPattern() foi chamado");
 
-        if (!canSpawn) {
+        if (!canSpawn)
+        {
             Debug.Log("Spawn bloqueado!");
             return;
         }
@@ -84,17 +83,26 @@ public class PatternGen : MonoBehaviour
         {
             LevelSegment segment = levelData.segments[currentSegmentIndex];
 
-            // Novo jeito: usamos patternTier diretamente
             if (segment.patternTier != null && segment.patternTier.patterns.Count > 0)
             {
                 var tierList = segment.patternTier.patterns;
-
                 GameObject chosenPattern;
-                do
+
+                // Se spawnInOrder estiver ativo, seguimos a ordem da lista
+                if (spawnInOrder)
                 {
-                    chosenPattern = tierList[Random.Range(0, tierList.Count)];
+                    chosenPattern = tierList[orderedPatternIndex];
+                    orderedPatternIndex = (orderedPatternIndex + 1) % tierList.Count;
                 }
-                while (chosenPattern == lastPattern && tierList.Count > 1);
+                else
+                {
+                    // Modo aleatório padrão
+                    do
+                    {
+                        chosenPattern = tierList[Random.Range(0, tierList.Count)];
+                    }
+                    while (chosenPattern == lastPattern && tierList.Count > 1);
+                }
 
                 lastPattern = chosenPattern;
 
@@ -113,6 +121,7 @@ public class PatternGen : MonoBehaviour
                 {
                     currentSegmentIndex++;
                     patternsSpawnedInSegment = 0;
+                    orderedPatternIndex = 0; // reinicia a ordem a cada segmento
                 }
             }
             else
@@ -127,8 +136,6 @@ public class PatternGen : MonoBehaviour
         }
     }
 
-
-    // (LEGADO) método antigo, você pode usar se quiser delays antes de spawnar
     IEnumerator WaitToSpawn()
     {
         yield return new WaitForSeconds(2f);

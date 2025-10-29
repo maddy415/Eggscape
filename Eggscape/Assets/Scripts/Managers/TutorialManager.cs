@@ -33,7 +33,7 @@ public class TutorialManager : MonoBehaviour
     
     // ========== DIÁLOGOS ==========
     private string[] dialogues = {
-        "Chicken, sou o TutoriOvo e vou te ensinar como sobreviver a este mundo cruel.",
+        "Chicken, precisamos correr, as outras galinhas estão nos esperando!",
         "Primeiro, vou te ensinar a pular troncos. Tem um vindo aí, aperte 'Espaço' para pular!",
     };
 
