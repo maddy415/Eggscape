@@ -442,7 +442,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 102}
+  m_AnchoredPosition: {x: 0, y: 58}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &322908466
@@ -3895,7 +3895,7 @@ PrefabInstance:
       objectReference: {fileID: 726785169}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: impForce
-      value: 30
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: jumpTime
@@ -3903,7 +3903,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: defaultGS
-      value: 4.5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: explosion
@@ -3911,7 +3911,7 @@ PrefabInstance:
       objectReference: {fileID: 6665745316554304104, guid: 40ca9d35ab54cd747a9e6553dcf44720, type: 3}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: moveSpeed
-      value: 6
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: impulsePos
