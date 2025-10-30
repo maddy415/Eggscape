@@ -4,13 +4,20 @@ using UnityEngine;
 public class ObstacleMove : MonoBehaviour
 {
     public float speed;
-    private Rigidbody2D playerRB;
     public LevelSegment currentSegment;
-
 
     private void Start()
     {
-        GetComponent<ObstacleMove>().speed = currentSegment.velocidade;
+        /*if (currentSegment != null)
+        {
+            speed = currentSegment.velocidade;
+        }
+        else
+        {
+            Debug.LogError($"[ObstacleMove] currentSegment está NULL em '{name}'. " +
+                           $"Garanta que o spawner chame Init() antes do Start ou preencha no prefab.");
+            enabled = false; // opcional: desabilita pra evitar Update com speed 0
+        }*/
     }
 
     void Update()
@@ -26,18 +33,13 @@ public class ObstacleMove : MonoBehaviour
             ObstacleGen.logObstacle.Remove(gameObject);
             GameManager.Instance.objsOnScene.Remove(gameObject);
         }
-
-        /*if (other.gameObject.CompareTag("Attack"))
-        {
-            
-            Destroy(gameObject);
-            Debug.Log("tocou");
-            GameManager.Instance.objsOnScene.Remove(gameObject);
-            
-            
-            
-            
-        }*/
     }
-    
+
+    // >>> Forma correta de injetar o LevelSegment <<<
+    public void Init(LevelSegment seg)
+    {
+        currentSegment = seg;
+        speed = seg != null ? seg.velocidade : 0f;
+        if (!enabled) enabled = true;
+    }
 }

@@ -7,12 +7,13 @@ public class TutorialEgg : MonoBehaviour
     public float walkTime = 2f;          // Duração da caminhada antes da "voada"
     private float walkTimer;
     public bool isWalkingCutscene = true;
-    public TutorialManager tutorialManager;
 
     [Header("Componentes")]
     private SpriteRenderer sprite;
     private Rigidbody2D rb;
     private BoxCollider2D bodyCollider;
+    public TutorialManager tutorialManager;
+
 
     [Header("Explosão e física da voada")]
     public GameObject explosion;
@@ -63,6 +64,9 @@ public class TutorialEgg : MonoBehaviour
         if (other.gameObject.CompareTag("Obstacle"))
         {
             tutorialManager.CloseDialogueBox();
+            tutorialManager.ShowGeneralDialogue();
+            
+            StartCoroutine(tutorialManager.GeneralWalk());
             // Cria explosão
             GameObject explosionA = Instantiate(explosion, other.transform.position, other.transform.rotation);
             Destroy(explosionA, 2f);

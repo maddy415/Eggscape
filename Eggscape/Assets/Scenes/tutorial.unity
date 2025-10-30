@@ -1648,6 +1648,89 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosion: {fileID: 6665745316554304104, guid: 40ca9d35ab54cd747a9e6553dcf44720, type: 3}
+--- !u!1 &734380280 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6173180886403171675, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
+  m_PrefabInstance: {fileID: 5601547508024123873}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &734380282 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 310884287486008670, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
+  m_PrefabInstance: {fileID: 5601547508024123873}
+  m_PrefabAsset: {fileID: 0}
+--- !u!50 &734380283
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734380280}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 4
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
+--- !u!61 &734380284
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734380280}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.5, y: 0.46}
+    newSize: {x: 0.5, y: 0.46}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.5, y: 0.46}
+  m_EdgeRadius: 0
 --- !u!1 &777596017
 GameObject:
   m_ObjectHideFlags: 0
@@ -3132,6 +3215,10 @@ PrefabInstance:
       propertyPath: impactForce
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 6206063709283405773, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
+      propertyPath: tutorialManager
+      value: 
+      objectReference: {fileID: 1839681819}
     - target: {fileID: 9116005471098941904, guid: 1c05c22cbf9209c428ffaab26931eb27, type: 3}
       propertyPath: m_Name
       value: Nerd egg
@@ -3654,28 +3741,65 @@ MonoBehaviour:
   nerdEgg: {fileID: 1524477763}
   obsGen: {fileID: 304386137}
   objectGen: {fileID: 304386134}
+  generalRb: {fileID: 734380283}
+  general: {fileID: 734380280}
+  generalTransform: {fileID: 734380282}
   dialogueBox: {fileID: 1272814374}
   dialoguePanelImage: {fileID: 0}
   dialogueText: {fileID: 346386257}
   nameText: {fileID: 346386257}
+  speakerPortrait: {fileID: 1888281765}
+  speakerPortraitGroup: {fileID: 1888281767}
+  portraitFadeDuration: 0.15
+  portraitOffsetX: 380
+  speakerPortraits:
+  - speakerName: NerdEgg
+    portraitSprite: {fileID: -5409755506759027159, guid: 17c4947f3650a7e47827b88309a2df86, type: 3}
+    alignRight: 1
+  - speakerName: General
+    portraitSprite: {fileID: 4338715086640432656, guid: d2dfa0879021de249acc8a1a3b9e6ed9, type: 3}
+    alignRight: 0
+  speakerEmotions: []
   panelColor: {r: 0, g: 0, b: 0, a: 0.65}
   nameColor: {r: 1, g: 0.93, b: 0.35, a: 1}
   dialogueFontSize: 32
   nameFontSize: 26
   dialogueAlignment: 257
   walkTime: 2
-  spawnTime: 3
+  spawnTime: 2.5
   spawnIndex: 1
+  generalSpeed: 13
   typingSpeed: 0.03
   allowSkipTypingWithClick: 1
   typeBlip: {fileID: 0}
-  nonSkippableIndices: 01000000
+  nonSkippableIndices: 
   dialogues:
   - speaker: NerdEgg
     text: "Chicken, precisamos correr, as outras galinhas est\xE3o nos esperando!"
+    emotion: 
   - speaker: NerdEgg
     text: "N\xE3o temos muito tempo! Apenas se lembre do que sempre nos diziam: Se
       a vida ficar dif\xEDcil, apenas *PULEEEEEEE*"
+    emotion: 
+  generalDialogues:
+  - speaker: General
+    text: '"AVAAAAAAAAAANTE!!!'
+    emotion: 
+  - speaker: General
+    text: "\"A\xED est\xE1 nossa comandante! Quem era aquele novato querendo ensinar
+      galinha a bicar milho?\""
+    emotion: 
+  - speaker: General
+    text: "\"(Ser\xE1 que o novato t\xE1 bem?)\""
+    emotion: 
+  - speaker: General
+    text: "\"N\xE3o temos tempo pra isso, Chicken! Voc\xEA tem uma revolu\xE7\xE3o
+      pra liderar!"
+    emotion: 
+  - speaker: General
+    text: "\"Vamos, lidere nosso caminho para a liberdade! Tenho certeza de que n\xE3o
+      preciso te ensinar a pular uns tronquinhos, certo?\""
+    emotion: 
 --- !u!4 &1839681820
 Transform:
   m_ObjectHideFlags: 0
@@ -3869,8 +3993,9 @@ GameObject:
   - component: {fileID: 1888281764}
   - component: {fileID: 1888281766}
   - component: {fileID: 1888281765}
+  - component: {fileID: 1888281767}
   m_Layer: 5
-  m_Name: Image
+  m_Name: SpeakerPortrait
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3885,15 +4010,15 @@ RectTransform:
   m_GameObject: {fileID: 1888281763}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.07756, y: 5.969403, z: 1.9104}
+  m_LocalScale: {x: 0.97568446, y: 2.8034108, z: 0.89718115}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1272814375}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -795, y: 18}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 171, y: 0}
+  m_SizeDelta: {x: 256, y: 256}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1888281765
 MonoBehaviour:
@@ -3915,7 +4040,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5409755506759027159, guid: 17c4947f3650a7e47827b88309a2df86, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3933,6 +4058,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1888281763}
   m_CullTransparentMesh: 1
+--- !u!225 &1888281767
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1888281763}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1907704285
 GameObject:
   m_ObjectHideFlags: 0
@@ -4395,11 +4532,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 310884287486008670, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.89
+      value: 6.35
       objectReference: {fileID: 0}
     - target: {fileID: 310884287486008670, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.7
+      value: -1.42
       objectReference: {fileID: 0}
     - target: {fileID: 310884287486008670, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4435,12 +4572,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6173180886403171675, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
       propertyPath: m_Name
-      value: chicken 2_0 (1)
+      value: General
+      objectReference: {fileID: 0}
+    - target: {fileID: 6173180886403171675, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6173180886403171675, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 734380283}
+    - targetCorrespondingSourceObject: {fileID: 6173180886403171675, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 734380284}
   m_SourcePrefab: {fileID: 100100000, guid: 24e483ed6b2e53c46994f4aff1dfbdab, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
