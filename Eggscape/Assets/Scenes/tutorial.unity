@@ -3750,14 +3750,17 @@ MonoBehaviour:
   nameText: {fileID: 346386257}
   speakerPortrait: {fileID: 1888281765}
   speakerPortraitGroup: {fileID: 1888281767}
-  portraitFadeDuration: 0.15
+  portraitFadeDuration: 0
   portraitOffsetX: 380
   speakerPortraits:
   - speakerName: NerdEgg
     portraitSprite: {fileID: -5409755506759027159, guid: 17c4947f3650a7e47827b88309a2df86, type: 3}
-    alignRight: 1
+    alignRight: 0
   - speakerName: General
     portraitSprite: {fileID: 4338715086640432656, guid: d2dfa0879021de249acc8a1a3b9e6ed9, type: 3}
+    alignRight: 0
+  - speakerName: Chicken
+    portraitSprite: {fileID: 6222667781011105439, guid: 91742f60e2aa32144b93791907696204, type: 3}
     alignRight: 0
   speakerEmotions: []
   panelColor: {r: 0, g: 0, b: 0, a: 0.65}
@@ -3775,22 +3778,21 @@ MonoBehaviour:
   nonSkippableIndices: 
   dialogues:
   - speaker: NerdEgg
-    text: "Chicken, precisamos correr, as outras galinhas est\xE3o nos esperando!"
+    text: "\"Chicken, precisamos correr, as outras galinhas est\xE3o nos esperando!"
     emotion: 
   - speaker: NerdEgg
-    text: "N\xE3o temos muito tempo! Apenas se lembre do que sempre nos diziam: Se
-      a vida ficar dif\xEDcil, apenas *PULEEEEEEE*"
+    text: "\"N\xE3o temos muito tempo! Apenas se lembre do que sempre nos diziam:
+      Se a vida ficar dif\xEDcil, apenas *PULEEEEEEE*\""
     emotion: 
   generalDialogues:
   - speaker: General
     text: '"AVAAAAAAAAAANTE!!!'
     emotion: 
   - speaker: General
-    text: "\"A\xED est\xE1 nossa comandante! Quem era aquele novato querendo ensinar
-      galinha a bicar milho?\""
+    text: '"Tentente Clara se apresentando, Comandante!'
     emotion: 
-  - speaker: General
-    text: "\"(Ser\xE1 que o novato t\xE1 bem?)\""
+  - speaker: Chicken
+    text: '"Quem era aquele novato querendo ensinar galinha a bicar milho?"'
     emotion: 
   - speaker: General
     text: "\"N\xE3o temos tempo pra isso, Chicken! Voc\xEA tem uma revolu\xE7\xE3o
@@ -3799,6 +3801,9 @@ MonoBehaviour:
   - speaker: General
     text: "\"Vamos, lidere nosso caminho para a liberdade! Tenho certeza de que n\xE3o
       preciso te ensinar a pular uns tronquinhos, certo?\""
+    emotion: 
+  - speaker: Chicken
+    text: '"..."'
     emotion: 
 --- !u!4 &1839681820
 Transform:

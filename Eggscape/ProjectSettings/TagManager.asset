@@ -12,6 +12,7 @@ TagManager:
   - SpawnNextTrigger
   - TutorialEgg
   - JumpDetector
+  - CloudReset
   layers:
   - Default
   - TransparentFX

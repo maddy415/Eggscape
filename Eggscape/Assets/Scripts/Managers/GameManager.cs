@@ -194,5 +194,10 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene("lvl_2");
     }
+
+    public void UpdateScore()
+    {
+        score++;
+    }
     
 }

@@ -49,6 +49,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (4)
@@ -111,6 +115,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0
@@ -173,6 +181,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (8)
@@ -235,6 +247,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (3)
@@ -297,6 +313,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (5)
@@ -359,6 +379,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (2)
@@ -421,6 +445,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (7)
@@ -483,6 +511,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (6)
@@ -545,6 +577,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (9)
@@ -607,6 +643,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6233247937781335004}
     m_Modifications:
+    - target: {fileID: 3785684370203783768, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5312243115922915816, guid: 1fb122e209a408e4db5dadd9aaad7d9d, type: 3}
       propertyPath: m_Name
       value: fence_0 (1)

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7ff8917558e6fe46bde47a87147b904, type: 3}
   m_Name: Lvl 1 Segment
   m_EditorClassIdentifier: 
-  patternsToSpawn: 5
+  patternsToSpawn: 3
   velocidade: 9
   patternTier: {fileID: 11400000, guid: 3f1cae883abb4624f9a1ddd78eda4268, type: 2}

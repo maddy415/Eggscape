@@ -426,7 +426,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        GameManager.Instance.score++;
+        GameManager.Instance.UpdateScore();
     }
 
     #endregion

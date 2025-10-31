@@ -10,8 +10,9 @@ public class AttackCollisionHandler : MonoBehaviour
       {
 
          Destroy(other.gameObject);
-         
          GameManager.Instance.objsOnScene.Remove(other.gameObject);
+         GameManager.Instance.UpdateScore();
+
          
          GetComponentInParent<Player>().Knockback();
          AudioManager.audioInstance.LogSFX();
