@@ -53,7 +53,7 @@ public class CloudsManager : MonoBehaviour
         {
             if (c.transform != null)
             {
-                c.transform.Translate(Vector3.right * c.speed * Time.deltaTime, Space.World);
+                c.transform.Translate(Vector3.left * c.speed * Time.deltaTime, Space.World);
             }
         }
     }
