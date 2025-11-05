@@ -823,7 +823,7 @@ GameObject:
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 2974397684917235467, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -4041,7 +4041,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: -1241.7}
   m_LocalScale: {x: 3.554702, y: 3.6336956, z: 3.1597362}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1835830021}
   m_Father: {fileID: 1792852746}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4860,7 +4861,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9132518384313571126, guid: 191d792466c99ef4bbb772f4cbc62ee8, type: 3}
+  m_Sprite: {fileID: -1760585698218798725, guid: 016b58e51fc72294e9587e9c047400b5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4880,8 +4881,8 @@ Transform:
   m_GameObject: {fileID: 1763577831}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.31, y: 1.6800001, z: 0.3}
-  m_LocalScale: {x: 1.9594574, y: 1.5834, z: 1.5834}
+  m_LocalPosition: {x: 0.31, y: 2, z: 0.3}
+  m_LocalScale: {x: 1.789011, y: 1.789011, z: 1.789011}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -5148,7 +5149,7 @@ GameObject:
   - component: {fileID: 1792852744}
   - component: {fileID: 1792852743}
   m_Layer: 5
-  m_Name: BG Canvas
+  m_Name: Background Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5233,7 +5234,6 @@ RectTransform:
   - {fileID: 1498492280}
   - {fileID: 1218617712}
   - {fileID: 1785413892}
-  - {fileID: 1835830021}
   - {fileID: 326006300}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5506,18 +5506,18 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835830020}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1241.7}
-  m_LocalScale: {x: 6.4324884, y: 6.575433, z: 5.717769}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.8095717, y: 1.8095719, z: 1.8095719}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1031972871}
   - {fileID: 1815251807}
   - {fileID: 452493822}
-  m_Father: {fileID: 1792852746}
+  m_Father: {fileID: 1498492280}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3.9999592, y: 54.999996}
+  m_AnchoredPosition: {x: 198.50998, y: -81.24977}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &1854859179 stripped
