@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7ff8917558e6fe46bde47a87147b904, type: 3}
-  m_Name: Lvl 2 Segment
+  m_Name: Lvl 3 Segment
   m_EditorClassIdentifier: 
   patternsToSpawn: 5
-  velocidade: 9.5
-  patternTier: {fileID: 11400000, guid: 17ecbb3733e8e34428d029bbaaa2cd26, type: 2}
+  velocidade: 10
+  birdSpeed: 15
+  patternTier: {fileID: 11400000, guid: 3fafda23f6c26a14891dd6ba8d77e9f0, type: 2}

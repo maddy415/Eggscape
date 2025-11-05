@@ -1909,12 +1909,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   difficultyTiers: []
-  levelData: {fileID: 11400000, guid: 637c26513b4424446b4170ffc91df55f, type: 2}
+  levelData: {fileID: 11400000, guid: 0048946ea3526e840a3d0767b429b6a7, type: 2}
   spawnPoint: {fileID: 892812691}
   SpawnTrigger: {fileID: 1098348600}
   nextPatternSpawn: {fileID: 1098348600}
   canSpawn: 1
-  spawnInOrder: 0
+  spawnInOrder: 1
   propagateSegmentToChildren: 1
   activeSegment: {fileID: 11400000, guid: dbffda03c56aed942976b48dbbf229b9, type: 2}
   patterns:
@@ -2401,7 +2401,7 @@ MonoBehaviour:
   prefabChao: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
   genPos: {fileID: 881868769}
   larguraDoChao: 32
-  velocidade: 9.5
+  velocidade: 10
 --- !u!4 &881868769
 Transform:
   m_ObjectHideFlags: 0
@@ -4049,7 +4049,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -469, y: 350.2369}
+  m_AnchoredPosition: {x: -178, y: 350.2369}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1498492281
@@ -4783,7 +4783,7 @@ MonoBehaviour:
   patternGen: {fileID: 788158579}
   saveData: {fileID: 0}
   sceneTime: 0
-  timeGoal: 20
+  timeGoal: 30
   playerAlive: 1
   isCheatOn: 0
   victoryAchieved: 0

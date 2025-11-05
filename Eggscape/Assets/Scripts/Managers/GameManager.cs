@@ -98,6 +98,12 @@ public class GameManager : MonoBehaviour
         {
             LoadNextScene();
         }
+
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            LoadNextScene();
+        }
+        
     }
 
     public void StopScene()
@@ -192,7 +198,21 @@ public class GameManager : MonoBehaviour
 
     public void LoadNextScene()
     {
-        SceneManager.LoadScene("lvl_2");
+        // Pega o índice da cena atual
+        int currentIndex = SceneManager.GetActiveScene().buildIndex;
+
+        // Calcula o índice da próxima cena
+        int nextIndex = currentIndex + 1;
+
+        // Se ainda houver próxima cena na lista, carrega
+        if (nextIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(nextIndex);
+        }
+        else
+        {
+            Debug.LogWarning("Não há próxima cena configurada no Build Settings!");
+        }
     }
 
     public void UpdateScore()

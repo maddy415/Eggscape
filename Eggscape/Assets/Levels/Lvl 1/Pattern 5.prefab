@@ -226,6 +226,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (12)
@@ -288,6 +292,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (8)
@@ -350,6 +358,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (9)
@@ -412,6 +424,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (11)
@@ -474,6 +490,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (5)
@@ -536,6 +556,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (6)
@@ -598,6 +622,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (10)
@@ -662,7 +690,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: speed
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
@@ -726,6 +754,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1608420909277122594}
     m_Modifications:
+    - target: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
       propertyPath: m_Name
       value: Tronco 32x32_0 (7)

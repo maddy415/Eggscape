@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 7674506689570532980}
   - component: {fileID: 7099892128402292969}
   - component: {fileID: 4718347264925495235}
-  - component: {fileID: 8149753692194287247}
   - component: {fileID: -1002321314078507476}
+  - component: {fileID: 1201743935625138212}
   m_Layer: 8
   m_Name: Bird
   m_TagString: Obstacle
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: -5764533403837374442, guid: 0e0a268d7026c09479aa80e2e7bab9f1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -159,19 +159,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.25964308, y: 0.1837367}
   m_EdgeRadius: 0
---- !u!114 &8149753692194287247
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 996071509807926308}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb0a43bd92878d8438658ceff4c065e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 14
 --- !u!50 &-1002321314078507476
 Rigidbody2D:
   serializedVersion: 5
@@ -199,3 +186,16 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1201743935625138212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 996071509807926308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02db4487abd7c7d4f8c52d616809d8bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentSegment: {fileID: 0}

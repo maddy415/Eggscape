@@ -1915,6 +1915,8 @@ MonoBehaviour:
   nextPatternSpawn: {fileID: 1098348600}
   canSpawn: 1
   spawnInOrder: 1
+  propagateSegmentToChildren: 1
+  activeSegment: {fileID: 11400000, guid: dbffda03c56aed942976b48dbbf229b9, type: 2}
   patterns:
   - {fileID: 8232251528394940728, guid: 20ebb0233b0a05c4dbb93520eb6b072e, type: 3}
   - {fileID: 8232251528394940728, guid: 1925cc9c65ac7a04fae5975881d4427f, type: 3}
@@ -2399,7 +2401,7 @@ MonoBehaviour:
   prefabChao: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
   genPos: {fileID: 881868769}
   larguraDoChao: 32
-  velocidade: 9
+  velocidade: 9.5
 --- !u!4 &881868769
 Transform:
   m_ObjectHideFlags: 0
@@ -2442,7 +2444,7 @@ Transform:
   m_GameObject: {fileID: 892812691}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.14, y: 1.66, z: 3.553988}
+  m_LocalPosition: {x: -2.87, y: 1.66, z: 3.553988}
   m_LocalScale: {x: 4.3411, y: 4.3411, z: 4.3411}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3595,7 +3597,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1225567997}
   m_Layer: 0
-  m_Name: Spawners & Gens
+  m_Name: Ground & Fence
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4781,7 +4783,7 @@ MonoBehaviour:
   patternGen: {fileID: 788158579}
   saveData: {fileID: 0}
   sceneTime: 0
-  timeGoal: 20
+  timeGoal: 40
   playerAlive: 1
   isCheatOn: 0
   victoryAchieved: 0

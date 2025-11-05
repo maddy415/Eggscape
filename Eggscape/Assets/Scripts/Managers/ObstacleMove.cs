@@ -1,27 +1,16 @@
-using System;
 using UnityEngine;
 
 public class ObstacleMove : MonoBehaviour
 {
+    [Header("Velocidade aplicada em runtime")]
     public float speed;
-    public LevelSegment currentSegment;
 
-    private void Start()
-    {
-        /*if (currentSegment != null)
-        {
-            speed = currentSegment.velocidade;
-        }
-        else
-        {
-            Debug.LogError($"[ObstacleMove] currentSegment está NULL em '{name}'. " +
-                           $"Garanta que o spawner chame Init() antes do Start ou preencha no prefab.");
-            enabled = false; // opcional: desabilita pra evitar Update com speed 0
-        }*/
-    }
+    // Opcional: apenas para debug no Inspetor (não arraste nada aqui!)
+    [HideInInspector] public LevelSegment currentSegment;
 
     void Update()
     {
+        // Move globalmente para a esquerda
         transform.Translate(Vector3.left * speed * Time.deltaTime, Space.World);
     }
 
@@ -29,17 +18,28 @@ public class ObstacleMove : MonoBehaviour
     {
         if (other.CompareTag("Destroyer"))
         {
-            Destroy(gameObject);
+            // Remove antes de destruir (mantém tua lógica existente)
             ObstacleGen.logObstacle.Remove(gameObject);
             GameManager.Instance.objsOnScene.Remove(gameObject);
+            Destroy(gameObject);
         }
     }
 
-    // >>> Forma correta de injetar o LevelSegment <<<
+    /// <summary>
+    /// Recebe o LevelSegment atual e aplica sua velocidade.
+    /// Deve ser chamado pelo spawner imediatamente após Instantiate.
+    /// </summary>
     public void Init(LevelSegment seg)
     {
         currentSegment = seg;
-        speed = seg != null ? seg.velocidade : 0f;
-        if (!enabled) enabled = true;
+        if (seg != null)
+        {
+            speed = seg.velocidade;
+        }
+        else
+        {
+            speed = 0f;
+            Debug.LogWarning($"[ObstacleMove] Nenhum LevelSegment passado para '{name}'. Velocidade = 0.");
+        }
     }
 }

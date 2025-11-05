@@ -4,8 +4,8 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 /// <summary>
-/// Script que instancia padrões (chunks) com base em um sistema de dificuldade dividido em fases.
-/// Agora adaptado para funcionar com tiers + controle por LevelData.
+/// Instancia padrões (chunks) com base em segments do LevelData.
+/// O LevelSegment ativo fica SOMENTE aqui e é injetado nos ObstacleMove dos chunks ao spawnar.
 /// </summary>
 public class PatternGen : MonoBehaviour
 {
@@ -24,44 +24,52 @@ public class PatternGen : MonoBehaviour
     [Tooltip("Objeto com o script SpawnTriggerHandler, que detecta quando spawnar o próximo padrão.")]
     public GameObject SpawnTrigger;
 
-    [Tooltip("Tag usada pra localizar o trigger de spawn (não obrigatório, mas mantido por compatibilidade).")]
+    [Tooltip("Objeto com a tag 'SpawnNextTrigger' (compatibilidade).")]
     public GameObject nextPatternSpawn;
 
     [Header("Controle de spawn")]
-    [Tooltip("Se estiver falso, impede o spawn de novos patterns.")]
+    [Tooltip("Se falso, impede o spawn de novos patterns.")]
     public bool canSpawn = true;
 
     [Tooltip("Se verdadeiro, os patterns serão spawnados em ordem ao invés de aleatoriamente.")]
     public bool spawnInOrder = false;
 
-    private SpawnTriggerHandler handler; // Referência ao script do trigger
-    private GameObject lastPattern;      // Último padrão instanciado, pra evitar repetição
-    private int orderedPatternIndex = 0; // Índice para controle da ordem
+    [Header("Injeção de Segmento")]
+    [Tooltip("Aplica o LevelSegment atual a todos os ObstacleMove do pattern instanciado.")]
+    public bool propagateSegmentToChildren = true;
 
-    [Header("Internos")]
-    public GameObject[] patterns;                    // (LEGADO) array antigo de patterns
-    public List<GameObject> patternsList = new();    // (LEGADO) lista com os patterns originais
+    [Header("Debug")]
+    [Tooltip("Segmento atualmente ativo (apenas leitura).")]
+    public LevelSegment activeSegment; // só pra visualizar no Inspector
 
-    // Controle de progressão do level
-    private int currentSegmentIndex = 0;             // Em qual segmento (fase) estamos
-    private int patternsSpawnedInSegment = 0;        // Quantos padrões já foram spawnados nesse segmento
+    // Internos
+    private SpawnTriggerHandler handler;
+    private GameObject lastPattern;
+    private int orderedPatternIndex = 0;
+
+    [Header("Legado (se ainda usa)")]
+    public GameObject[] patterns;
+    public List<GameObject> patternsList = new();
+
+    // Progresso por segmento
+    private int currentSegmentIndex = 0;
+    private int patternsSpawnedInSegment = 0;
 
     void Start()
     {
         handler = SpawnTrigger.GetComponent<SpawnTriggerHandler>();
         nextPatternSpawn = GameObject.FindWithTag("SpawnNextTrigger");
 
+        // Suporte à lista legada
         foreach (GameObject pattern in patterns)
-        {
             patternsList.Add(pattern);
-        }
 
         SpawnPattern();
     }
 
     void Update()
     {
-        if (handler.TriggeredSpawn)
+        if (handler != null && handler.TriggeredSpawn)
         {
             Debug.Log("TriggeredSpawn detectado!");
             SpawnPattern();
@@ -71,74 +79,110 @@ public class PatternGen : MonoBehaviour
 
     void SpawnPattern()
     {
-        Debug.Log("SpawnPattern() foi chamado");
-
         if (!canSpawn)
         {
             Debug.Log("Spawn bloqueado!");
             return;
         }
 
-        if (currentSegmentIndex < levelData.segments.Count)
+        if (levelData == null || levelData.segments == null || levelData.segments.Count == 0)
         {
-            LevelSegment segment = levelData.segments[currentSegmentIndex];
-
-            if (segment.patternTier != null && segment.patternTier.patterns.Count > 0)
-            {
-                var tierList = segment.patternTier.patterns;
-                GameObject chosenPattern;
-
-                // Se spawnInOrder estiver ativo, seguimos a ordem da lista
-                if (spawnInOrder)
-                {
-                    chosenPattern = tierList[orderedPatternIndex];
-                    orderedPatternIndex = (orderedPatternIndex + 1) % tierList.Count;
-                }
-                else
-                {
-                    // Modo aleatório padrão
-                    do
-                    {
-                        chosenPattern = tierList[Random.Range(0, tierList.Count)];
-                    }
-                    while (chosenPattern == lastPattern && tierList.Count > 1);
-                }
-
-                lastPattern = chosenPattern;
-
-                GameObject patternClone = Instantiate(chosenPattern, spawnPoint.transform.position, Quaternion.identity);
-
-                foreach (Transform child in patternClone.transform)
-                {
-                    GameManager.Instance.objsOnScene.Add(child.gameObject);
-                }
-
-                Debug.Log($"Spawned pattern: {chosenPattern.name} | Tier: {segment.patternTier.name}");
-
-                patternsSpawnedInSegment++;
-
-                if (patternsSpawnedInSegment >= segment.patternsToSpawn)
-                {
-                    currentSegmentIndex++;
-                    patternsSpawnedInSegment = 0;
-                    orderedPatternIndex = 0; // reinicia a ordem a cada segmento
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"O PatternTier de {segment.name} está nulo ou vazio!");
-            }
+            Debug.LogWarning("[PatternGen] LevelData ou seus segments estão nulos/vazios.");
+            canSpawn = false;
+            return;
         }
-        else
+
+        if (currentSegmentIndex >= levelData.segments.Count)
         {
             Debug.Log("Fase finalizada! Nenhum padrão novo será gerado.");
             canSpawn = false;
+            return;
         }
+
+        // Define o segmento ativo (só no spawner)
+        activeSegment = levelData.segments[currentSegmentIndex];
+
+        if (activeSegment == null)
+        {
+            Debug.LogWarning($"[PatternGen] Segmento {currentSegmentIndex} é nulo.");
+            AvancaSegmento();
+            return;
+        }
+
+        if (activeSegment.patternTier == null || activeSegment.patternTier.patterns == null || activeSegment.patternTier.patterns.Count == 0)
+        {
+            Debug.LogWarning($"[PatternGen] PatternTier do segmento '{activeSegment.name}' está nulo ou sem patterns.");
+            AvancaSegmento();
+            return;
+        }
+
+        var tierList = activeSegment.patternTier.patterns;
+        GameObject chosenPattern;
+
+        // Seleção ordenada ou aleatória (evitando repetição)
+        if (spawnInOrder)
+        {
+            chosenPattern = tierList[orderedPatternIndex];
+            orderedPatternIndex = (orderedPatternIndex + 1) % tierList.Count;
+        }
+        else
+        {
+            do
+            {
+                chosenPattern = tierList[Random.Range(0, tierList.Count)];
+            }
+            while (chosenPattern == lastPattern && tierList.Count > 1);
+        }
+
+        lastPattern = chosenPattern;
+
+        // Instancia o chunk/pattern
+        GameObject patternClone = Instantiate(chosenPattern, spawnPoint.transform.position, Quaternion.identity);
+
+        // Injeção do LevelSegment nos ObstacleMove
+        if (propagateSegmentToChildren)
+            InjectSegmentIntoChildren(patternClone, activeSegment);
+
+        // Registra no GameManager (mantém tua lógica existente)
+        foreach (Transform child in patternClone.transform)
+            GameManager.Instance.objsOnScene.Add(child.gameObject);
+
+        Debug.Log($"[PatternGen] Spawned pattern: {chosenPattern.name} | Tier: {activeSegment.patternTier.name} | Vel: {activeSegment.velocidade}");
+
+        // Contabiliza e verifica avanço de segmento
+        patternsSpawnedInSegment++;
+        if (patternsSpawnedInSegment >= activeSegment.patternsToSpawn)
+            AvancaSegmento();
     }
 
     IEnumerator WaitToSpawn()
     {
         yield return new WaitForSeconds(2f);
         SpawnPattern();
+    }
+
+    /// <summary>
+    /// Aplica o LevelSegment a todos os ObstacleMove do objeto root.
+    /// </summary>
+    private void InjectSegmentIntoChildren(GameObject root, LevelSegment seg)
+    {
+        // Obstáculos
+        foreach (var m in root.GetComponentsInChildren<ObstacleMove>(true))
+            m.Init(seg);
+
+        // Pássaros
+        foreach (var bird in root.GetComponentsInChildren<BirdMove>(true))
+            bird.Init(seg);
+    }
+
+
+    /// <summary>
+    /// Avança para o próximo segmento e reseta contadores necessários.
+    /// </summary>
+    private void AvancaSegmento()
+    {
+        currentSegmentIndex++;
+        patternsSpawnedInSegment = 0;
+        orderedPatternIndex = 0;
     }
 }

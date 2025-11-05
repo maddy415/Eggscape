@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Lvl 2 Tier
   m_EditorClassIdentifier: 
   patterns:
-  - {fileID: 8232251528394940728, guid: 1925cc9c65ac7a04fae5975881d4427f, type: 3}
-  - {fileID: 8232251528394940728, guid: 20ebb0233b0a05c4dbb93520eb6b072e, type: 3}
-  - {fileID: 8232251528394940728, guid: 53128f1a315cf8944be20f43787cb7cc, type: 3}
+  - {fileID: 8232251528394940728, guid: 399ba2597e3df00429eaed099f2e3663, type: 3}
+  - {fileID: 8232251528394940728, guid: 3a36732cb8a2dba4d9d5c8fa506aa7d5, type: 3}
+  - {fileID: 8232251528394940728, guid: a17281124b1e64a4e843a6e55142ce82, type: 3}
+  - {fileID: 8232251528394940728, guid: ef07fc972504a14469fd5348cccc702f, type: 3}
