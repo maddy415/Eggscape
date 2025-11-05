@@ -6919,7 +6919,7 @@ MonoBehaviour:
   jumpPromptFade: 0.2
   jumpPromptMessage: "APERTE ESPA\xC7O"
   jumpKeyword: '*PULEEEEEEE*'
-  jumpPromptDelay: 2.4
+  jumpPromptDelay: 2.6
   dialogues:
   - speaker: NerdEgg
     text: "\"Chicken, precisamos correr, as outras galinhas est\xE3o nos esperando!"
@@ -7807,7 +7807,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -78, y: 0}
+  m_AnchoredPosition: {x: -208, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2121000917
@@ -7839,7 +7839,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4279836135
   m_fontColor: {r: 0.9056604, g: 0.11406773, b: 0.09825563, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -7895,7 +7895,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -22.673553, y: 0, z: -83.65, w: 0}
+  m_margin: {x: -22.673553, y: 0, z: -109.04777, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
