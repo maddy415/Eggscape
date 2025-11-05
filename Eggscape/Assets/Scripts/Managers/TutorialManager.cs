@@ -99,6 +99,24 @@ public class TutorialManager : MonoBehaviour
     private bool isTyping = false;
     private bool skipTyping = false;
 
+    // ========== UI DE PROMPT DE AÇÃO ==========
+    [Header("Prompt de Ação (ex.: APERTE ESPAÇO)")]
+    [Tooltip("Objeto de UI (no Canvas) que contém o texto grande do prompt. Pode ser um painel com TMP grande.")]
+    public CanvasGroup jumpPromptGroup;     // use um CanvasGroup no objeto do prompt
+    public TextMeshProUGUI jumpPromptText;  // o TMP grandão do “APERTE ESPAÇO”
+    [Tooltip("Quanto tempo o prompt permanece na tela antes de ocultar.")]
+    public float jumpPromptDuration = 2.0f;
+    [Tooltip("Duração do fade-in/out do prompt.")]
+    public float jumpPromptFade = 0.2f;
+    [Tooltip("Texto exibido quando é hora de pular.")]
+    public string jumpPromptMessage = "APERTE ESPAÇO";
+    [Tooltip("Palavra-chave que, quando aparecer no diálogo, dispara o prompt.")]
+    public string jumpKeyword = "PULEEEE";
+    [Tooltip("Tempo (em segundos) de atraso antes do prompt aparecer.")]
+    public float jumpPromptDelay = 0.5f;
+
+    private Coroutine jumpPromptRoutine;
+
     // ========== DIÁLOGOS ==========
     [System.Serializable]
     public struct DialogueLine
@@ -136,11 +154,17 @@ public class TutorialManager : MonoBehaviour
 
         if (dialogueBox != null) dialogueBox.SetActive(false);
         ApplyStyleOnce();
-
         BuildPortraitMaps();
 
         // começa usando as falas do tutorial
         activeDialogues = dialogues;
+
+        // deixa o prompt oculto no início
+        if (jumpPromptGroup != null)
+        {
+            jumpPromptGroup.alpha = 0f;
+            jumpPromptGroup.gameObject.SetActive(false);
+        }
     }
 
     private void BuildPortraitMaps()
@@ -254,6 +278,9 @@ public class TutorialManager : MonoBehaviour
         // Texto com máquina de escrever
         dialogueText.text = "";
         typingCoroutine = StartCoroutine(TypeText(activeDialogues[index].text));
+
+        // >>> PROMPT "APERTE ESPAÇO" se for a fala do PULEEEE
+        TryShowJumpPromptIfNeeded(activeDialogues[index]);
     }
 
     // --------- Retrato com alinhamento + fade ----------
@@ -289,11 +316,13 @@ public class TutorialManager : MonoBehaviour
             return;
         }
 
-        // Calcula posição horizontal
-        /*RectTransform rt = speakerPortrait.rectTransform;
+        // Se quiser reposicionar pelo lado, basta reativar o bloco abaixo
+        /*
+        RectTransform rt = speakerPortrait.rectTransform;
         Vector2 p = rt.anchoredPosition;
         p.x = (alignRight ? Mathf.Abs(portraitOffsetX) : -Mathf.Abs(portraitOffsetX));
-        rt.anchoredPosition = p;*/
+        rt.anchoredPosition = p;
+        */
 
         // troca com fade
         if (portraitFadeCoroutine != null) StopCoroutine(portraitFadeCoroutine);
@@ -454,5 +483,70 @@ public class TutorialManager : MonoBehaviour
         currentIndex = 0;
         OpenDialogueBox();
         ShowDialogue(currentIndex);
+    }
+
+    // ======= PROMPT "APERTE ESPAÇO" =======
+
+    private void TryShowJumpPromptIfNeeded(DialogueLine line)
+    {
+        // Só mostra se for o NerdEgg falando e a fala contiver a palavra-chave (case-insensitive)
+        if (line.speaker != null && line.text != null &&
+            line.speaker.Trim().Equals("NerdEgg", System.StringComparison.OrdinalIgnoreCase) &&
+            line.text.ToUpperInvariant().Contains(jumpKeyword.ToUpperInvariant()))
+        {
+            ShowJumpPrompt(jumpPromptMessage, jumpPromptDuration);
+        }
+    }
+
+    public void ShowJumpPrompt(string message, float duration)
+    {
+        if (jumpPromptGroup == null || jumpPromptText == null)
+            return;
+
+        jumpPromptText.text = string.IsNullOrWhiteSpace(message) ? jumpPromptMessage : message;
+
+        // Se já tiver um prompt rolando, reinicia
+        if (jumpPromptRoutine != null) StopCoroutine(jumpPromptRoutine);
+        jumpPromptRoutine = StartCoroutine(JumpPromptRoutine(duration));
+    }
+
+    private IEnumerator JumpPromptRoutine(float duration)
+    {
+        // ⏳ Aguarda o delay configurável antes de mostrar
+        if (jumpPromptDelay > 0f)
+            yield return new WaitForSeconds(jumpPromptDelay);
+
+        // Ativa e faz fade-in
+        jumpPromptGroup.gameObject.SetActive(true);
+        yield return FadeCanvasGroup(jumpPromptGroup, 0f, 1f, jumpPromptFade);
+
+        // Mantém na tela por 'duration'
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        // Fade-out e desativa
+        yield return FadeCanvasGroup(jumpPromptGroup, 1f, 0f, jumpPromptFade);
+        jumpPromptGroup.gameObject.SetActive(false);
+        jumpPromptRoutine = null;
+    }
+
+
+    private IEnumerator FadeCanvasGroup(CanvasGroup cg, float from, float to, float time)
+    {
+        if (cg == null) yield break;
+        float d = Mathf.Max(0.0001f, time);
+        float t = 0f;
+        cg.alpha = from;
+        while (t < d)
+        {
+            t += Time.unscaledDeltaTime;
+            cg.alpha = Mathf.Lerp(from, to, t / d);
+            yield return null;
+        }
+        cg.alpha = to;
     }
 }
