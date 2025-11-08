@@ -421,12 +421,13 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        
         if (!other.gameObject.CompareTag("JumpDetector"))
         {
             return;
         }
 
-        GameManager.Instance.UpdateScore();
+        GameManager.Instance.UpdateScore(1);
     }
 
     #endregion

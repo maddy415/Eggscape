@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     
     public GameObject vicCanvas;
+    public FrogIdleJumper frogJumper;
+    public GameObject barn;
+    public GameObject frog;
     public GameObject spawnerLog; 
     public GameObject spawnerBird; 
     public GameObject ground;
@@ -32,6 +35,14 @@ public class GameManager : MonoBehaviour
     
     public bool victoryAchieved = false;
 
+    // ========= DEBUG DE VITÓRIA (NOVO) =========
+    [Header("Debug de Vitória")]
+    public bool debugVictoryHUD = false;                  // F3 liga/desliga
+    public TextMeshProUGUI debugVictoryText;              // opcional: arrasta um TMP aqui
+    [Range(0.1f, 2f)] public float debugRefresh = 0.25f;  // freq de atualização da HUD
+    private float debugTimer;
+    private string debugCache = "";                       // buffer do texto da HUD
+    public int debugListMax = 6;                          // quantos objs listar
 
     void Awake()
     {
@@ -47,19 +58,18 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        frogJumper = frog.GetComponent<FrogIdleJumper>();
+        
         groundRef.SetActive(false);
         victoryText.text = "";
         
         // carregar save ao iniciar
         SaveData loaded = SaveSystem.Load();
-        //scoreText.text = "Highscore: " + data.highScore;
         Debug.Log("Highscore carregado: " + loaded.highScore + " | levelReached: " + loaded.levelReached);
-        // opcional: aplicar loaded.highScore ao UI
     }
 
     private void Update()
     {
-        
         //score += Time.deltaTime;
         scoreText.text = "Score: "+Convert.ToInt32(score);
         
@@ -74,8 +84,6 @@ public class GameManager : MonoBehaviour
             waitingForVictory = false;
             victoryAchieved = true;
         }
-        
-        
         
         ResetScene();
         
@@ -103,7 +111,21 @@ public class GameManager : MonoBehaviour
         {
             LoadNextScene();
         }
-        
+
+        // ===== DEBUG: toggles (NOVO) =====
+        if (Input.GetKeyDown(KeyCode.F3)) debugVictoryHUD = !debugVictoryHUD;
+        if (Input.GetKeyDown(KeyCode.F4)) DumpVictoryDebugToConsole();
+
+        // ===== DEBUG: atualiza HUD com frequência leve (NOVO) =====
+        if (debugVictoryHUD)
+        {
+            debugTimer -= Time.deltaTime;
+            if (debugTimer <= 0f)
+            {
+                UpdateVictoryDebug();
+                debugTimer = debugRefresh;
+            }
+        }
     }
 
     public void StopScene()
@@ -117,17 +139,20 @@ public class GameManager : MonoBehaviour
             
             ground.GetComponent<GroundGen>().enabled = false;
             fence.GetComponent<GroundGen>().enabled = false;
+            barn.GetComponent<ObstacleMove>().enabled = false;
 
             foreach (GameObject obj in GameManager.Instance.objsOnScene)
             {
+                if (obj.layer == 9)
+                {
+                    frogJumper.speed = 0;
+
+                }
                 if (obj.layer != 8)
                 {
                     obj.GetComponent<ObstacleMove>().enabled = false; //Isso potencialmente ta mal otimizado pra caralho
                 }
             }
-
-            
-            
         }
     }
 
@@ -138,15 +163,12 @@ public class GameManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.R))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-                // ObstacleGen.logObstacle.RemoveAll(item => item == null);
-              
             }
         }
         
         if(Input.GetKeyDown(KeyCode.H))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-
         }
     }
 
@@ -163,7 +185,6 @@ public class GameManager : MonoBehaviour
         SaveSystem.Save(data);
 
         Debug.Log("Progresso salvo!");
-        
         Debug.Log("Vitória iniciada. Esperando limpar a cena...");
     }
     
@@ -193,7 +214,6 @@ public class GameManager : MonoBehaviour
     {
         isCheatOn = true;
         Debug.Log("Cheat ativado");
-        
     }
 
     public void LoadNextScene()
@@ -215,9 +235,84 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UpdateScore()
+    public void UpdateScore(int peso)
     {
-        score++;
+        if (peso == 2)
+        {
+            score += 2;
+        }
+        else
+        {
+            score++;
+        }
     }
-    
+
+    // ========= MÉTODOS DE DEBUG (NOVO) =========
+    private void UpdateVictoryDebug()
+    {
+        // limpa nulos pra contagem honesta
+        objsOnScene.RemoveAll(x => x == null);
+
+        debugCache = BuildVictoryDebugString();
+
+        // HUD com TMP se fornecido
+        if (debugVictoryText != null)
+        {
+            debugVictoryText.text = debugCache;
+        }
+        // se não tiver TMP, OnGUI exibe o fallback
+    }
+
+    private string BuildVictoryDebugString()
+    {
+        bool timeOk = sceneTime >= timeGoal;
+        int count = objsOnScene.Count;
+
+        // coleta alguns nomes de objetos que restam
+        List<string> names = new List<string>();
+        for (int i = 0; i < count && i < debugListMax; i++)
+        {
+            var obj = objsOnScene[i];
+            if (obj == null) continue;
+            int layer = obj.layer;
+            string nm = obj.name;
+            names.Add($"{nm} [L{layer}]");
+        }
+
+        string objsList = names.Count > 0 ? string.Join(", ", names) : "(nenhum listado)";
+        string spawner = (patternGen != null) ? (patternGen.canSpawn ? "ATIVO" : "PARADO") : "desconhecido";
+
+        float faltaTempo = Mathf.Max(0f, timeGoal - sceneTime);
+
+        return
+            $"[VICTORY DEBUG]\n" +
+            $"Tempo: {sceneTime:F1}s / {timeGoal:F1}s  (falta ~{faltaTempo:F1}s)  | TimeOK: {timeOk}\n" +
+            $"Objs restantes: {count}  | WaitingClear: {waitingForVictory}\n" +
+            $"Flags -> triggered:{victoryTriggered}  waiting:{waitingForVictory}  achieved:{victoryAchieved}  alive:{playerAlive}\n" +
+            $"Spawner: {spawner}\n" +
+            $"Lista (até {debugListMax}): {objsList}\n";
+    }
+
+    private void DumpVictoryDebugToConsole()
+    {
+        UpdateVictoryDebug(); // força atualizar antes do log
+        Debug.Log(debugCache);
+    }
+
+    // HUD fallback se não usar TMP
+    private void OnGUI()
+    {
+        if (!debugVictoryHUD || debugVictoryText != null) return;
+
+        var style = new GUIStyle(GUI.skin.box)
+        {
+            alignment = TextAnchor.UpperLeft,
+            fontSize = 12,
+            wordWrap = true
+        };
+
+        float w = 520f;
+        float h = 160f;
+        GUI.Box(new Rect(10, 10, w, h), debugCache, style);
+    }
 }

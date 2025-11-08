@@ -11,7 +11,7 @@ public class AttackCollisionHandler : MonoBehaviour
 
          Destroy(other.gameObject);
          GameManager.Instance.objsOnScene.Remove(other.gameObject);
-         GameManager.Instance.UpdateScore();
+         GameManager.Instance.UpdateScore(2);
 
          
          GetComponentInParent<Player>().Knockback();
