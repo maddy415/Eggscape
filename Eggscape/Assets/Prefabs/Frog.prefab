@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   jumpForce: 9.5
-  speed: 10.5
+  speed: 10
   minInterval: 2
   maxInterval: 3
   jumpOnAwake: 1
@@ -232,7 +232,7 @@ MonoBehaviour:
   groundRadius: 0.1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   animator: {fileID: 0}
   animTriggerPreJump: PreJump
   animTriggerJump: Jump

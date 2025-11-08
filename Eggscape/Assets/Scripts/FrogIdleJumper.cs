@@ -79,8 +79,8 @@ public class FrogIdleJumper : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector2 targetPos = rb.position + Vector2.left * speed * Time.fixedDeltaTime;
-        rb.MovePosition(targetPos);
+        var v = new Vector2(-Mathf.Abs(speed), rb.linearVelocity.y);
+        rb.linearVelocity = v;
     }
 
     
