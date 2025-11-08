@@ -2019,7 +2019,7 @@ MonoBehaviour:
   SpawnTrigger: {fileID: 1098348600}
   nextPatternSpawn: {fileID: 1098348600}
   canSpawn: 1
-  spawnInOrder: 0
+  spawnInOrder: 1
   propagateSegmentToChildren: 1
   activeSegment: {fileID: 11400000, guid: dbffda03c56aed942976b48dbbf229b9, type: 2}
   patterns:
@@ -2370,7 +2370,7 @@ MonoBehaviour:
   prefabChao: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
   genPos: {fileID: 881868769}
   larguraDoChao: 32
-  velocidade: 10.5
+  velocidade: 10
 --- !u!4 &881868769
 Transform:
   m_ObjectHideFlags: 0
@@ -6684,7 +6684,7 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 1578966170}
   - {fileID: 3655688236464903742}
+  - {fileID: 1988584649}
   - {fileID: 1225567997}
   - {fileID: 2016416299}
-  - {fileID: 1988584649}
   - {fileID: 1907704286}
