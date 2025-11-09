@@ -32,6 +32,12 @@ public class Player : MonoBehaviour
     [SerializeField] private float attackAirTime;
     [SerializeField] private float attackCD;
     [SerializeField] private float attackForce;
+    public bool IsAttackActive => attackHB != null && attackHB.enabled;
+
+    
+    [Header("Attack Damage")]
+    [SerializeField] public float attackDamage = 20f;   // dano que o boss vai tomar
+    
 
     [Header("Knockback")]
     [SerializeField] private float kbForce;
@@ -379,7 +385,7 @@ public class Player : MonoBehaviour
         GameManager.Instance.victoryText.text = "Passou de fase! Aperte \"Espaço\" para continuar";
     }
 
-    private void Death()
+    public void Death()
     {
         if (playerDead)
         {

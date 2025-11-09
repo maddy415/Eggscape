@@ -1,2 +1,26 @@
 fileFormatVersion: 2
 guid: e70421f22aabc4d40b35a78f770ca0aa
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - vicCanvas: {instanceID: 0}
+  - frogJumper: {instanceID: 0}
+  - barn: {instanceID: 0}
+  - frog: {instanceID: 0}
+  - spawnerLog: {instanceID: 0}
+  - spawnerBird: {instanceID: 0}
+  - ground: {instanceID: 0}
+  - fence: {instanceID: 0}
+  - groundRef: {instanceID: 0}
+  - player: {instanceID: 0}
+  - scoreText: {instanceID: 0}
+  - victoryText: {instanceID: 0}
+  - patternGen: {instanceID: 0}
+  - saveData: {instanceID: 0}
+  - debugVictoryText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -5043,6 +5043,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vicCanvas: {fileID: 682906393}
+  frogJumper: {fileID: -6432850150247976287, guid: 630d6f9717d68e44d9d147eb3a56aa28, type: 3}
+  barn: {fileID: 1763577831}
+  frog: {fileID: 7672838025917734753, guid: 630d6f9717d68e44d9d147eb3a56aa28, type: 3}
   spawnerLog: {fileID: 304386134}
   spawnerBird: {fileID: 1411324291}
   ground: {fileID: 881868767}
@@ -5056,10 +5059,14 @@ MonoBehaviour:
   patternGen: {fileID: 788158579}
   saveData: {fileID: 0}
   sceneTime: 0
-  timeGoal: 40
+  timeGoal: 30
   playerAlive: 1
   isCheatOn: 0
   victoryAchieved: 0
+  debugVictoryHUD: 0
+  debugVictoryText: {fileID: 0}
+  debugRefresh: 0.25
+  debugListMax: 6
 --- !u!1 &1763577831
 GameObject:
   m_ObjectHideFlags: 0

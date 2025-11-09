@@ -1,21 +1,23 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-
+using Random = UnityEngine.Random;
 
 /// <summary>
-/// Template simples de chefe para fase 1x1 (Player vs Boss).
-/// - 1 único script controla: vida, fases, seleção de ataques, execução e morte.
-/// - Ataques embutidos (Charge e JumpSmash) para começar rápido.
-/// - Extensível: adicione novos ataques só criando um método IEnumerator NovoAtaque().
+/// Boss 2D com fases e ataques:
+/// - Charge
+/// - JumpSmash (clássico)
+/// - JumpSuperHigh (lock-on/meteoro)
+/// Player morre com 1 hit ao encostar (exceto enquanto está atacando).
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class BossSimpleController : MonoBehaviour
 {
-    #region Tipos de dados simples (pra configurar tudo no inspetor)
+    #region Tipos de dados (Inspector)
 
-    public enum AttackType { Charge, JumpSmash }
+    public enum AttackType { Charge, JumpSmash, JumpSuperHigh }
 
     [System.Serializable]
     public class Attack
@@ -23,32 +25,72 @@ public class BossSimpleController : MonoBehaviour
         public string name = "Charge";
         public AttackType type = AttackType.Charge;
 
-        
         [Header("Telegraph/Timing")]
         [Tooltip("Tempo antes de executar (telegraph/aviso).")]
         public float windup = 0.5f;
         [Tooltip("Tempo de recuperação após o ataque terminar.")]
         public float recovery = 0.5f;
 
+        [Header("One-hit on touch (sempre que encostar)")]
+        public bool killOnTouch = true;
+        [Tooltip("Layers considerados Player para kill por contato (além da tag 'Player').")]
+        public LayerMask playerLayers = 0;
+
         [Header("Pesagem p/ sorteio")]
         [Tooltip("Quanto maior, mais chances de sair este ataque.")]
         public int weight = 1;
 
+        // ------------------- Charge -------------------
         [Header("Charge params")]
         public float dashSpeed = 12f;
         public float dashDuration = 0.6f;
         public Vector2 chargeHitbox = new Vector2(1.2f, 1.0f);
 
-        [Header("JumpSmash params")]
-        public float jumpForce = 12f;
-        public float gravityDuringJump = 2.2f;
-        public float smashRadius = 3.0f;
+        // ------------------- JumpSmash (clássico) -------------------
+        [Header("JumpSmash (clássico)")]
+        public float jumpForceSmash = 12f;
+        public float gravityDuringJumpSmash = 2.2f;
+        public float smashRadiusSmash = 3.0f;
 
-        [Header("Dano")]
-        public float damage = 15f;
+        // ------------------- JumpSuperHigh (meteoro lock-on) -------------------
+        [Header("JumpSuperHigh (meteoro lock-on)")]
+        [Tooltip("Força para subir para fora da câmera.")]
+        public float jumpForceSuper = 16f;
+        [Tooltip("Gravidade durante a subida (antes de sair da câmera).")]
+        public float riseGravitySuper = 2.0f;
 
-        [Header("Quem leva dano (LayerMask)")]
+        [Tooltip("Prefab do indicador que aparece durante o lock-on (opcional).")]
+        public GameObject lockOnIndicatorPrefab;
+        [Tooltip("Offset vertical do indicador em relação ao player.")]
+        public float indicatorYOffset = -1.2f;
+
+        [Tooltip("Tempo seguindo o X do player antes de travar o alvo.")]
+        public float lockOnDelay = 0.7f;
+        [Tooltip("Tempo que o indicador fica PARADO (alvo travado) antes da queda.")]
+        public float lockOnFreeze = 0.6f;
+        [Tooltip("Quão rápido o boss acompanha o X do player lá em cima.")]
+        public float followXSharpness = 20f;
+
+        [Tooltip("Força do impulso para baixo quando solta a queda.")]
+        public float fallImpulse = 40f;
+        [Tooltip("Gravidade durante a queda do meteoro.")]
+        public float fallGravity = 10f;
+
+        [Tooltip("Esconder o sprite do boss enquanto estiver fora da câmera.")]
+        public bool hideWhileOffscreen = true;
+        [Tooltip("Margem de viewport para considerar 'fora da câmera' (1 + margin).")]
+        public float offscreenMargin = 0.08f;
+
+        [Tooltip("Raio do impacto do meteoro.")]
+        public float smashRadiusSuper = 3.0f;
+
+        // ------------------- Mask -------------------
+        [Header("Quem leva hit (LayerMask)")]
         public LayerMask hitMask = ~0;
+
+        [Header("Identificação de Player (one-hit)")]
+        [Tooltip("Layers considerados Player (além de tag 'Player').")]
+        public LayerMask playerMask = 0;
     }
 
     [System.Serializable]
@@ -73,30 +115,35 @@ public class BossSimpleController : MonoBehaviour
 
     [Header("Vida do Boss")]
     public float maxHealth = 120f;
-    [ReadOnly] public float currentHealth; // só leitura no inspetor
+    [ReadOnly] public float currentHealth;
     public bool invulnerable = false;
 
     [Header("Alvos / Refs")]
-    public float speed;
+    public float speed = 6f;
     public Transform player;
-    public SpriteRenderer bossSprite;   // opcional (pra piscada)
+    public SpriteRenderer bossSprite;
     public Color telegraphColor = Color.red;
 
     [Header("Fases (na ordem)")]
     public List<Phase> phases = new List<Phase>();
-    
+
     [Header("Intro")]
     public float introDuration = 1.2f;
+
+    [Header("Ground Check")]
+    [Tooltip("Camadas consideradas chão para detectar aterrissagem.")]
+    public LayerMask groundMask = ~0;
+    [Tooltip("Distância extra para o boxcast de chão.")]
+    public float groundProbeDistance = 0.15f;
 
     #endregion
 
     #region Internals
-
     private Rigidbody2D rb;
+    private Collider2D col;
     private int phaseIndex = -1;
     private float phaseTimer = 0f;
     private bool dead = false;
-
     #endregion
 
     #region Unity
@@ -112,14 +159,19 @@ public class BossSimpleController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
+        if (!col) col = GetComponentInChildren<Collider2D>();
         currentHealth = maxHealth;
+    }
+
+    private void Start()
+    {
+        BeginIntro();
     }
 
     private void OnEnable()
     {
-        // Se quiser iniciar automaticamente, chame BeginIntro() via diretor da cena.
-        // Aqui, por simplicidade, vamos já começar:
-        BeginIntro();
+        // vazio de propósito
     }
 
     #endregion
@@ -129,17 +181,20 @@ public class BossSimpleController : MonoBehaviour
     public void BeginIntro()
     {
         if (dead) return;
-        StopAllCoroutines();
         StartCoroutine(IntroRoutine());
     }
 
     private IEnumerator IntroRoutine()
     {
-        rb.linearVelocity = Vector2.left * speed * Time.deltaTime;
-
         invulnerable = true;
-        Flash(telegraphColor, introDuration);
+        if (bossSprite) Flash(telegraphColor, introDuration);
+
+        // movimento simples de entrada
+        rb.linearVelocity = Vector2.left * speed;
         yield return new WaitForSeconds(introDuration);
+
+        // parar e iniciar fase 0
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         invulnerable = false;
         GoToPhase(0);
     }
@@ -159,18 +214,23 @@ public class BossSimpleController : MonoBehaviour
         {
             var phase = phases[phaseIndex];
 
-            // Transições de fase (tempo/HP) — verificadas a cada loop
+            // Transições (evitar loop infinito na última fase)
+            bool isLast = (phaseIndex == phases.Count - 1);
             phaseTimer += Time.deltaTime;
             float hpFrac = currentHealth / maxHealth;
-            if (phase.hpThreshold > 0 && hpFrac <= phase.hpThreshold)
+
+            if (!isLast)
             {
-                TryAdvancePhase();
-                yield break;
-            }
-            if (phase.timeLimit > 0 && phaseTimer >= phase.timeLimit)
-            {
-                TryAdvancePhase();
-                yield break;
+                if (phase.hpThreshold > 0 && hpFrac <= phase.hpThreshold)
+                {
+                    TryAdvancePhase();
+                    yield break;
+                }
+                if (phase.timeLimit > 0 && phaseTimer >= phase.timeLimit)
+                {
+                    TryAdvancePhase();
+                    yield break;
+                }
             }
 
             // Escolhe um ataque por peso
@@ -192,20 +252,20 @@ public class BossSimpleController : MonoBehaviour
         if (next < phases.Count)
             GoToPhase(next);
         else
-            GoToPhase(phaseIndex); // fica na última (ou adapte para "Enrage")
+            phaseTimer = 0f; // última fase: não reinicia PhaseLoop
     }
 
     #endregion
 
-    #region Ataques (inline)
+    #region Ataques
 
     private IEnumerator ExecuteAttack(Attack a)
     {
-        // TELEGRAPH
+        // Telegraph
         if (bossSprite) Flash(telegraphColor, a.windup);
         yield return new WaitForSeconds(a.windup);
 
-        // Decide e executa
+        // Execução
         switch (a.type)
         {
             case AttackType.Charge:
@@ -214,15 +274,17 @@ public class BossSimpleController : MonoBehaviour
             case AttackType.JumpSmash:
                 yield return Attack_JumpSmash(a);
                 break;
+            case AttackType.JumpSuperHigh:
+                yield return Attack_JumpSuperHigh(a);
+                break;
         }
 
-        // Recuperação
+        // Recovery
         yield return new WaitForSeconds(a.recovery);
     }
 
     private IEnumerator Attack_Charge(Attack a)
     {
-        // Direção simples: vira para o player antes de avançar
         FacePlayerX();
 
         float t = 0f;
@@ -233,78 +295,214 @@ public class BossSimpleController : MonoBehaviour
             t += Time.deltaTime;
             rb.linearVelocity = new Vector2(dir.x * a.dashSpeed, rb.linearVelocity.y);
 
-            // Hitbox simples por OverlapBox
+            // Hitbox (caixa)
             var hits = Physics2D.OverlapBoxAll(transform.position, a.chargeHitbox, 0f, a.hitMask);
             foreach (var h in hits)
             {
-                ApplyDamageIfDamageable(h.gameObject, a.damage, (Vector2)h.transform.position, -dir);
+                ApplyPlayerHitIfAny(h.gameObject, a);
             }
 
             yield return null;
         }
 
-        // Para horizontalmente no fim
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
 
+    // JumpSmash clássico — params separados
     private IEnumerator Attack_JumpSmash(Attack a)
     {
         float originalGravity = rb.gravityScale;
 
         // Sobe
-        rb.gravityScale = a.gravityDuringJump;
+        rb.gravityScale = a.gravityDuringJumpSmash;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-        rb.AddForce(Vector2.up * a.jumpForce, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * a.jumpForceSmash, ForceMode2D.Impulse);
 
-        // Espera o pico e a queda (checa quando velocidade de Y ficar negativa)
+        // Espera começar a cair
         while (rb.linearVelocity.y > -0.1f) yield return null;
 
-        // Pequeno buffer pra garantir contato com chão da arena
-        yield return new WaitForSeconds(0.08f);
+        // Espera tocar o chão (robusto)
+        yield return StartCoroutine(WaitUntilGrounded(0.4f));
 
-        // Smash: dano em área
-        var hits = Physics2D.OverlapCircleAll(transform.position, a.smashRadius, a.hitMask);
-        foreach (var h in hits)
-        {
-            Vector2 dir = (h.transform.position - transform.position).normalized;
-            ApplyDamageIfDamageable(h.gameObject, a.damage, (Vector2)h.transform.position, dir);
-        }
+        // Impacto
+        var hits = Physics2D.OverlapCircleAll(transform.position, a.smashRadiusSmash, a.hitMask);
+        foreach (var h in hits) ApplyPlayerHitIfAny(h.gameObject, a);
 
-        // Restauro gravidade
+        // Restaura gravidade só DEPOIS de tocar o chão
         rb.gravityScale = originalGravity;
 
-        // (Opcional) micro feedback visual
+        if (bossSprite) Flash(Color.white, 0.15f);
+    }
+
+    // JumpSuperHigh (meteoro lock-on) — params separados
+    private IEnumerator Attack_JumpSuperHigh(Attack a)
+    {
+        float originalGravity = rb.gravityScale;
+
+        // 1) Sobe
+        rb.gravityScale = a.riseGravitySuper;
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(Vector2.up * a.jumpForceSuper, ForceMode2D.Impulse);
+
+        // 2) Espera sair da câmera (acima do topo)
+        yield return StartCoroutine(WaitUntilAboveCameraTop(a.offscreenMargin));
+
+        // Manter fora da câmera e opcionalmente oculto
+        float hoverY = rb.position.y;
+        if (a.hideWhileOffscreen && bossSprite) bossSprite.enabled = false;
+
+        // paira fora da câmera (sem gravidade)
+        rb.gravityScale = 0f;
+        rb.linearVelocity = Vector2.zero;
+
+        // 3) Lock-on: seguir X do player por lockOnDelay, com indicador acompanhando
+        GameObject indicator = null;
+        float t = 0f;
+        while (t < a.lockOnDelay)
+        {
+            t += Time.deltaTime;
+
+            if (player)
+            {
+                float targetX = player.position.x;
+                float newX = Mathf.Lerp(rb.position.x, targetX, Time.deltaTime * Mathf.Max(1f, a.followXSharpness));
+                rb.MovePosition(new Vector2(newX, hoverY));
+
+                if (a.lockOnIndicatorPrefab)
+                {
+                    Vector3 indPos = new Vector3(player.position.x, player.position.y + a.indicatorYOffset, 0f);
+                    if (!indicator) indicator = Instantiate(a.lockOnIndicatorPrefab, indPos, Quaternion.identity);
+                    else indicator.transform.position = indPos;
+                }
+            }
+
+            yield return null;
+        }
+
+        // 4) Trava o alvo e congela indicador
+        float dropX = player ? player.position.x : rb.position.x;
+        float freezeT = 0f;
+        while (freezeT < a.lockOnFreeze)
+        {
+            freezeT += Time.deltaTime;
+
+            // boss continua fora da câmera, pairando
+            rb.MovePosition(new Vector2(rb.position.x, hoverY));
+
+            // indicador PARADO no X travado
+            if (indicator)
+            {
+                float baseY = player ? player.position.y : (indicator.transform.position.y - a.indicatorYOffset);
+                indicator.transform.position = new Vector3(dropX, baseY + a.indicatorYOffset, 0f);
+            }
+
+            yield return null;
+        }
+
+        // 5) Inicia a queda na posição travada (mantém sprite oculto até reentrar)
+        transform.position = new Vector3(dropX, hoverY, transform.position.z);
+        rb.gravityScale = a.fallGravity;   // queda forte
+        rb.linearVelocity = Vector2.zero;
+        rb.linearDamping = 0f;
+        rb.AddForce(Vector2.down * a.fallImpulse, ForceMode2D.Impulse);
+
+        // espera reentrar na câmera para mostrar o sprite
+        yield return StartCoroutine(WaitUntilReenterCameraFromTop());
+        if (bossSprite) bossSprite.enabled = true;
+
+        // mantém X travado até tocar o chão
+        while (!IsGrounded())
+        {
+            rb.MovePosition(new Vector2(dropX, rb.position.y));
+            yield return new WaitForFixedUpdate();
+        }
+
+        // 6) Impacto (no chão)
+        var hits = Physics2D.OverlapCircleAll(transform.position, a.smashRadiusSuper, a.hitMask);
+        foreach (var h in hits) ApplyPlayerHitIfAny(h.gameObject, a);
+
+        // destruir indicador SÓ depois do impacto
+        // (deixa alguns frames pra VFX, se preferir: yield return null;)
+        if (indicator) Destroy(indicator);
+
+        // Restaura gravidade original APÓS aterrissar
+        rb.gravityScale = originalGravity;
+
         if (bossSprite) Flash(Color.white, 0.15f);
     }
 
     #endregion
 
-    #region Dano / Morte
+    #region Helpers (câmera / chão)
+
+    private IEnumerator WaitUntilAboveCameraTop(float margin = 0.02f, float timeout = 3f)
+    {
+        var cam = Camera.main;
+        float t = 0f;
+
+        while (true)
+        {
+            t += Time.deltaTime;
+            if (t > timeout) yield break;
+
+            if (cam)
+            {
+                Vector3 vp = cam.WorldToViewportPoint(transform.position);
+                if (vp.y > 1f + margin) yield break;
+            }
+            yield return null;
+        }
+    }
+
+    private IEnumerator WaitUntilReenterCameraFromTop(float timeout = 3f)
+    {
+        var cam = Camera.main;
+        float t = 0f;
+
+        while (true)
+        {
+            t += Time.deltaTime;
+            if (t > timeout) yield break;
+
+            if (cam)
+            {
+                var vp = cam.WorldToViewportPoint(transform.position);
+                // reentrou quando cruzar o topo (y <= 1)
+                if (vp.y <= 1f) yield break;
+            }
+            yield return null;
+        }
+    }
+
+    private bool IsGrounded()
+    {
+        if (!col) return false;
+        Bounds b = col.bounds;
+        float castDist = groundProbeDistance;
+        RaycastHit2D hit = Physics2D.BoxCast(b.center, b.size, 0f, Vector2.down, castDist, groundMask);
+        return hit.collider != null;
+    }
+
+    private IEnumerator WaitUntilGrounded(float timeout = 1.5f)
+    {
+        float t = 0f;
+        while (t < timeout)
+        {
+            if (IsGrounded()) yield break;
+            t += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    #endregion
+
+    #region Dano / Morte do Boss
 
     public void TakeDamage(float amount)
     {
         if (dead || invulnerable) return;
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Abs(amount));
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void ApplyDamageIfDamageable(GameObject target, float dmg, Vector2 hitPoint, Vector2 hitNormal)
-    {
-        // Interface opcional: se seu player já usa um script com esse método, adapte aqui.
-        // Aqui faremos: se tiver um componente "IDamageableLike" genérico, chamamos; senão, tenta achar um método padrão.
-        // Para simplificar, vamos procurar um método público "TakeDamage(float)".
-        var comp = target.GetComponent<MonoBehaviour>();
-        if (comp != null)
-        {
-            var m = comp.GetType().GetMethod("TakeDamage", new System.Type[] { typeof(float) });
-            if (m != null)
-            {
-                m.Invoke(comp, new object[] { dmg });
-            }
-        }
+        if (currentHealth <= 0) Die();
     }
 
     private void Die()
@@ -312,8 +510,35 @@ public class BossSimpleController : MonoBehaviour
         dead = true;
         StopAllCoroutines();
         rb.linearVelocity = Vector2.zero;
-        // TODO: VFX/SFX de morte, liberar saída, sinalizar diretor etc.
         gameObject.SetActive(false);
+    }
+
+    #endregion
+
+    #region One-Hit no Player
+
+    private void ApplyPlayerHitIfAny(GameObject target, Attack a)
+    {
+        bool isPlayerTag = target.CompareTag("Player");
+        bool isPlayerLayer = (a.playerMask.value & (1 << target.layer)) != 0;
+        if (!isPlayerTag && !isPlayerLayer) return;
+
+        var playerComp = target.GetComponent<Player>()
+                         ?? target.GetComponentInParent<Player>()
+                         ?? target.GetComponentInChildren<Player>();
+
+        // se o player está atacando, NÃO mata aqui
+        if (playerComp != null && playerComp.IsAttackActive) return;
+
+        if (playerComp != null)
+        {
+            try { playerComp.Death(); }
+            catch (Exception e) { Debug.LogError($"[Boss] Falha ao chamar Player.Death(): {e.Message}"); }
+        }
+        else
+        {
+            Debug.LogWarning("[Boss] Player detectado mas não achei componente 'Player'.");
+        }
     }
 
     #endregion
@@ -364,12 +589,40 @@ public class BossSimpleController : MonoBehaviour
 
     #endregion
 
+    #region KillOnTouch
+
+    private void TryKillPlayerOnContact(GameObject hit)
+    {
+        var playerRef = hit.GetComponent<Player>()
+                        ?? hit.GetComponentInParent<Player>()
+                        ?? hit.GetComponentInChildren<Player>();
+
+        if (playerRef == null) return;
+
+        // se o player está atacando, não mata
+        if (playerRef.IsAttackActive) return;
+
+        try { playerRef.Death(); }
+        catch (Exception e) { Debug.LogError($"[Boss] Falha ao chamar Player.Death() no contato: {e.Message}"); }
+    }
+
+    private void OnCollisionEnter2D(Collision2D c)
+    {
+        TryKillPlayerOnContact(c.gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        TryKillPlayerOnContact(other.gameObject);
+    }
+
+    #endregion
+
     #region Gizmos (debug)
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        // Visual aproximado das áreas de ataque com base na fase atual (apenas debug).
         if (phases == null || phases.Count == 0) return;
         int idx = Mathf.Clamp(phaseIndex, 0, phases.Count - 1);
         if (idx < 0 || idx >= phases.Count) return;
@@ -385,7 +638,12 @@ public class BossSimpleController : MonoBehaviour
             else if (atk.type == AttackType.JumpSmash)
             {
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawWireSphere(transform.position, atk.smashRadius);
+                Gizmos.DrawWireSphere(transform.position, atk.smashRadiusSmash);
+            }
+            else // JumpSuperHigh
+            {
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireSphere(transform.position, atk.smashRadiusSuper);
             }
         }
     }
@@ -394,9 +652,7 @@ public class BossSimpleController : MonoBehaviour
     #endregion
 }
 
-/// <summary>
-/// Atributo só pra mostrar campo como ReadOnly no inspetor (cosmético).
-/// </summary>
+/// <summary> ReadOnly no Inspector (cosmético). </summary>
 public class ReadOnlyAttribute : PropertyAttribute {}
 #if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]

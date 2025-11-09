@@ -184,3 +184,7 @@ MonoBehaviour:
   telegraphColor: {r: 1, g: 0, b: 0, a: 1}
   phases: []
   introDuration: 1.2
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundProbeDistance: 0.15
