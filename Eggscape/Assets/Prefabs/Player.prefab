@@ -82,22 +82,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   attackHB: {fileID: 0}
-  moveSpeed: 5
+  moveSpeed: 10
   jumpForce: 8
-  groundDistance: 0.1
-  impForce: 4
+  groundDistance: 0.3
+  impForce: 40
   jumpTime: 0.3
-  defaultGS: 1
+  defaultGS: 6
   jumpBufferTime: 0.2
-  attackAirTime: 0
-  attackCD: 0
-  attackForce: 0
+  attackAirTime: 0.2
+  attackCD: 1
+  attackForce: 15
   attackDamage: 20
-  kbForce: 0
-  explosion: {fileID: 0}
+  kbForce: 10
+  explosion: {fileID: 6665745316554304104, guid: 40ca9d35ab54cd747a9e6553dcf44720, type: 3}
   canMove: 1
-  torqueForce: 0
-  deathSpinSpeed: 720
+  torqueForce: 40
+  deathSpinSpeed: 900
 --- !u!1 &2469948182430380231
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +280,7 @@ Transform:
   m_GameObject: {fileID: 5974744692612967776}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.646, z: 0}
+  m_LocalPosition: {x: -0.057, y: -0.02, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

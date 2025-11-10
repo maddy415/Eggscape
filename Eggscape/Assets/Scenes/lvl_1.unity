@@ -3526,11 +3526,6 @@ BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 4560781891439897506, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
   m_PrefabInstance: {fileID: 3655688236464903742}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1209102116 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3660278345995962580, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
-  m_PrefabInstance: {fileID: 3655688236464903742}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1211596590
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4565,7 +4560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7d03abaa598a2a42abc6ec704677a62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1209102116}
+  player: {fileID: 0}
   strikePrefab: {fileID: 8990822323469660107, guid: 12773816f1da98c47b36a66c9400bb6c, type: 3}
   spawnDepthOffset: 2
   triggerKey: 108
@@ -6179,7 +6174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 703211e5b6300174bbbd607618750a62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1209102116}
+  player: {fileID: 0}
   scythePrefab: {fileID: 344461915602035899, guid: 8607c437aafad034eac3e1519065869b, type: 3}
   spawnHeightOffset: 7
   spawnInterval: 1
@@ -6479,7 +6474,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6512184536916511377, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: m_SortingOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8396240400684166681, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: m_LocalPosition.x
