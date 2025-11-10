@@ -75,14 +75,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 3491993274841644074}
+  bodyCollider: {fileID: 0}
+  sprite: {fileID: 0}
   feetPos: {fileID: 8396240400684166681}
   groundLayer:
     serializedVersion: 2
     m_Bits: 128
+  attackHB: {fileID: 0}
+  moveSpeed: 5
   jumpForce: 8
   groundDistance: 0.1
-  moveSpeed: 5
+  impForce: 4
   jumpTime: 0.3
+  defaultGS: 1
+  jumpBufferTime: 0.2
+  attackAirTime: 0
+  attackCD: 0
+  attackForce: 0
+  attackDamage: 20
+  kbForce: 0
+  explosion: {fileID: 0}
+  canMove: 1
+  torqueForce: 0
+  deathSpinSpeed: 720
 --- !u!1 &2469948182430380231
 GameObject:
   m_ObjectHideFlags: 0
