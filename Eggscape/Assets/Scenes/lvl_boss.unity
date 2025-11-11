@@ -2696,6 +2696,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1787775785}
   - component: {fileID: 1787775784}
+  - component: {fileID: 1787775786}
   m_Layer: 0
   m_Name: Dash Spot
   m_TagString: Untagged
@@ -2767,12 +2768,48 @@ Transform:
   m_GameObject: {fileID: 1787775783}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.03, y: 0.99, z: 0}
+  m_LocalPosition: {x: -3.01, y: 0.41, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &1787775786
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1787775783}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.5
 --- !u!1 &1792852742
 GameObject:
   m_ObjectHideFlags: 0
@@ -3524,11 +3561,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.17
+      value: -2.94
       objectReference: {fileID: 0}
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.44
+      value: 2.13
       objectReference: {fileID: 0}
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3571,6 +3608,86 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 279004609}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: chargeAnchor
+      value: 
+      objectReference: {fileID: 1787775785}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: chargeAirAccel
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: chargeLeapUpForce
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: chargePreDashHold
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: chargeAnchorTrigger
+      value: 
+      objectReference: {fileID: 1787775786}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: chargeLeapHorizSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: chargeAnchorXTolerance
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].timeLimit
+      value: 253.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].name
+      value: Jump High
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].type
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[1].name
+      value: Dash
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[1].type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].weight
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[1].weight
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].dashSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[1].dashSpeed
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].fallGravity
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].fallImpulse
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].lockOnDelay
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[1].fallGravity
       value: 9
       objectReference: {fileID: 0}
@@ -3579,9 +3696,45 @@ PrefabInstance:
       value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].dashDuration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].lockOnFreeze
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].jumpForceSuper
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].offscreenMargin
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].followXSharpness
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].indicatorYOffset
+      value: -1.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].riseGravitySuper
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].smashRadiusSuper
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[1].indicatorYOffset
       value: -1.02
       objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].lockOnIndicatorPrefab
+      value: 
+      objectReference: {fileID: 6298200817734743884, guid: 8fb1d26846fda7a4392a26caf418036b, type: 3}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[1].lockOnIndicatorPrefab
       value: 
@@ -3610,6 +3763,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3040554633894955242, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3089985569905209911, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
       propertyPath: m_LocalPosition.x
       value: -20.69
@@ -3649,6 +3806,10 @@ PrefabInstance:
     - target: {fileID: 3089985569905209911, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: attackSpinSpeed
+      value: 1400
       objectReference: {fileID: 0}
     - target: {fileID: 7055952870495538840, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
       propertyPath: m_Name

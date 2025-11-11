@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 2809721784010619720, guid: 0d85ee8b1a983cf40a86cbe3b7e66995, type: 3}
-  m_Color: {r: 1, g: 0.0000008459834, b: 0.0000008459834, a: 1}
+  m_Color: {r: 1, g: 0.0000003659694, b: 0.0000003659694, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -142,6 +142,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   groundProbeDistance: 0.15
+  useChargeAnchor: 1
+  chargeAnchor: {fileID: 0}
+  chargeAnchorTrigger: {fileID: 0}
+  requireAnchorTriggerForDash: 1
+  chargeLeapUpForce: 10
+  chargeLeapHorizSpeed: 6
+  chargeAirAccel: 40
+  chargePreDashHold: 0.35
+  chargeAnchorXTolerance: 0.15
 --- !u!61 &6285176174509000561
 BoxCollider2D:
   m_ObjectHideFlags: 0

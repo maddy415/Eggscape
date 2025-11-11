@@ -34,10 +34,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float attackForce;
     public bool IsAttackActive => attackHB != null && attackHB.enabled;
 
-    
     [Header("Attack Damage")]
     [SerializeField] public float attackDamage = 20f;   // dano que o boss vai tomar
-    
 
     [Header("Knockback")]
     [SerializeField] private float kbForce;
@@ -47,12 +45,24 @@ public class Player : MonoBehaviour
 
     [Header("State Flags")]
     [SerializeField] private bool canMove = true;
-    
+
     [Header("Misc.")]
     [SerializeField] private float torqueForce;
 
+    // [NEW] Giro durante o ataque
+    [Header("Attack Spin")]
+    [SerializeField] private bool attackSpinEnabled = true;
+    [SerializeField, Tooltip("Velocidade do giro durante o ataque (graus/seg).")]
+    private float attackSpinSpeed = 1080f;
+    [SerializeField, Tooltip("Se true, gira apenas o sprite (recomendado).")]
+    private bool spinSpriteOnlyDuringAttack = true;
+
+    private bool attackSpinActive;
+    private float attackSpinAngle;
+    private Transform attackSpinTarget;
+
     // [NEW] Controle de giro do SPRITE ao morrer (sem mexer no corpo)
-    [Header("Death Spin (Sprite Only)")] 
+    [Header("Death Spin (Sprite Only)")]
     [SerializeField, Tooltip("Velocidade de rotação do SPRITE após morrer (graus/seg).")]
     private float deathSpinSpeed = 720f; // [NEW]
     private bool spinOnDeathActive = false; // [NEW]
@@ -110,6 +120,11 @@ public class Player : MonoBehaviour
                 }
             }
         }
+
+        // alvo de rotação: sprite se existir, senão o próprio transform
+        attackSpinTarget = (spinSpriteOnlyDuringAttack && sprite != null)
+            ? sprite.transform
+            : transform;
     }
 
     private void Update()
@@ -289,17 +304,21 @@ public class Player : MonoBehaviour
         UpdateAirAttackTimer();
     }
 
-    //public SpriteRenderer hbSprite;
     private void BeginAttack()
     {
         canAttack = false;
         attackHB.enabled = true;
-        //hbSprite.enabled = true;
-        
 
         attackTimer = 0f;
         isAttacking = true;
         rb.gravityScale = 0f;
+
+        // ativa spin do ataque
+        if (attackSpinEnabled)
+        {
+            attackSpinActive = true;
+            attackSpinAngle = 0f;
+        }
     }
 
     private void HandleOngoingAttackMovement()
@@ -316,7 +335,16 @@ public class Player : MonoBehaviour
             if (!isGrounded && Input.GetKeyDown(KeyCode.S))
             {
                 CancelAttack();
+                return;
             }
+        }
+
+        // GIRO DURANTE O ATAQUE
+        if (attackSpinEnabled && attackSpinActive && attackSpinTarget != null && !playerDead)
+        {
+            float dir = sprite != null && sprite.flipX ? -1f : 1f;
+            attackSpinAngle += attackSpinSpeed * Time.deltaTime * dir;
+            attackSpinTarget.localRotation = Quaternion.Euler(0f, 0f, attackSpinAngle);
         }
     }
 
@@ -366,7 +394,13 @@ public class Player : MonoBehaviour
         }
 
         attackHB.enabled = false;
-        //hbSprite.enabled = false;
+
+        // RESET DO GIRO DO ATAQUE
+        if (attackSpinActive && attackSpinTarget != null)
+        {
+            attackSpinActive = false;
+            attackSpinTarget.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        }
     }
 
     #endregion
@@ -404,7 +438,16 @@ public class Player : MonoBehaviour
         rb.freezeRotation = false;
         rb.AddTorque(torqueForce);
 
-        // [NEW] ativa giro apenas no SPRITE (o corpo/colisor não rotaciona)
+        // se estava girando no ataque, desativa para evitar soma dupla
+        attackSpinActive = false;
+
+        // inicia spin de morte a partir do ângulo atual do sprite (fica suave)
+        if (sprite != null)
+        {
+            currentSpriteRotation = sprite.transform.localEulerAngles.z;
+        }
+
+        // ativa giro apenas no SPRITE (o corpo/colisor pode rodar pela física)
         spinOnDeathActive = true;
     }
 
@@ -427,7 +470,6 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        
         if (!other.gameObject.CompareTag("JumpDetector"))
         {
             return;
