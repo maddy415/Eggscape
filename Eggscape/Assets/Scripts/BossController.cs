@@ -165,6 +165,17 @@ public class BossSimpleController : MonoBehaviour
     [Tooltip("Tolerância de X para considerar que chegou ao anchor (em unidades).")]
     public float chargeAnchorXTolerance = 0.15f;
 
+    // ======= NOVO: Shockwave ao aterrissar do JumpSuperHigh =======
+    [Header("Shockwave (JumpSuperHigh landing)")]
+    [Tooltip("Prefab da shockwave instanciada ao tocar o chão após o meteoro.")]
+    public GameObject shockwavePrefab;
+
+    [Tooltip("Offset vertical acima do pé (bounds.min.y) para spawn das shockwaves.")]
+    public float shockwaveSpawnYOffset = 0.15f;
+
+    [Tooltip("Velocidade inicial desejada para as shockwaves (opcional, sobrescreve a do prefab).")]
+    public float shockwaveInitialSpeed = 12f;
+
     #endregion
 
     #region Internals
@@ -369,7 +380,7 @@ public class BossSimpleController : MonoBehaviour
         // B) longe do ponto => PULAR e AJUSTAR X EM AR, sem teleporte
         FaceX(chargeAnchor.position.x);
 
-        // salto limpo + já injeta velocidade horizontal inicial rumo ao anchor
+        // salto limpo + injeta velocidade horizontal inicial rumo ao anchor
         float initialDirX = Mathf.Sign(chargeAnchor.position.x - transform.position.x);
         rb.linearVelocity = new Vector2(initialDirX * chargeLeapHorizSpeed, 0f);
         rb.AddForce(Vector2.up * chargeLeapUpForce, ForceMode2D.Impulse);
@@ -377,7 +388,7 @@ public class BossSimpleController : MonoBehaviour
         // deve sair do chão
         yield return StartCoroutine(WaitUntilAirborne(0.4f));
 
-        // fase aérea: manter velocidade X em direção ao anchor (FixedUpdate), suavizando perto
+        // fase aérea: manter velocidade X em direção ao anchor, suavizando perto
         while (!IsGrounded())
         {
             float dx = chargeAnchor.position.x - transform.position.x;
@@ -387,7 +398,6 @@ public class BossSimpleController : MonoBehaviour
             float targetVx = dirX * chargeLeapHorizSpeed;
             if (absDx < 1f) targetVx *= Mathf.Clamp01(absDx); // suaviza no final
 
-            // aproxima a velocidade atual do alvo com aceleração
             float newVx = Mathf.MoveTowards(rb.linearVelocity.x, targetVx, chargeAirAccel * Time.fixedDeltaTime);
             rb.linearVelocity = new Vector2(newVx, rb.linearVelocity.y);
 
@@ -409,7 +419,7 @@ public class BossSimpleController : MonoBehaviour
         // zera drift
         rb.linearVelocity = Vector2.zero;
 
-        // vira pro player, pre-hold e D A S H (horizontal-only)
+        // vira pro player, pre-hold e dash (horizontal-only)
         FacePlayerX();
         if (chargePreDashHold > 0f)
             yield return new WaitForSeconds(chargePreDashHold);
@@ -511,7 +521,7 @@ public class BossSimpleController : MonoBehaviour
         transform.position = new Vector3(dropX, hoverY, transform.position.z);
         rb.gravityScale = a.fallGravity;
         rb.linearVelocity = Vector2.zero;
-        rb.linearDamping = 0f; // se estiver usando Rigidbody2D, pode remover esta linha se não existir
+        rb.linearDamping = 0f; // ok ignorar se não usar esse campo
         rb.AddForce(Vector2.down * a.fallImpulse, ForceMode2D.Impulse);
 
         yield return StartCoroutine(WaitUntilReenterCameraFromTop());
@@ -523,11 +533,39 @@ public class BossSimpleController : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
+        // 6) Impacto (no chão): dano em área + SHOCKWAVES
         var hits2 = Physics2D.OverlapCircleAll(transform.position, a.smashRadiusSuper, a.hitMask);
         foreach (var h in hits2) ApplyPlayerHitIfAny(h.gameObject, a);
 
+        // --- NOVO: spawn das shockwaves dos dois lados, pouco acima do pé ---
+        if (shockwavePrefab != null)
+        {
+            float baseY = col != null ? col.bounds.min.y + shockwaveSpawnYOffset
+                                      : transform.position.y + shockwaveSpawnYOffset;
+            Vector3 spawnPos = new Vector3(transform.position.x, baseY, transform.position.z);
+
+            // direita
+            var swR = Instantiate(shockwavePrefab, spawnPos, Quaternion.identity);
+            var cR = swR.GetComponent<Shockwave>();
+            if (cR != null)
+            {
+                cR.speed = shockwaveInitialSpeed;
+                cR.Initialize(Vector2.right);
+            }
+
+            // esquerda
+            var swL = Instantiate(shockwavePrefab, spawnPos, Quaternion.identity);
+            var cL = swL.GetComponent<Shockwave>();
+            if (cL != null)
+            {
+                cL.speed = shockwaveInitialSpeed;
+                cL.Initialize(Vector2.left);
+            }
+        }
+
         if (indicator) Destroy(indicator);
 
+        // Restaura gravidade original APÓS aterrissar
         rb.gravityScale = originalGravity;
 
         if (bossSprite) Flash(Color.white, 0.15f);

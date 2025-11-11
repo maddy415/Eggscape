@@ -3616,6 +3616,10 @@ PrefabInstance:
       value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: shockwavePrefab
+      value: 
+      objectReference: {fileID: 8708167408854439480, guid: 2500f26499e37e842b0b6575eedf388f, type: 3}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: chargeLeapUpForce
       value: 15
       objectReference: {fileID: 0}
@@ -3630,6 +3634,10 @@ PrefabInstance:
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: chargeLeapHorizSpeed
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: shockwaveSpawnYOffset
+      value: -2.02
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: chargeAnchorXTolerance
@@ -3712,6 +3720,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].shockwavePrefab
+      value: 
+      objectReference: {fileID: 8708167408854439480, guid: 2500f26499e37e842b0b6575eedf388f, type: 3}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[0].followXSharpness
       value: 100
       objectReference: {fileID: 0}
@@ -3732,6 +3744,10 @@ PrefabInstance:
       value: -1.02
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].shockwaveLifetime
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[0].lockOnIndicatorPrefab
       value: 
       objectReference: {fileID: 6298200817734743884, guid: 8fb1d26846fda7a4392a26caf418036b, type: 3}
@@ -3743,6 +3759,10 @@ PrefabInstance:
       propertyPath: phases.Array.data[1].attacks.Array.data[1].lockOnIndicatorPrefab
       value: 
       objectReference: {fileID: 80571768}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: phases.Array.data[0].attacks.Array.data[0].shockwaveSpawnOffset.x
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8739108415465236745, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_Name
       value: boss true
