@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 /// - Charge (com âncora; dash pode ser cancelado por ataque do player)
 /// - JumpSmash (clássico)
 /// - JumpSuperHigh (lock-on/meteoro + shockwaves ao pousar)
-/// - BulletHell (recuo opcional + padrões via BulletPatternSO)
+/// - BulletHell (recuo opcional + padrões via BulletPatternSO + OBJECT POOL)
 /// Player morre com 1 hit ao encostar (exceto enquanto está atacando).
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
@@ -27,18 +27,14 @@ public class BossSimpleController : MonoBehaviour
         public AttackType type = AttackType.Charge;
 
         [Header("Telegraph/Timing")]
-        [Tooltip("Tempo antes de executar (telegraph/aviso).")]
         public float windup = 0.5f;
-        [Tooltip("Tempo de recuperação após o ataque terminar.")]
         public float recovery = 0.5f;
 
         [Header("One-hit on touch (sempre que encostar)")]
         public bool killOnTouch = true;
-        [Tooltip("Layers considerados Player para kill por contato (além da tag 'Player').")]
         public LayerMask playerLayers = 0;
 
         [Header("Pesagem p/ sorteio")]
-        [Tooltip("Quanto maior, mais chances de sair este ataque.")]
         public int weight = 1;
 
         // ------------------- Charge -------------------
@@ -55,34 +51,22 @@ public class BossSimpleController : MonoBehaviour
 
         // ------------------- JumpSuperHigh (meteoro lock-on) -------------------
         [Header("JumpSuperHigh (meteoro lock-on)")]
-        [Tooltip("Força para subir para fora da câmera.")]
         public float jumpForceSuper = 16f;
-        [Tooltip("Gravidade durante a subida (antes de sair da câmera).")]
         public float riseGravitySuper = 2.0f;
 
-        [Tooltip("Prefab do indicador que aparece durante o lock-on (opcional).")]
         public GameObject lockOnIndicatorPrefab;
-        [Tooltip("Offset vertical do indicador em relação ao player.")]
         public float indicatorYOffset = -1.2f;
 
-        [Tooltip("Tempo seguindo o X do player antes de travar o alvo.")]
         public float lockOnDelay = 0.7f;
-        [Tooltip("Tempo que o indicador fica PARADO (alvo travado) antes da queda.")]
         public float lockOnFreeze = 0.6f;
-        [Tooltip("Quão rápido o boss acompanha o X do player lá em cima.")]
         public float followXSharpness = 20f;
 
-        [Tooltip("Força do impulso para baixo quando solta a queda.")]
         public float fallImpulse = 40f;
-        [Tooltip("Gravidade durante a queda do meteoro.")]
         public float fallGravity = 10f;
 
-        [Tooltip("Esconder o sprite do boss enquanto estiver fora da câmera.")]
         public bool hideWhileOffscreen = true;
-        [Tooltip("Margem de viewport para considerar 'fora da câmera' (1 + margin).")]
         public float offscreenMargin = 0.08f;
 
-        [Tooltip("Raio do impacto do meteoro.")]
         public float smashRadiusSuper = 3.0f;
 
         // ------------------- Mask -------------------
@@ -90,7 +74,6 @@ public class BossSimpleController : MonoBehaviour
         public LayerMask hitMask = ~0;
 
         [Header("Identificação de Player (one-hit)")]
-        [Tooltip("Layers considerados Player (além de tag 'Player').")]
         public LayerMask playerMask = 0;
     }
 
@@ -98,16 +81,13 @@ public class BossSimpleController : MonoBehaviour
     public class Phase
     {
         public string phaseName = "Fase 1";
-        [Tooltip("Ataques possíveis nesta fase.")]
         public List<Attack> attacks = new List<Attack>();
-        [Tooltip("Delay mínimo entre ataques.")]
         public float minDelayBetween = 0.6f;
-        [Tooltip("Delay máximo entre ataques.")]
         public float maxDelayBetween = 1.4f;
 
         [Header("Transição de fase (use um ou ambos)")]
-        [Range(0, 1f)] public float hpThreshold = 0f;   // troca quando HP <= fração
-        public float timeLimit = 0f;                    // troca depois de X segundos
+        [Range(0, 1f)] public float hpThreshold = 0f;
+        public float timeLimit = 0f;
     }
 
     #endregion
@@ -132,84 +112,52 @@ public class BossSimpleController : MonoBehaviour
     public float introDuration = 1.2f;
 
     [Header("Ground Check")]
-    [Tooltip("Camadas consideradas chão para detectar aterrissagem.")]
     public LayerMask groundMask = ~0;
-    [Tooltip("Distância extra para o boxcast de chão.")]
     public float groundProbeDistance = 0.15f;
 
     // ======= Charge Anchor =======
     [Header("Charge Anchor (ponto fixo do dash)")]
-    [Tooltip("Se ativo, antes do dash o boss salta até este ponto e só então carrega e dispara.")]
     public bool useChargeAnchor = true;
-
-    [Tooltip("Ponto de aterrissagem/posicionamento antes do dash (marque com um GameObject na arena).")]
     public Transform chargeAnchor;
-
-    [Tooltip("Collider da âncora (deve ser Trigger). Se não definir, pegamos do 'chargeAnchor'.")]
     public Collider2D chargeAnchorTrigger;
-
-    [Tooltip("Exigir tocar o Trigger da âncora para liberar o dash após o salto.")]
     public bool requireAnchorTriggerForDash = true;
-
-    [Tooltip("Força vertical do salto até o anchor.")]
     public float chargeLeapUpForce = 10f;
-
-    [Tooltip("Velocidade horizontal durante o salto até o anchor.")]
     public float chargeLeapHorizSpeed = 6f;
-
-    [Tooltip("Aceleração horizontal usada no ar para ajustar o X.")]
     public float chargeAirAccel = 40f;
-
-    [Tooltip("Tempo parado 'carregando' o dash DEPOIS de pousar no anchor.")]
     public float chargePreDashHold = 0.35f;
-
-    [Tooltip("Tolerância de X para considerar que chegou ao anchor (em unidades).")]
     public float chargeAnchorXTolerance = 0.15f;
 
     // ======= Cancel do dash ao ser atingido =======
     [Header("Charge Cancel ao ser atingido")]
-    [Tooltip("Layer(s) dos colisores de ATAQUE do player que cancelam o dash (ex.: PlayerAttack).")]
     public LayerMask playerAttackMask;
-    [Tooltip("Força do knockback aplicada no boss ao cancelar o dash.")]
     public float dashCancelKnockback = 10f;
-    [Tooltip("Stun/espera breve após cancelar o dash.")]
     public float dashCancelStun = 0.2f;
 
     // ======= Shockwave do JumpSuperHigh =======
     [Header("Shockwave (JumpSuperHigh landing)")]
-    [Tooltip("Prefab da shockwave instanciada ao tocar o chão após o meteoro.")]
     public GameObject shockwavePrefab;
-
-    [Tooltip("Offset vertical acima do pé (bounds.min.y) para spawn das shockwaves.")]
     public float shockwaveSpawnYOffset = 0.15f;
-
-    [Tooltip("Velocidade inicial desejada para as shockwaves (opcional, sobrescreve a do prefab).")]
     public float shockwaveInitialSpeed = 12f;
 
     // ======= Bullet Hell =======
     [Header("Bullet Hell")]
-    [Tooltip("Pattern ScriptableObject a ser usado neste ataque.")]
     public BulletPatternSO bulletPattern;
-    [Tooltip("Prefab da foice/projétil (deve ter ScytheProjectile ou BulletProjectile).")]
     public GameObject bulletPrefab;
-    [Tooltip("Mask que as foices atingem (normalmente Player).")]
     public LayerMask bulletHitMask = 0;
-    [Tooltip("Quanto tempo o boss ficará atirando (0 = usa duração do Pattern).")]
     public float bulletHellDurationOverride = 0f;
 
     [Header("Bullet Hell – Retreat")]
-    [Tooltip("Se a distância ao Player for menor que isso, o boss recua antes de atirar.")]
     public float bhMinDistanceToPlayer = 5f;
-    [Tooltip("Distância alvo ao recuar (ex.: 8).")]
     public float bhRetreatTargetDistance = 8f;
-    [Tooltip("Velocidade de recuo.")]
     public float bhRetreatSpeed = 8f;
-    [Tooltip("Tempo máximo que pode gastar recuando (failsafe).")]
     public float bhRetreatMaxTime = 1.5f;
 
     [Header("Bullet Hell – Spawn")]
-    [Tooltip("Offset vertical acima do pé do boss para spawn das foices.")]
     public float bulletSpawnYOffset = 0.25f;
+
+    [Header("Bullet Hell – OBJECT POOL")]
+    [Tooltip("Pool de foices. Se nulo, usa Instantiate como fallback.")]
+    public ScythePool scythePool;
 
     #endregion
 
@@ -220,10 +168,10 @@ public class BossSimpleController : MonoBehaviour
     private float phaseTimer = 0f;
     private bool dead = false;
 
-    // Estado Charge/Anchor
+    // Charge/Anchor
     private bool anchorTouchedThisCharge = false;
 
-    // Estado de dash em execução (para poder cancelar on-hit)
+    // Dash em execução (para cancelar on-hit)
     private bool isChargingDash = false;
     private bool dashWasCancelled = false;
     #endregion
@@ -355,10 +303,9 @@ public class BossSimpleController : MonoBehaviour
         yield return new WaitForSeconds(a.recovery);
     }
 
-    // ====== Charge com salto até âncora e dash SÓ após tocar o trigger e estar no chão ======
+    // ====== Charge ======
     private IEnumerator Attack_Charge(Attack a)
     {
-        // Sem âncora: comportamento antigo
         if (!useChargeAnchor || chargeAnchor == null)
         {
             FacePlayerX();
@@ -366,7 +313,6 @@ public class BossSimpleController : MonoBehaviour
             float t0 = 0f;
             Vector2 dir0 = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
 
-            // --- DASH INÍCIO ---
             isChargingDash = true;
             dashWasCancelled = false;
 
@@ -377,17 +323,11 @@ public class BossSimpleController : MonoBehaviour
 
                 var hits0 = Physics2D.OverlapBoxAll(transform.position, a.chargeHitbox, 0f, a.hitMask);
                 foreach (var h in hits0) ApplyPlayerHitIfAny(h.gameObject, a);
-
                 yield return null;
             }
 
-            // encerra dash (normal ou cancelado)
             isChargingDash = false;
-
-            // se cancelado, aplica pequena pausa
-            if (dashWasCancelled && dashCancelStun > 0f)
-                yield return new WaitForSeconds(dashCancelStun);
-
+            if (dashWasCancelled && dashCancelStun > 0f) yield return new WaitForSeconds(dashCancelStun);
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             yield break;
         }
@@ -400,7 +340,7 @@ public class BossSimpleController : MonoBehaviour
         float dx0 = chargeAnchor.position.x - transform.position.x;
         float absDx0 = Mathf.Abs(dx0);
 
-        // A) já no/pertinho do ponto (sem salto)
+        // A) já perto do anchor
         if (absDx0 <= chargeAnchorXTolerance)
         {
             yield return StartCoroutine(WaitUntilGrounded(0.8f));
@@ -410,13 +350,11 @@ public class BossSimpleController : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
 
             FacePlayerX();
-            if (chargePreDashHold > 0f)
-                yield return new WaitForSeconds(chargePreDashHold);
+            if (chargePreDashHold > 0f) yield return new WaitForSeconds(chargePreDashHold);
 
             float elapsedA = 0f;
             Vector2 dirA = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
 
-            // --- DASH INÍCIO ---
             isChargingDash = true;
             dashWasCancelled = false;
 
@@ -431,28 +369,21 @@ public class BossSimpleController : MonoBehaviour
                 yield return new WaitForFixedUpdate();
             }
 
-            // encerra dash (normal ou cancelado)
             isChargingDash = false;
-
-            if (dashWasCancelled && dashCancelStun > 0f)
-                yield return new WaitForSeconds(dashCancelStun);
-
+            if (dashWasCancelled && dashCancelStun > 0f) yield return new WaitForSeconds(dashCancelStun);
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             yield break;
         }
 
-        // B) longe do ponto => PULAR e AJUSTAR X EM AR, sem teleporte
+        // B) longe do anchor -> salto até lá
         FaceX(chargeAnchor.position.x);
 
-        // salto limpo + injeta velocidade horizontal inicial rumo ao anchor
         float initialDirX = Mathf.Sign(chargeAnchor.position.x - transform.position.x);
         rb.linearVelocity = new Vector2(initialDirX * chargeLeapHorizSpeed, 0f);
         rb.AddForce(Vector2.up * chargeLeapUpForce, ForceMode2D.Impulse);
 
-        // deve sair do chão
         yield return StartCoroutine(WaitUntilAirborne(0.4f));
 
-        // fase aérea: manter velocidade X em direção ao anchor, suavizando perto
         while (!IsGrounded())
         {
             float dx = chargeAnchor.position.x - transform.position.x;
@@ -460,7 +391,7 @@ public class BossSimpleController : MonoBehaviour
             float absDx = Mathf.Abs(dx);
 
             float targetVx = dirX * chargeLeapHorizSpeed;
-            if (absDx < 1f) targetVx *= Mathf.Clamp01(absDx); // suaviza no final
+            if (absDx < 1f) targetVx *= Mathf.Clamp01(absDx);
 
             float newVx = Mathf.MoveTowards(rb.linearVelocity.x, targetVx, chargeAirAccel * Time.fixedDeltaTime);
             rb.linearVelocity = new Vector2(newVx, rb.linearVelocity.y);
@@ -468,30 +399,19 @@ public class BossSimpleController : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        // pousou: agora esperamos trigger (se exigido) e estar grounded
-        yield return StartCoroutine(WaitForAnchorTouchAndGrounded(
-            anchorX: chargeAnchor.position.x,
-            tol: chargeAnchorXTolerance,
-            requireTrigger: requireAnchorTriggerForDash,
-            timeout: 1.0f
-        ));
+        yield return StartCoroutine(WaitForAnchorTouchAndGrounded(chargeAnchor.position.x, chargeAnchorXTolerance, requireAnchorTriggerForDash, 1.0f));
 
-        // assentar fisicamente
         yield return new WaitForFixedUpdate();
         yield return new WaitForFixedUpdate();
 
-        // zera drift
         rb.linearVelocity = Vector2.zero;
 
-        // vira pro player, pre-hold e dash (horizontal-only)
         FacePlayerX();
-        if (chargePreDashHold > 0f)
-            yield return new WaitForSeconds(chargePreDashHold);
+        if (chargePreDashHold > 0f) yield return new WaitForSeconds(chargePreDashHold);
 
         float elapsed = 0f;
         Vector2 dir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
 
-        // --- DASH INÍCIO ---
         isChargingDash = true;
         dashWasCancelled = false;
 
@@ -506,16 +426,12 @@ public class BossSimpleController : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        // encerra dash (normal ou cancelado)
         isChargingDash = false;
-
-        if (dashWasCancelled && dashCancelStun > 0f)
-            yield return new WaitForSeconds(dashCancelStun);
-
+        if (dashWasCancelled && dashCancelStun > 0f) yield return new WaitForSeconds(dashCancelStun);
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
 
-    // JumpSmash clássico — params separados
+    // ====== JumpSmash ======
     private IEnumerator Attack_JumpSmash(Attack a)
     {
         float originalGravity = rb.gravityScale;
@@ -536,7 +452,7 @@ public class BossSimpleController : MonoBehaviour
         if (bossSprite) Flash(Color.white, 0.15f);
     }
 
-    // JumpSuperHigh (meteoro lock-on) — params separados
+    // ====== JumpSuperHigh ======
     private IEnumerator Attack_JumpSuperHigh(Attack a)
     {
         float originalGravity = rb.gravityScale;
@@ -596,7 +512,7 @@ public class BossSimpleController : MonoBehaviour
         transform.position = new Vector3(dropX, hoverY, transform.position.z);
         rb.gravityScale = a.fallGravity;
         rb.linearVelocity = Vector2.zero;
-        rb.linearDamping = 0f; // ok ignorar se não usar esse campo
+        rb.linearDamping = 0f;
         rb.AddForce(Vector2.down * a.fallImpulse, ForceMode2D.Impulse);
 
         yield return StartCoroutine(WaitUntilReenterCameraFromTop());
@@ -608,11 +524,9 @@ public class BossSimpleController : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        // 6) Impacto (no chão): dano em área + SHOCKWAVES
         var hits2 = Physics2D.OverlapCircleAll(transform.position, a.smashRadiusSuper, a.hitMask);
         foreach (var h in hits2) ApplyPlayerHitIfAny(h.gameObject, a);
 
-        // Shockwaves dos dois lados, pouco acima do pé
         if (shockwavePrefab != null)
         {
             float baseY = col != null ? col.bounds.min.y + shockwaveSpawnYOffset
@@ -621,24 +535,15 @@ public class BossSimpleController : MonoBehaviour
 
             var swR = Instantiate(shockwavePrefab, spawnPos, Quaternion.identity);
             var cR = swR.GetComponent<Shockwave>();
-            if (cR != null)
-            {
-                cR.speed = shockwaveInitialSpeed;
-                cR.Initialize(Vector2.right);
-            }
+            if (cR != null) { cR.speed = shockwaveInitialSpeed; cR.Initialize(Vector2.right); }
 
             var swL = Instantiate(shockwavePrefab, spawnPos, Quaternion.identity);
             var cL = swL.GetComponent<Shockwave>();
-            if (cL != null)
-            {
-                cL.speed = shockwaveInitialSpeed;
-                cL.Initialize(Vector2.left);
-            }
+            if (cL != null) { cL.speed = shockwaveInitialSpeed; cL.Initialize(Vector2.left); }
         }
 
         if (indicator) Destroy(indicator);
 
-        // Restaura gravidade original APÓS aterrissar
         rb.gravityScale = originalGravity;
 
         if (bossSprite) Flash(Color.white, 0.15f);
@@ -647,7 +552,7 @@ public class BossSimpleController : MonoBehaviour
     // ====== Bullet Hell ======
     private IEnumerator Attack_BulletHell(Attack a)
     {
-        if (bulletPattern == null || bulletPrefab == null) yield break;
+        if (bulletPattern == null || (bulletPrefab == null && scythePool == null)) yield break;
 
         // 1) RETREAT se colado demais
         if (player != null)
@@ -661,10 +566,9 @@ public class BossSimpleController : MonoBehaviour
                     dx = Mathf.Abs(player.position.x - transform.position.x);
                     if (dx >= bhRetreatTargetDistance) break;
 
-                    float dir = Mathf.Sign(transform.position.x - player.position.x); // oposto ao player
+                    float dir = Mathf.Sign(transform.position.x - player.position.x);
                     rb.linearVelocity = new Vector2(dir * bhRetreatSpeed, rb.linearVelocity.y);
-                    if (IsGrounded())
-                        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+                    if (IsGrounded()) rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
 
                     FacePlayerX();
                     timer += Time.deltaTime;
@@ -690,7 +594,7 @@ public class BossSimpleController : MonoBehaviour
             {
                 fireT -= fireInt;
 
-                var dirs = bulletPattern.GenerateBurst(elapsed, transform, player); // direções já normalizadas
+                var dirs = bulletPattern.GenerateBurst(elapsed, transform, player);
                 SpawnBullets(dirs, bulletPattern);
             }
 
@@ -711,9 +615,24 @@ public class BossSimpleController : MonoBehaviour
 
         foreach (var d in dirs)
         {
+            // ======== POOL ========
+            if (scythePool != null)
+            {
+                var sc = scythePool.Spawn(
+                    spawnPos,
+                    d,
+                    so.bulletSpeed,
+                    so.bulletLifeTime,
+                    bulletHitMask
+                );
+
+                sc.Initialize(d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
+                continue;
+            }
+
+            // ======== Fallback: Instantiate ========
             var go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
 
-            // Preferência: ScytheProjectile
             var scythe = go.GetComponent<ScytheProjectile>();
             if (scythe != null)
             {
@@ -721,15 +640,6 @@ public class BossSimpleController : MonoBehaviour
                 continue;
             }
 
-            // Alternativa: BulletProjectile genérico
-            var bullet = go.GetComponent<ScytheProjectile>();
-            if (bullet != null)
-            {
-                bullet.Initialize(d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
-                continue;
-            }
-
-            // Fallback: empurra com RB
             var rb2 = go.GetComponent<Rigidbody2D>();
             if (rb2 != null)
             {
@@ -758,11 +668,10 @@ public class BossSimpleController : MonoBehaviour
         }
     }
 
-    // deve sair do chão após iniciar o salto
     private IEnumerator WaitUntilAirborne(float timeout = 0.4f)
     {
         float t = 0f;
-        yield return null; // pelo menos 1 frame
+        yield return null;
 
         while (t < timeout && IsGrounded())
         {
@@ -771,7 +680,6 @@ public class BossSimpleController : MonoBehaviour
         }
     }
 
-    // aguarda condição para liberar dash depois de pousar próximo/encostar no anchor
     private IEnumerator WaitForAnchorTouchAndGrounded(float anchorX, float tol, bool requireTrigger, float timeout)
     {
         float t = 0f;
@@ -785,7 +693,6 @@ public class BossSimpleController : MonoBehaviour
 
             if (grounded && okAnchor) yield break;
 
-            // se grounded mas fora do X (quando não exige trigger), corrija suavemente
             if (grounded && !requireTrigger && !withinX)
             {
                 float dir = Mathf.Sign(anchorX - transform.position.x);
@@ -796,7 +703,6 @@ public class BossSimpleController : MonoBehaviour
             yield return null;
         }
 
-        // fallback: se estourou o tempo e trigger é exigido, libera se grounded+withinX
         if (IsGrounded())
         {
             float dx = Mathf.Abs(transform.position.x - anchorX);
@@ -876,7 +782,6 @@ public class BossSimpleController : MonoBehaviour
                          ?? target.GetComponentInParent<Player>()
                          ?? target.GetComponentInChildren<Player>();
 
-        // se o player está atacando, não mata por contato aqui
         if (playerComp != null && playerComp.IsAttackActive) return;
 
         if (playerComp != null)
@@ -944,10 +849,7 @@ public class BossSimpleController : MonoBehaviour
         bossSprite.color = original;
     }
 
-    private static bool IsInLayerMask(int layer, LayerMask mask)
-    {
-        return (mask.value & (1 << layer)) != 0;
-    }
+    private static bool IsInLayerMask(int layer, LayerMask mask) => (mask.value & (1 << layer)) != 0;
 
     #endregion
 
@@ -960,22 +862,19 @@ public class BossSimpleController : MonoBehaviour
                         ?? hit.GetComponentInChildren<Player>();
 
         if (playerRef == null) return;
-        if (playerRef.IsAttackActive) return; // se está atacando, não mata por contato
+        if (playerRef.IsAttackActive) return;
 
         try { playerRef.Death(); }
         catch (Exception e) { Debug.LogError($"[Boss] Falha ao chamar Player.Death() no contato: {e.Message}"); }
     }
 
-    // CANCELA O DASH e CAUSA DANO se em execução e o colisor que bateu é de ataque do player
     private void MaybeCancelDashFromHit(Component hitter)
     {
         if (!isChargingDash) return;
 
-        // precisa estar na(s) layer(s) configuradas
         int layer = hitter.gameObject.layer;
         if (!IsInLayerMask(layer, playerAttackMask)) return;
 
-        // pega o Player para ler o dano do ataque
         var playerComp = hitter.GetComponent<Player>()
                        ?? hitter.GetComponentInParent<Player>()
                        ?? hitter.GetComponentInChildren<Player>();
@@ -989,43 +888,33 @@ public class BossSimpleController : MonoBehaviour
         }
         else
         {
-            // se por algum motivo não achou Player, ainda cancela o dash
             Debug.Log("[Boss] Dash CANCELADO por ataque (sem Player encontrado).");
         }
 
-        // marca cancel, zera vel. horizontal e aplica knockback
         dashWasCancelled = true;
 
-        // direção do knockback: empurra o boss pra longe do ponto de contato
         float dir = Mathf.Sign(transform.position.x - hitter.transform.position.x);
-        if (dir == 0f) dir = (transform.localScale.x >= 0) ? -1f : 1f; // fallback
+        if (dir == 0f) dir = (transform.localScale.x >= 0) ? -1f : 1f;
 
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y); // corta o dash
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         rb.AddForce(new Vector2(dir * dashCancelKnockback, 0f), ForceMode2D.Impulse);
     }
 
     private void OnCollisionEnter2D(Collision2D c)
     {
-        // tentativa de cancel em colisão sólida (se o colisor do ataque for não-trigger)
         MaybeCancelDashFromHit(c.collider);
-
-        // matar player por contato (se aplicável)
         TryKillPlayerOnContact(c.gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // 1) Se tocou o trigger da âncora, marca a flag e NÃO faz mais nada
         if (useChargeAnchor && chargeAnchorTrigger != null && other == chargeAnchorTrigger)
         {
             anchorTouchedThisCharge = true;
             return;
         }
 
-        // 2) Tenta cancelar dash se levou hit de ataque (colisor de ataque costuma ser trigger)
         MaybeCancelDashFromHit(other);
-
-        // 3) Demais triggers: lógica padrão de matar player (se aplicável)
         TryKillPlayerOnContact(other.gameObject);
     }
 

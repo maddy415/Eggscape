@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2538c4d9052bbed4ca3b1ad0050c63b1, type: 3}
   m_Name: BulletPattern
   m_EditorClassIdentifier: 
-  pattern: 1
+  pattern: 0
   duration: 3.74
   shotsPerSecond: 9
-  bulletSpeed: 54.2
-  bulletLifeTime: 21.09
+  bulletSpeed: 8
+  bulletLifeTime: 5
   radialCount: 472
   spiralRevsPerSec: 3.5
   spiralArms: 1
