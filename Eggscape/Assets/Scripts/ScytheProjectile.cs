@@ -1,13 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Foice de bullet hell:
-/// - RB2D Kinematic + Trigger
-/// - Anda em linha reta (dir * speed)
-/// - Gira visualmente (opcional)
-/// - Expira após lifeTime
-/// - Mata o Player ao tocar (exceto se IsAttackActive)
-/// </summary>
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class ScytheProjectile : MonoBehaviour
@@ -20,15 +12,26 @@ public class ScytheProjectile : MonoBehaviour
     [Header("Spin")]
     public bool spin = true;
     public float spinDegPerSec = 360f;
-    public Transform visual; // arraste seu sprite aqui (opcional)
+    public Transform visual;
 
-    [Header("Hit")]
-    public LayerMask hitMask;
+    [Header("Hit (layers que PODEM morrer)")]
+    public LayerMask hitMask; // ex.: Player, PlayerLayer
 
+    // Internos
     private float t;
     private Rigidbody2D rb;
     private Collider2D col;
+    private ScythePool pool; // referência ao pool (pra devolver a foice)
 
+    // =======================
+    // POOL LINK
+    // =======================
+    public void AttachPool(ScythePool p)
+    {
+        pool = p;
+    }
+
+    // Inicializa com novos parâmetros
     public void Initialize(Vector2 direction, float spd, float ttl, LayerMask mask)
     {
         dir = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector2.right;
@@ -36,6 +39,9 @@ public class ScytheProjectile : MonoBehaviour
         lifeTime = ttl;
         hitMask = mask;
         t = 0f;
+
+        if (visual)
+            visual.localRotation = Quaternion.identity;
     }
 
     private void Awake()
@@ -45,33 +51,51 @@ public class ScytheProjectile : MonoBehaviour
 
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.simulated = true;
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         col.isTrigger = true;
 
-        if (visual == null) visual = transform;
+        if (!visual) visual = transform;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        t += Time.deltaTime;
-        if (t >= lifeTime) { gameObject.SetActive(false); return; }
+        t += Time.fixedDeltaTime;
+        if (t >= lifeTime)
+        {
+            Despawn();
+            return;
+        }
 
-        rb.MovePosition(rb.position + dir * speed * Time.deltaTime);
+        rb.MovePosition(rb.position + dir * speed * Time.fixedDeltaTime);
 
-        if (spin && visual != null)
-            visual.Rotate(0f, 0f, spinDegPerSec * Time.deltaTime);
+        if (spin && visual)
+            visual.Rotate(0f, 0f, spinDegPerSec * Time.fixedDeltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if ((hitMask.value & (1 << other.gameObject.layer)) == 0) return;
 
-        var player = other.GetComponent<Player>()
-                  ?? other.GetComponentInParent<Player>()
-                  ?? other.GetComponentInChildren<Player>();
+        var p = other.GetComponent<Player>()
+              ?? other.GetComponentInParent<Player>()
+              ?? other.GetComponentInChildren<Player>();
 
-        if (player != null && !player.IsAttackActive)
-            player.Death();
+        if (p != null)
+        {
+            // se quiser imunidade durante ataque, descomente:
+            // if (p.IsAttackActive) return;
 
-        gameObject.SetActive(false);
+            p.Death();
+            Despawn();
+        }
+    }
+
+    private void Despawn()
+    {
+        if (pool != null)
+            pool.Despawn(this);
+        else
+            gameObject.SetActive(false); // fallback se não tiver pool
     }
 }

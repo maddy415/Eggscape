@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 2809721784010619720, guid: 0d85ee8b1a983cf40a86cbe3b7e66995, type: 3}
-  m_Color: {r: 1, g: 0.0000000017429755, b: 0.0000000017429755, a: 1}
+  m_Color: {r: 1, g: 2.3367573e-12, b: 2.3367573e-12, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -159,6 +159,17 @@ MonoBehaviour:
   shockwavePrefab: {fileID: 0}
   shockwaveSpawnYOffset: 0.15
   shockwaveInitialSpeed: 12
+  bulletPattern: {fileID: 0}
+  bulletPrefab: {fileID: 0}
+  bulletHitMask:
+    serializedVersion: 2
+    m_Bits: 0
+  bulletHellDurationOverride: 0
+  bhMinDistanceToPlayer: 5
+  bhRetreatTargetDistance: 8
+  bhRetreatSpeed: 8
+  bhRetreatMaxTime: 1.5
+  bulletSpawnYOffset: 0.25
 --- !u!61 &6285176174509000561
 BoxCollider2D:
   m_ObjectHideFlags: 0

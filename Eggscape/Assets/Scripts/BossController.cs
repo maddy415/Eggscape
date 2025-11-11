@@ -7,9 +7,10 @@ using Random = UnityEngine.Random;
 
 /// <summary>
 /// Boss 2D com fases e ataques:
-/// - Charge
+/// - Charge (com âncora; dash pode ser cancelado por ataque do player)
 /// - JumpSmash (clássico)
-/// - JumpSuperHigh (lock-on/meteoro)
+/// - JumpSuperHigh (lock-on/meteoro + shockwaves ao pousar)
+/// - BulletHell (recuo opcional + padrões via BulletPatternSO)
 /// Player morre com 1 hit ao encostar (exceto enquanto está atacando).
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
@@ -17,7 +18,7 @@ public class BossSimpleController : MonoBehaviour
 {
     #region Tipos de dados (Inspector)
 
-    public enum AttackType { Charge, JumpSmash, JumpSuperHigh }
+    public enum AttackType { Charge, JumpSmash, JumpSuperHigh, BulletHell }
 
     [System.Serializable]
     public class Attack
@@ -185,6 +186,31 @@ public class BossSimpleController : MonoBehaviour
     [Tooltip("Velocidade inicial desejada para as shockwaves (opcional, sobrescreve a do prefab).")]
     public float shockwaveInitialSpeed = 12f;
 
+    // ======= Bullet Hell =======
+    [Header("Bullet Hell")]
+    [Tooltip("Pattern ScriptableObject a ser usado neste ataque.")]
+    public BulletPatternSO bulletPattern;
+    [Tooltip("Prefab da foice/projétil (deve ter ScytheProjectile ou BulletProjectile).")]
+    public GameObject bulletPrefab;
+    [Tooltip("Mask que as foices atingem (normalmente Player).")]
+    public LayerMask bulletHitMask = 0;
+    [Tooltip("Quanto tempo o boss ficará atirando (0 = usa duração do Pattern).")]
+    public float bulletHellDurationOverride = 0f;
+
+    [Header("Bullet Hell – Retreat")]
+    [Tooltip("Se a distância ao Player for menor que isso, o boss recua antes de atirar.")]
+    public float bhMinDistanceToPlayer = 5f;
+    [Tooltip("Distância alvo ao recuar (ex.: 8).")]
+    public float bhRetreatTargetDistance = 8f;
+    [Tooltip("Velocidade de recuo.")]
+    public float bhRetreatSpeed = 8f;
+    [Tooltip("Tempo máximo que pode gastar recuando (failsafe).")]
+    public float bhRetreatMaxTime = 1.5f;
+
+    [Header("Bullet Hell – Spawn")]
+    [Tooltip("Offset vertical acima do pé do boss para spawn das foices.")]
+    public float bulletSpawnYOffset = 0.25f;
+
     #endregion
 
     #region Internals
@@ -320,6 +346,9 @@ public class BossSimpleController : MonoBehaviour
                 break;
             case AttackType.JumpSuperHigh:
                 yield return Attack_JumpSuperHigh(a);
+                break;
+            case AttackType.BulletHell:
+                yield return Attack_BulletHell(a);
                 break;
         }
 
@@ -615,9 +644,100 @@ public class BossSimpleController : MonoBehaviour
         if (bossSprite) Flash(Color.white, 0.15f);
     }
 
+    // ====== Bullet Hell ======
+    private IEnumerator Attack_BulletHell(Attack a)
+    {
+        if (bulletPattern == null || bulletPrefab == null) yield break;
+
+        // 1) RETREAT se colado demais
+        if (player != null)
+        {
+            float dx = Mathf.Abs(player.position.x - transform.position.x);
+            if (dx < bhMinDistanceToPlayer)
+            {
+                float timer = 0f;
+                while (timer < bhRetreatMaxTime)
+                {
+                    dx = Mathf.Abs(player.position.x - transform.position.x);
+                    if (dx >= bhRetreatTargetDistance) break;
+
+                    float dir = Mathf.Sign(transform.position.x - player.position.x); // oposto ao player
+                    rb.linearVelocity = new Vector2(dir * bhRetreatSpeed, rb.linearVelocity.y);
+                    if (IsGrounded())
+                        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+
+                    FacePlayerX();
+                    timer += Time.deltaTime;
+                    yield return null;
+                }
+            }
+        }
+
+        // 2) PARA o boss e começa a atirar parado
+        rb.linearVelocity = Vector2.zero;
+
+        float duration = bulletHellDurationOverride > 0f ? bulletHellDurationOverride : bulletPattern.duration;
+        float elapsed = 0f;
+        float fireInt = bulletPattern.FireInterval;
+        float fireT = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            fireT += Time.deltaTime;
+
+            if (fireT >= fireInt)
+            {
+                fireT -= fireInt;
+
+                var dirs = bulletPattern.GenerateBurst(elapsed, transform, player); // direções já normalizadas
+                SpawnBullets(dirs, bulletPattern);
+            }
+
+            yield return null;
+        }
+    }
+
     #endregion
 
-    #region Helpers (câmera / chão / âncora)
+    #region Helpers (câmera / chão / âncora / bullet)
+
+    private void SpawnBullets(List<Vector2> dirs, BulletPatternSO so)
+    {
+        if (dirs == null || dirs.Count == 0) return;
+
+        float baseY = (col != null ? col.bounds.min.y : transform.position.y) + bulletSpawnYOffset;
+        Vector3 spawnPos = new Vector3(transform.position.x, baseY, 0f);
+
+        foreach (var d in dirs)
+        {
+            var go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
+
+            // Preferência: ScytheProjectile
+            var scythe = go.GetComponent<ScytheProjectile>();
+            if (scythe != null)
+            {
+                scythe.Initialize(d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
+                continue;
+            }
+
+            // Alternativa: BulletProjectile genérico
+            var bullet = go.GetComponent<ScytheProjectile>();
+            if (bullet != null)
+            {
+                bullet.Initialize(d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
+                continue;
+            }
+
+            // Fallback: empurra com RB
+            var rb2 = go.GetComponent<Rigidbody2D>();
+            if (rb2 != null)
+            {
+                rb2.bodyType = RigidbodyType2D.Kinematic;
+                rb2.linearVelocity = d * so.bulletSpeed;
+            }
+        }
+    }
 
     private IEnumerator WaitUntilAboveCameraTop(float margin = 0.02f, float timeout = 3f)
     {
@@ -933,10 +1053,15 @@ public class BossSimpleController : MonoBehaviour
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawWireSphere(transform.position, atk.smashRadiusSmash);
             }
-            else // JumpSuperHigh
+            else if (atk.type == AttackType.JumpSuperHigh)
             {
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawWireSphere(transform.position, atk.smashRadiusSuper);
+            }
+            else // BulletHell
+            {
+                Gizmos.color = new Color(0.2f, 1f, 1f, 0.65f);
+                Gizmos.DrawWireSphere(transform.position, 0.25f);
             }
         }
 
