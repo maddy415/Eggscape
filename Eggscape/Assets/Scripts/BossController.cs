@@ -136,7 +136,7 @@ public class BossSimpleController : MonoBehaviour
     [Tooltip("Distância extra para o boxcast de chão.")]
     public float groundProbeDistance = 0.15f;
 
-    // ======= NOVO: Âncora do Charge =======
+    // ======= Charge Anchor =======
     [Header("Charge Anchor (ponto fixo do dash)")]
     [Tooltip("Se ativo, antes do dash o boss salta até este ponto e só então carrega e dispara.")]
     public bool useChargeAnchor = true;
@@ -165,7 +165,16 @@ public class BossSimpleController : MonoBehaviour
     [Tooltip("Tolerância de X para considerar que chegou ao anchor (em unidades).")]
     public float chargeAnchorXTolerance = 0.15f;
 
-    // ======= NOVO: Shockwave ao aterrissar do JumpSuperHigh =======
+    // ======= Cancel do dash ao ser atingido =======
+    [Header("Charge Cancel ao ser atingido")]
+    [Tooltip("Layer(s) dos colisores de ATAQUE do player que cancelam o dash (ex.: PlayerAttack).")]
+    public LayerMask playerAttackMask;
+    [Tooltip("Força do knockback aplicada no boss ao cancelar o dash.")]
+    public float dashCancelKnockback = 10f;
+    [Tooltip("Stun/espera breve após cancelar o dash.")]
+    public float dashCancelStun = 0.2f;
+
+    // ======= Shockwave do JumpSuperHigh =======
     [Header("Shockwave (JumpSuperHigh landing)")]
     [Tooltip("Prefab da shockwave instanciada ao tocar o chão após o meteoro.")]
     public GameObject shockwavePrefab;
@@ -185,8 +194,12 @@ public class BossSimpleController : MonoBehaviour
     private float phaseTimer = 0f;
     private bool dead = false;
 
-    // estado do ataque Charge
+    // Estado Charge/Anchor
     private bool anchorTouchedThisCharge = false;
+
+    // Estado de dash em execução (para poder cancelar on-hit)
+    private bool isChargingDash = false;
+    private bool dashWasCancelled = false;
     #endregion
 
     #region Unity
@@ -324,7 +337,11 @@ public class BossSimpleController : MonoBehaviour
             float t0 = 0f;
             Vector2 dir0 = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
 
-            while (t0 < a.dashDuration)
+            // --- DASH INÍCIO ---
+            isChargingDash = true;
+            dashWasCancelled = false;
+
+            while (t0 < a.dashDuration && !dashWasCancelled)
             {
                 t0 += Time.deltaTime;
                 rb.linearVelocity = new Vector2(dir0.x * a.dashSpeed, rb.linearVelocity.y);
@@ -334,6 +351,13 @@ public class BossSimpleController : MonoBehaviour
 
                 yield return null;
             }
+
+            // encerra dash (normal ou cancelado)
+            isChargingDash = false;
+
+            // se cancelado, aplica pequena pausa
+            if (dashWasCancelled && dashCancelStun > 0f)
+                yield return new WaitForSeconds(dashCancelStun);
 
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             yield break;
@@ -362,7 +386,12 @@ public class BossSimpleController : MonoBehaviour
 
             float elapsedA = 0f;
             Vector2 dirA = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
-            while (elapsedA < a.dashDuration)
+
+            // --- DASH INÍCIO ---
+            isChargingDash = true;
+            dashWasCancelled = false;
+
+            while (elapsedA < a.dashDuration && !dashWasCancelled)
             {
                 elapsedA += Time.fixedDeltaTime;
                 rb.linearVelocity = new Vector2(dirA.x * a.dashSpeed, 0f);
@@ -372,6 +401,12 @@ public class BossSimpleController : MonoBehaviour
 
                 yield return new WaitForFixedUpdate();
             }
+
+            // encerra dash (normal ou cancelado)
+            isChargingDash = false;
+
+            if (dashWasCancelled && dashCancelStun > 0f)
+                yield return new WaitForSeconds(dashCancelStun);
 
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             yield break;
@@ -426,7 +461,12 @@ public class BossSimpleController : MonoBehaviour
 
         float elapsed = 0f;
         Vector2 dir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
-        while (elapsed < a.dashDuration)
+
+        // --- DASH INÍCIO ---
+        isChargingDash = true;
+        dashWasCancelled = false;
+
+        while (elapsed < a.dashDuration && !dashWasCancelled)
         {
             elapsed += Time.fixedDeltaTime;
             rb.linearVelocity = new Vector2(dir.x * a.dashSpeed, 0f);
@@ -436,6 +476,12 @@ public class BossSimpleController : MonoBehaviour
 
             yield return new WaitForFixedUpdate();
         }
+
+        // encerra dash (normal ou cancelado)
+        isChargingDash = false;
+
+        if (dashWasCancelled && dashCancelStun > 0f)
+            yield return new WaitForSeconds(dashCancelStun);
 
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
     }
@@ -537,14 +583,13 @@ public class BossSimpleController : MonoBehaviour
         var hits2 = Physics2D.OverlapCircleAll(transform.position, a.smashRadiusSuper, a.hitMask);
         foreach (var h in hits2) ApplyPlayerHitIfAny(h.gameObject, a);
 
-        // --- NOVO: spawn das shockwaves dos dois lados, pouco acima do pé ---
+        // Shockwaves dos dois lados, pouco acima do pé
         if (shockwavePrefab != null)
         {
             float baseY = col != null ? col.bounds.min.y + shockwaveSpawnYOffset
                                       : transform.position.y + shockwaveSpawnYOffset;
             Vector3 spawnPos = new Vector3(transform.position.x, baseY, transform.position.z);
 
-            // direita
             var swR = Instantiate(shockwavePrefab, spawnPos, Quaternion.identity);
             var cR = swR.GetComponent<Shockwave>();
             if (cR != null)
@@ -553,7 +598,6 @@ public class BossSimpleController : MonoBehaviour
                 cR.Initialize(Vector2.right);
             }
 
-            // esquerda
             var swL = Instantiate(shockwavePrefab, spawnPos, Quaternion.identity);
             var cL = swL.GetComponent<Shockwave>();
             if (cL != null)
@@ -712,6 +756,7 @@ public class BossSimpleController : MonoBehaviour
                          ?? target.GetComponentInParent<Player>()
                          ?? target.GetComponentInChildren<Player>();
 
+        // se o player está atacando, não mata por contato aqui
         if (playerComp != null && playerComp.IsAttackActive) return;
 
         if (playerComp != null)
@@ -779,6 +824,11 @@ public class BossSimpleController : MonoBehaviour
         bossSprite.color = original;
     }
 
+    private static bool IsInLayerMask(int layer, LayerMask mask)
+    {
+        return (mask.value & (1 << layer)) != 0;
+    }
+
     #endregion
 
     #region Collisions / Triggers
@@ -790,14 +840,56 @@ public class BossSimpleController : MonoBehaviour
                         ?? hit.GetComponentInChildren<Player>();
 
         if (playerRef == null) return;
-        if (playerRef.IsAttackActive) return;
+        if (playerRef.IsAttackActive) return; // se está atacando, não mata por contato
 
         try { playerRef.Death(); }
         catch (Exception e) { Debug.LogError($"[Boss] Falha ao chamar Player.Death() no contato: {e.Message}"); }
     }
 
+    // CANCELA O DASH e CAUSA DANO se em execução e o colisor que bateu é de ataque do player
+    private void MaybeCancelDashFromHit(Component hitter)
+    {
+        if (!isChargingDash) return;
+
+        // precisa estar na(s) layer(s) configuradas
+        int layer = hitter.gameObject.layer;
+        if (!IsInLayerMask(layer, playerAttackMask)) return;
+
+        // pega o Player para ler o dano do ataque
+        var playerComp = hitter.GetComponent<Player>()
+                       ?? hitter.GetComponentInParent<Player>()
+                       ?? hitter.GetComponentInChildren<Player>();
+
+        float dmg = 0f;
+        if (playerComp != null)
+        {
+            dmg = Mathf.Max(0f, playerComp.attackDamage);
+            TakeDamage(dmg);
+            Debug.Log($"[Boss] Dash CANCELADO por ataque do player. Dano: {dmg} | HP: {currentHealth}/{maxHealth}");
+        }
+        else
+        {
+            // se por algum motivo não achou Player, ainda cancela o dash
+            Debug.Log("[Boss] Dash CANCELADO por ataque (sem Player encontrado).");
+        }
+
+        // marca cancel, zera vel. horizontal e aplica knockback
+        dashWasCancelled = true;
+
+        // direção do knockback: empurra o boss pra longe do ponto de contato
+        float dir = Mathf.Sign(transform.position.x - hitter.transform.position.x);
+        if (dir == 0f) dir = (transform.localScale.x >= 0) ? -1f : 1f; // fallback
+
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y); // corta o dash
+        rb.AddForce(new Vector2(dir * dashCancelKnockback, 0f), ForceMode2D.Impulse);
+    }
+
     private void OnCollisionEnter2D(Collision2D c)
     {
+        // tentativa de cancel em colisão sólida (se o colisor do ataque for não-trigger)
+        MaybeCancelDashFromHit(c.collider);
+
+        // matar player por contato (se aplicável)
         TryKillPlayerOnContact(c.gameObject);
     }
 
@@ -810,7 +902,10 @@ public class BossSimpleController : MonoBehaviour
             return;
         }
 
-        // 2) Demais triggers: lógica padrão de matar player (se aplicável)
+        // 2) Tenta cancelar dash se levou hit de ataque (colisor de ataque costuma ser trigger)
+        MaybeCancelDashFromHit(other);
+
+        // 3) Demais triggers: lógica padrão de matar player (se aplicável)
         TryKillPlayerOnContact(other.gameObject);
     }
 
