@@ -39,7 +39,21 @@ public class MenuManager : MonoBehaviour
         Debug.Log("Lvl 1 Loaded");
     }
 
-    public void LoadTutorial()
+    public void LoadStory()
+    {
+        if (transition != null)
+        {
+            transition.LoadScene("story");
+        }
+        else
+        {
+            SceneManager.LoadScene("story");
+        }
+
+        Debug.Log("story Loaded");
+    }
+    
+    public void LoadTutoial()
     {
         if (transition != null)
         {
@@ -50,7 +64,7 @@ public class MenuManager : MonoBehaviour
             SceneManager.LoadScene("tutorial");
         }
 
-        Debug.Log("Tutorial Loaded");
+        Debug.Log("tutorial Loaded");
     }
 
     public void LoadGame2()
