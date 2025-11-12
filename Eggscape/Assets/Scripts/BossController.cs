@@ -158,6 +158,11 @@ public class BossSimpleController : MonoBehaviour
     [Header("Bullet Hell – OBJECT POOL")]
     [Tooltip("Pool de foices. Se nulo, usa Instantiate como fallback.")]
     public ScythePool scythePool;
+    
+    [Header("Trilha Sonora")]
+    public AudioClip bossTheme;
+    public AudioClip phaseChangeTheme;
+    public AudioClip deathTheme;
 
     #endregion
 
@@ -214,6 +219,7 @@ public class BossSimpleController : MonoBehaviour
 
     private IEnumerator IntroRoutine()
     {
+        AudioManager.audioInstance.Crossfade(bossTheme, 1f);
         invulnerable = true;
         if (bossSprite) Flash(telegraphColor, introDuration);
 

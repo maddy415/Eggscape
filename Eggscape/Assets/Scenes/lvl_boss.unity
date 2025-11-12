@@ -3174,7 +3174,10 @@ MonoBehaviour:
   logSFX: {fileID: 8300000, guid: e83c34a649e1af549ae4aa8813c26d0e, type: 3}
   deathSFX: {fileID: 8300000, guid: 2bbba8330c5685e488dd2552ac6b7288, type: 3}
   explosionSFX: {fileID: 8300000, guid: 210bc3f1e643b1c43953f56ab6468dff, type: 3}
-  audioSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  musicSource: {fileID: 0}
+  sfxVolume: 1
+  musicVolume: 1
 --- !u!4 &1941320289
 Transform:
   m_ObjectHideFlags: 0
@@ -3655,6 +3658,18 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 279004609}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: bossTheme
+      value: 
+      objectReference: {fileID: 8300000, guid: ed5e37592ffcacd4aa3d8e0ef4c9e40b, type: 3}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: maxHealth
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: scythePool
+      value: 
+      objectReference: {fileID: 648080742}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: bulletPrefab
       value: 
       objectReference: {fileID: 344461915602035899, guid: dc6403277f06f24498555c61a386b970, type: 3}
@@ -3696,7 +3711,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: bhMinDistanceToPlayer
-      value: 11
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: shockwaveSpawnYOffset
@@ -3704,7 +3719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: chargeAnchorXTolerance
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: bhRetreatTargetDistance
@@ -3748,15 +3763,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[0].weight
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[1].weight
-      value: 20
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[2].weight
-      value: 200
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.data[2].windup

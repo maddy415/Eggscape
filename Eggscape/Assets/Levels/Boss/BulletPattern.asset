@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2538c4d9052bbed4ca3b1ad0050c63b1, type: 3}
   m_Name: BulletPattern
   m_EditorClassIdentifier: 
-  pattern: 4
+  pattern: 1
   duration: 3.74
   shotsPerSecond: 9
   bulletSpeed: 8

@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 2809721784010619720, guid: 0d85ee8b1a983cf40a86cbe3b7e66995, type: 3}
-  m_Color: {r: 1, g: 1.7017017e-13, b: 1.7017017e-13, a: 1}
+  m_Color: {r: 1, g: 5.4449453e-14, b: 5.4449453e-14, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -171,6 +171,9 @@ MonoBehaviour:
   bhRetreatMaxTime: 1.5
   bulletSpawnYOffset: 0.25
   scythePool: {fileID: 0}
+  bossTheme: {fileID: 0}
+  phaseChangeTheme: {fileID: 0}
+  deathTheme: {fileID: 0}
 --- !u!61 &6285176174509000561
 BoxCollider2D:
   m_ObjectHideFlags: 0
