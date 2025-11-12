@@ -7,13 +7,13 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    
+
     public GameObject vicCanvas;
     public FrogIdleJumper frogJumper;
     public GameObject barn;
     public GameObject frog;
-    public GameObject spawnerLog; 
-    public GameObject spawnerBird; 
+    public GameObject spawnerLog;
+    public GameObject spawnerBird;
     public GameObject ground;
     public GameObject fence;
     public List<GameObject> objsOnScene = new List<GameObject>();
@@ -24,18 +24,18 @@ public class GameManager : MonoBehaviour
     public float score;
     public PatternGen patternGen;
     public GameObject saveData;
-    
+
     public float sceneTime = 0;
     public float timeGoal;
-    
+
     public bool playerAlive = true;
     private bool victoryTriggered = false;
     private bool waitingForVictory = false;
     public bool isCheatOn = false;
-    
+
     public bool victoryAchieved = false;
 
-    // ========= DEBUG DE VITÓRIA (NOVO) =========
+    // ========= DEBUG DE VITÓRIA =========
     [Header("Debug de Vitória")]
     public bool debugVictoryHUD = false;                  // F3 liga/desliga
     public TextMeshProUGUI debugVictoryText;              // opcional: arrasta um TMP aqui
@@ -44,25 +44,35 @@ public class GameManager : MonoBehaviour
     private string debugCache = "";                       // buffer do texto da HUD
     public int debugListMax = 6;                          // quantos objs listar
 
+    // ========= TRANSITION (fade) =========
+    private SceneTransition transition;
+
     void Awake()
     {
         if (Instance == null)
         {
-            Instance = this; 
+            Instance = this;
         }
         else
         {
-            Destroy(gameObject); 
+            Destroy(gameObject);
+            return;
         }
     }
 
     private void Start()
     {
-        frogJumper = frog.GetComponent<FrogIdleJumper>();
-        
-        groundRef.SetActive(false);
-        victoryText.text = "";
-        
+        // cache de refs
+        if (frog != null) frogJumper = frog.GetComponent<FrogIdleJumper>();
+
+        if (groundRef != null) groundRef.SetActive(false);
+        if (victoryText != null) victoryText.text = "";
+
+        // pegar o SceneTransition (fade) se existir
+        transition = SceneTransition.Instance != null
+            ? SceneTransition.Instance
+            : FindObjectOfType<SceneTransition>(true);
+
         // carregar save ao iniciar
         SaveData loaded = SaveSystem.Load();
         Debug.Log("Highscore carregado: " + loaded.highScore + " | levelReached: " + loaded.levelReached);
@@ -70,29 +80,34 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        //score += Time.deltaTime;
-        scoreText.text = "Score: "+Convert.ToInt32(score);
-        
+        // HUD de score
+        if (scoreText) scoreText.text = "Score: " + Convert.ToInt32(score);
+
+        // condição de vitória por tempo
         if (!victoryTriggered && sceneTime >= timeGoal)
         {
             Victory();
         }
-        
+
+        // aguardando limpar a cena (sem inimigos)
         if (waitingForVictory && objsOnScene.Count <= 0)
         {
             Debug.Log("cabo os bixo ganhou");
             waitingForVictory = false;
             victoryAchieved = true;
         }
-        
+
+        // input de reset
         ResetScene();
-        
+
+        // cronômetro enquanto player vivo
         if (playerAlive)
         {
             sceneTime += Time.deltaTime;
         }
 
-        if (Input.GetKeyDown(KeyCode.J) && isCheatOn==false)
+        // cheat toggle
+        if (Input.GetKeyDown(KeyCode.J) && isCheatOn == false)
         {
             CheatOn();
         }
@@ -102,21 +117,23 @@ public class GameManager : MonoBehaviour
             Debug.Log("Cheat desativado");
         }
 
-        if (victoryAchieved && player.CanMove == false && Input.GetKeyDown(KeyCode.Space))
+        // avançar fase (quando vitória alcançada e player travado)
+        if (victoryAchieved && player != null && player.CanMove == false && Input.GetKeyDown(KeyCode.Space))
         {
             LoadNextScene();
         }
 
+        // avançar fase (forçado)
         if (Input.GetKeyDown(KeyCode.N))
         {
             LoadNextScene();
         }
 
-        // ===== DEBUG: toggles (NOVO) =====
+        // ===== DEBUG: toggles =====
         if (Input.GetKeyDown(KeyCode.F3)) debugVictoryHUD = !debugVictoryHUD;
         if (Input.GetKeyDown(KeyCode.F4)) DumpVictoryDebugToConsole();
 
-        // ===== DEBUG: atualiza HUD com frequência leve (NOVO) =====
+        // ===== DEBUG: atualiza HUD com frequência leve =====
         if (debugVictoryHUD)
         {
             debugTimer -= Time.deltaTime;
@@ -133,24 +150,26 @@ public class GameManager : MonoBehaviour
         if (playerAlive == false)
         {
             Debug.Log("Player is dead");
-            vicCanvas.SetActive(true); //Mostra a tela de game over
+            if (vicCanvas) vicCanvas.SetActive(true); //Mostra a tela de game over
 
             StopSpawners();
-            
-            ground.GetComponent<GroundGen>().enabled = false;
-            fence.GetComponent<GroundGen>().enabled = false;
-            barn.GetComponent<ObstacleMove>().enabled = false;
+
+            if (ground) ground.GetComponent<GroundGen>().enabled = false;
+            if (fence) fence.GetComponent<GroundGen>().enabled = false;
+            if (barn) barn.GetComponent<ObstacleMove>().enabled = false;
 
             foreach (GameObject obj in GameManager.Instance.objsOnScene)
             {
-                if (obj.layer == 9)
+                if (obj == null) continue;
+
+                if (obj.layer == 9 && frogJumper != null)
                 {
                     frogJumper.speed = 0;
-
                 }
                 if (obj.layer != 8)
                 {
-                    obj.GetComponent<ObstacleMove>().enabled = false; //Isso potencialmente ta mal otimizado pra caralho
+                    var mv = obj.GetComponent<ObstacleMove>();
+                    if (mv) mv.enabled = false; //Isso potencialmente ta mal otimizado pra caralho
                 }
             }
         }
@@ -162,13 +181,16 @@ public class GameManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                // antes: SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                LoadWithTransitionByIndex(SceneManager.GetActiveScene().buildIndex);
+                return;
             }
         }
-        
-        if(Input.GetKeyDown(KeyCode.H))
+
+        if (Input.GetKeyDown(KeyCode.H))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            // antes: SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            LoadWithTransitionByIndex(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
@@ -178,6 +200,7 @@ public class GameManager : MonoBehaviour
         waitingForVictory = true;
 
         StopSpawners();
+
         // salvar progresso ao vencer
         SaveData data = new SaveData();
         data.highScore = Mathf.Max((int)score, SaveSystem.Load().highScore); // manter melhor pontuação
@@ -187,7 +210,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Progresso salvo!");
         Debug.Log("Vitória iniciada. Esperando limpar a cena...");
     }
-    
+
     public void Debug_SaveNow()
     {
         SaveData d = new SaveData { highScore = (int)score, levelReached = SceneManager.GetActiveScene().buildIndex };
@@ -207,7 +230,7 @@ public class GameManager : MonoBehaviour
 
     void StopSpawners()
     {
-        patternGen.canSpawn = false;
+        if (patternGen != null) patternGen.canSpawn = false;
     }
 
     void CheatOn() //Desativa a detecção de colisão no OnCollisionEnter2D do Player
@@ -227,7 +250,8 @@ public class GameManager : MonoBehaviour
         // Se ainda houver próxima cena na lista, carrega
         if (nextIndex < SceneManager.sceneCountInBuildSettings)
         {
-            SceneManager.LoadScene(nextIndex);
+            // antes: SceneManager.LoadScene(nextIndex);
+            LoadWithTransitionByIndex(nextIndex);
         }
         else
         {
@@ -247,7 +271,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ========= MÉTODOS DE DEBUG (NOVO) =========
+    // ========= MÉTODOS DE DEBUG =========
     private void UpdateVictoryDebug()
     {
         // limpa nulos pra contagem honesta
@@ -314,5 +338,22 @@ public class GameManager : MonoBehaviour
         float w = 520f;
         float h = 160f;
         GUI.Box(new Rect(10, 10, w, h), debugCache, style);
+    }
+
+    // ========= HELPERS DE LOAD COM FADE =========
+    private void LoadWithTransitionByIndex(int buildIndex)
+    {
+        if (transition != null)
+            transition.LoadScene(buildIndex);
+        else
+            SceneManager.LoadScene(buildIndex);
+    }
+
+    private void LoadWithTransitionByName(string sceneName)
+    {
+        if (transition != null)
+            transition.LoadScene(sceneName);
+        else
+            SceneManager.LoadScene(sceneName);
     }
 }

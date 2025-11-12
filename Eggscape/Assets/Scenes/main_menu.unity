@@ -1848,7 +1848,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transitionAnim: {fileID: 2079495440}
+  fadeOutTrigger: Start
+  fadeInStateName: FadeIn
   transitionTime: 1
+  fadeCanvas: {fileID: 740187548}
+  sortingFront: 2
+  sortingBack: 0
 --- !u!95 &2079495440
 Animator:
   serializedVersion: 7

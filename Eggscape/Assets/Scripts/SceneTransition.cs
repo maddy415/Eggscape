@@ -2,23 +2,49 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[DisallowMultipleComponent]
 public class SceneTransition : MonoBehaviour
 {
+    public static SceneTransition Instance { get; private set; }
+
+    [Header("Animator / Fade")]
+    [Tooltip("Animator com as animações FadeOut (0->1) e FadeIn (1->0).")]
     public Animator transitionAnim;
+    [Tooltip("Trigger que toca o FadeOut no Animator.")]
+    public string fadeOutTrigger = "Start";
+    [Tooltip("Nome do state de entrada (deve ser o FadeIn, alpha 1->0).")]
+    public string fadeInStateName = "FadeIn";
+    [Tooltip("Duração do fade (segundos). Deve bater com as animações.")]
     public float transitionTime = 1f;
 
-    private static SceneTransition instance;
-    private bool firstSceneLoaded = false;
-    private Canvas fadeCanvas;
+    [Header("Canvas Sorting")]
+    [Tooltip("Canvas do overlay de fade. Deve estar como Screen Space - Overlay e Override Sorting = ON.")]
+    public Canvas fadeCanvas;
+    [Tooltip("Ordem enquanto o fade está ativo (sobre a UI).")]
+    public int sortingFront = 2;
+    [Tooltip("Ordem quando o fade termina (atrás da UI).")]
+    public int sortingBack = 0;
 
-    void Awake()
+    private bool firstSceneLoaded = false;
+
+    private void Awake()
     {
-        if (instance == null)
+        // Singleton
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            if (!fadeCanvas)
+                fadeCanvas = GetComponentInChildren<Canvas>(includeInactive: true);
+
+            if (fadeCanvas)
+                fadeCanvas.overrideSorting = true;
+
+            // Garante que não esteja cobrindo no início
+            if (fadeCanvas) fadeCanvas.sortingOrder = sortingBack;
+
             SceneManager.sceneLoaded += OnSceneLoaded;
-            fadeCanvas = GetComponentInChildren<Canvas>();
         }
         else
         {
@@ -26,45 +52,77 @@ public class SceneTransition : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // Ao dar Play no Editor direto numa cena, esse callback dispara;
+        // queremos ignorar o primeiro fade-in.
         if (!firstSceneLoaded)
         {
             firstSceneLoaded = true;
-            transitionAnim.Play("FadeIn", 0, 1f);
-            fadeCanvas.sortingOrder = 0;
+
+            // Se por qualquer motivo a tela estiver preta, garante limpar:
+            if (transitionAnim && !string.IsNullOrEmpty(fadeInStateName))
+                transitionAnim.Play(fadeInStateName, 0, 1f);
+
+            if (fadeCanvas) fadeCanvas.sortingOrder = sortingBack;
             return;
         }
 
-        // quando a nova cena carregar, toca o FadeIn e abaixa o canvas
+        // Nas transições normais, toca o FadeIn e desce o canvas depois
         StartCoroutine(FadeInRoutine());
     }
 
+    // ========= API pública =========
+
     public void LoadScene(string sceneName)
     {
-        StartCoroutine(Transition(sceneName));
+        StartCoroutine(TransitionByName(sceneName));
     }
 
-    private IEnumerator Transition(string sceneName)
+    public void LoadScene(int buildIndex)
     {
-        // sobe o fade pra frente
-        fadeCanvas.sortingOrder = 2;
+        StartCoroutine(TransitionByIndex(buildIndex));
+    }
 
-        transitionAnim.SetTrigger("Start");
+    // ========= Núcleo =========
+
+    private IEnumerator TransitionStart()
+    {
+        if (fadeCanvas) fadeCanvas.sortingOrder = sortingFront;
+
+        if (transitionAnim && !string.IsNullOrEmpty(fadeOutTrigger))
+            transitionAnim.SetTrigger(fadeOutTrigger);
+
         yield return new WaitForSeconds(transitionTime);
+    }
+
+    private IEnumerator TransitionByName(string sceneName)
+    {
+        yield return TransitionStart();
         SceneManager.LoadScene(sceneName);
+        // O FadeIn rola no OnSceneLoaded()
+    }
+
+    private IEnumerator TransitionByIndex(int buildIndex)
+    {
+        yield return TransitionStart();
+        SceneManager.LoadScene(buildIndex);
+        // O FadeIn rola no OnSceneLoaded()
     }
 
     private IEnumerator FadeInRoutine()
     {
-        transitionAnim.Play("FadeIn", 0, 0f);
+        if (transitionAnim && !string.IsNullOrEmpty(fadeInStateName))
+            transitionAnim.Play(fadeInStateName, 0, 0f);
+
         yield return new WaitForSeconds(transitionTime);
-        // depois que o fade sumir, abaixa ele de volta
-        fadeCanvas.sortingOrder = 0;
+
+        if (fadeCanvas) fadeCanvas.sortingOrder = sortingBack;
     }
 }
