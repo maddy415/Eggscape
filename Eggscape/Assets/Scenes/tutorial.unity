@@ -4178,7 +4178,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5326845853890688537, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
       propertyPath: m_Enabled
@@ -6342,6 +6342,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vicCanvas: {fileID: 682906393}
+  frogJumper: {fileID: 0}
+  barn: {fileID: 0}
+  frog: {fileID: 0}
   spawnerLog: {fileID: 304386134}
   spawnerBird: {fileID: 1411324291}
   ground: {fileID: 881868767}
@@ -6359,6 +6362,10 @@ MonoBehaviour:
   playerAlive: 1
   isCheatOn: 0
   victoryAchieved: 0
+  debugVictoryHUD: 0
+  debugVictoryText: {fileID: 0}
+  debugRefresh: 0.25
+  debugListMax: 6
 --- !u!1 &1755494551
 GameObject:
   m_ObjectHideFlags: 0
@@ -7381,7 +7388,10 @@ MonoBehaviour:
   logSFX: {fileID: 8300000, guid: e83c34a649e1af549ae4aa8813c26d0e, type: 3}
   deathSFX: {fileID: 8300000, guid: 2bbba8330c5685e488dd2552ac6b7288, type: 3}
   explosionSFX: {fileID: 8300000, guid: 210bc3f1e643b1c43953f56ab6468dff, type: 3}
-  audioSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  musicSource: {fileID: 0}
+  sfxVolume: 1
+  musicVolume: 1
 --- !u!4 &1941320289
 Transform:
   m_ObjectHideFlags: 0
@@ -7981,6 +7991,10 @@ PrefabInstance:
     - target: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
       propertyPath: m_Name
       value: Ground Filler
+      objectReference: {fileID: 0}
+    - target: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6838720885862636620, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
       propertyPath: m_LocalScale.x

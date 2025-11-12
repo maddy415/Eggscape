@@ -20,8 +20,8 @@ public class AttackCollisionHandler : MonoBehaviour
         }
 
         // 2) Se acertar o BOSS → causar dano + knockback
-        var boss = other.GetComponentInParent<BossSimpleController>() 
-                   ?? other.GetComponent<BossSimpleController>();
+        var boss = other.GetComponentInParent<BossController>() 
+                   ?? other.GetComponent<BossController>();
         if (boss != null)
         {
             var player = GetComponentInParent<Player>();

@@ -14,7 +14,7 @@ using Random = UnityEngine.Random;
 /// Player morre com 1 hit ao encostar (exceto enquanto está atacando).
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
-public class BossSimpleController : MonoBehaviour
+public class BossController : MonoBehaviour
 {
     #region Tipos de dados (Inspector)
 

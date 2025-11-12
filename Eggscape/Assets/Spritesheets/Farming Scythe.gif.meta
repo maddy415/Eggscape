@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0d85ee8b1a983cf40a86cbe3b7e66995
+guid: 8db2859be6d7344418527c7ff4298ae2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2809721784010619720
-    second: chicken 3_0
+      213: -7275714251951402985
+    second: Farming Scythe_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,17 +96,43 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: chicken 3_0
+      name: Farming Scythe_0
       rect:
         serializedVersion: 2
-        x: 14
-        y: 19
-        width: 122
-        height: 112
+        x: 17
+        y: 3
+        width: 40
+        height: 61
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 84b31a573132ef620800000000000000
-      internalID: 2809721784010619720
+      spriteID: 710903daf68770b90800000000000000
+      internalID: -7275714251951402985
       vertices: []
       indices: 
       edges: []
@@ -135,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      chicken 3_0: 2809721784010619720
+      Farming Scythe_0: -7275714251951402985
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
