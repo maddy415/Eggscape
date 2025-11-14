@@ -175,7 +175,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void ResetScene()
+    public void ResetScene()
     {
         if (playerAlive == false)
         {
