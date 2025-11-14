@@ -16,12 +16,27 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource musicSource;
 
     [Header("Volumes")]
-    [Range(0f,1f)] public float sfxVolume = 1f;
-    [Range(0f,1f)] public float musicVolume = 1f;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
+    [Range(0f, 1f)] public float musicVolume = 1f;
+
+    // ==== PlayerPrefs Keys ====
+    private const string KEY_SFX = "sfxVolume";
+    private const string KEY_MUSIC = "musicVolume";
+    private const string KEY_EXPLOSIONS = "explosionsEnabled";
+
+    // Flag global pra outros scripts checarem
+    public static bool ExplosionsEnabled
+    {
+        get { return PlayerPrefs.GetInt(KEY_EXPLOSIONS, 1) != 0; }
+    }
 
     void Awake()
     {
-        if (audioInstance != null && audioInstance != this) { Destroy(gameObject); return; }
+        if (audioInstance != null && audioInstance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         audioInstance = this;
         DontDestroyOnLoad(gameObject);
 
@@ -33,8 +48,29 @@ public class AudioManager : MonoBehaviour
         musicSource.playOnAwake = false;
         musicSource.loop        = true;
 
+        // ====== Carrega volumes salvos de forma segura ======
+
+        // SFX - carrega ou usa padrão 1
+        sfxVolume = PlayerPrefs.GetFloat(KEY_SFX, 1f);
+        
+        // Música - carrega ou usa padrão 1
+        musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC, 1f);
+
+        // CORREÇÃO: Clamp pra garantir valores válidos
+        sfxVolume = Mathf.Clamp01(sfxVolume);
+        musicVolume = Mathf.Clamp01(musicVolume);
+
+        // Explosões: se nunca mexeram, liga por padrão
+        if (!PlayerPrefs.HasKey(KEY_EXPLOSIONS))
+        {
+            PlayerPrefs.SetInt(KEY_EXPLOSIONS, 1);
+        }
+
+        // Aplica os volumes nas sources
         sfxSource.volume   = sfxVolume;
         musicSource.volume = musicVolume;
+
+        Debug.Log($"[AudioManager] music={musicVolume}, sfx={sfxVolume}, explosions={ExplosionsEnabled}");
     }
 
     // ======= SFX =======
@@ -42,16 +78,22 @@ public class AudioManager : MonoBehaviour
     {
         if (jumpSFX) sfxSource.PlayOneShot(jumpSFX, sfxVolume);
     }
+
     public void LogSFX()
     {
-        if (logSFX) sfxSource.PlayOneShot(logSFX, sfxVolume); // corrigido
+        if (logSFX) sfxSource.PlayOneShot(logSFX, sfxVolume);
     }
+
     public void DeathSFX()
     {
-        if (deathSFX) sfxSource.PlayOneShot(deathSFX, sfxVolume); // corrigido
+        if (deathSFX) sfxSource.PlayOneShot(deathSFX, sfxVolume);
     }
+
     public void ExplodeSFX()
     {
+        // Respeita o toggle de explosões
+        if (!ExplosionsEnabled) return;
+
         if (explosionSFX) sfxSource.PlayOneShot(explosionSFX, sfxVolume);
     }
 
@@ -66,14 +108,39 @@ public class AudioManager : MonoBehaviour
     }
 
     public void StopMusic() => musicSource.Stop();
-    public void PauseMusic(bool pause) { if (pause) musicSource.Pause(); else musicSource.UnPause(); }
 
-    public void SetMusicVolume(float v01) { musicVolume = Mathf.Clamp01(v01); musicSource.volume = musicVolume; }
-    public void SetSfxVolume(float v01)   { sfxVolume   = Mathf.Clamp01(v01); sfxSource.volume   = sfxVolume; }
+    public void PauseMusic(bool pause)
+    {
+        if (pause) musicSource.Pause();
+        else musicSource.UnPause();
+    }
+
+    public void SetMusicVolume(float v01)
+    {
+        musicVolume = Mathf.Clamp01(v01);
+        musicSource.volume = musicVolume;
+        PlayerPrefs.SetFloat(KEY_MUSIC, musicVolume);
+    }
+
+    public void SetSfxVolume(float v01)
+    {
+        sfxVolume = Mathf.Clamp01(v01);
+        sfxSource.volume = sfxVolume;
+        PlayerPrefs.SetFloat(KEY_SFX, sfxVolume);
+    }
+
+    // Toggle vindo do menu de configurações
+    public void SetExplosionsEnabled(bool enabled)
+    {
+        PlayerPrefs.SetInt(KEY_EXPLOSIONS, enabled ? 1 : 0);
+    }
 
     // Fade out/in da música atual
-    public void FadeOutMusic(float time = 0.5f) => StartCoroutine(FadeVolume(musicSource, musicSource.volume, 0f, time));
-    public void FadeInMusic(float target = 1f, float time = 0.5f) => StartCoroutine(FadeVolume(musicSource, musicSource.volume, Mathf.Clamp01(target), time));
+    public void FadeOutMusic(float time = 0.5f) =>
+        StartCoroutine(FadeVolume(musicSource, musicSource.volume, 0f, time));
+
+    public void FadeInMusic(float target = 1f, float time = 0.5f) =>
+        StartCoroutine(FadeVolume(musicSource, musicSource.volume, Mathf.Clamp01(target), time));
 
     // Troca de faixa com crossfade
     public void Crossfade(AudioClip newClip, float time = 0.5f, bool loop = true, float targetVolume = -1f)

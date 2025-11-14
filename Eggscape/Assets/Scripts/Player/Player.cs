@@ -131,6 +131,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (!CanMove || PauseMenu.IsPaused)
+            return;
         HandleOngoingAttackMovement();
 
         if (CanMove)
