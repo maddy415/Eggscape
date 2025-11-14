@@ -24,6 +24,8 @@ public class SettingsMenu : MonoBehaviour
     private bool canSave = false;
     private float lastMusicValue = 1f;
     private float lastSfxValue = 1f;
+    private float lastSfxTestTime = 0f;
+    private const float SFX_TEST_COOLDOWN = 0.5f; // 200ms entre cada som
 
     private void Awake()
     {
@@ -174,10 +176,11 @@ public class SettingsMenu : MonoBehaviour
             AudioManager.audioInstance.sfxVolume = value;
             AudioManager.audioInstance.SetSfxVolume(value);
             
-            // Toca feedback
-            if (value > 0.05f)
+            // Toca feedback COM COOLDOWN pra não spammar
+            if (value > 0.05f && Time.unscaledTime - lastSfxTestTime > SFX_TEST_COOLDOWN)
             {
                 AudioManager.audioInstance.JumpSFX();
+                lastSfxTestTime = Time.unscaledTime;
             }
         }
 
