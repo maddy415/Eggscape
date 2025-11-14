@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
 
     [Header("State Flags")]
     [SerializeField] private bool canMove = true;
+    [HideInInspector] public bool canJump = true;
 
     [Header("Misc.")]
     [SerializeField] private float torqueForce;

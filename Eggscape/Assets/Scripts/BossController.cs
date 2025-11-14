@@ -6,12 +6,7 @@ using UnityEditor;
 using Random = UnityEngine.Random;
 
 /// <summary>
-/// Boss 2D com fases e ataques:
-/// - Charge (com âncora; dash pode ser cancelado por ataque do player)
-/// - JumpSmash (clássico)
-/// - JumpSuperHigh (lock-on/meteoro + shockwaves ao pousar)
-/// - BulletHell (recuo opcional + padrões via BulletPatternSO + OBJECT POOL)
-/// Player morre com 1 hit ao encostar (exceto enquanto está atacando).
+/// Boss 2D com fases, ataques e integração com sistema de cutscene/tutorial
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class BossController : MonoBehaviour
@@ -30,7 +25,7 @@ public class BossController : MonoBehaviour
         public float windup = 0.5f;
         public float recovery = 0.5f;
 
-        [Header("One-hit on touch (sempre que encostar)")]
+        [Header("One-hit on touch")]
         public bool killOnTouch = true;
         public LayerMask playerLayers = 0;
 
@@ -85,7 +80,7 @@ public class BossController : MonoBehaviour
         public float minDelayBetween = 0.6f;
         public float maxDelayBetween = 1.4f;
 
-        [Header("Transição de fase (use um ou ambos)")]
+        [Header("Transição de fase")]
         [Range(0, 1f)] public float hpThreshold = 0f;
         public float timeLimit = 0f;
     }
@@ -105,6 +100,11 @@ public class BossController : MonoBehaviour
     public SpriteRenderer bossSprite;
     public Color telegraphColor = Color.red;
 
+    [Header("Tutorial - Eye Glow")]
+    public SpriteRenderer eyeGlowSprite;
+    public Color eyeGlowColor = Color.red;
+    public float eyeGlowDuration = 0.5f;
+
     [Header("Fases (na ordem)")]
     public List<Phase> phases = new List<Phase>();
 
@@ -116,7 +116,7 @@ public class BossController : MonoBehaviour
     public float groundProbeDistance = 0.15f;
 
     // ======= Charge Anchor =======
-    [Header("Charge Anchor (ponto fixo do dash)")]
+    [Header("Charge Anchor")]
     public bool useChargeAnchor = true;
     public Transform chargeAnchor;
     public Collider2D chargeAnchorTrigger;
@@ -127,13 +127,13 @@ public class BossController : MonoBehaviour
     public float chargePreDashHold = 0.35f;
     public float chargeAnchorXTolerance = 0.15f;
 
-    // ======= Cancel do dash ao ser atingido =======
+    // ======= Cancel do dash =======
     [Header("Charge Cancel ao ser atingido")]
     public LayerMask playerAttackMask;
     public float dashCancelKnockback = 10f;
     public float dashCancelStun = 0.2f;
 
-    // ======= Shockwave do JumpSuperHigh =======
+    // ======= Shockwave =======
     [Header("Shockwave (JumpSuperHigh landing)")]
     public GameObject shockwavePrefab;
     public float shockwaveSpawnYOffset = 0.15f;
@@ -156,7 +156,6 @@ public class BossController : MonoBehaviour
     public float bulletSpawnYOffset = 0.25f;
 
     [Header("Bullet Hell – OBJECT POOL")]
-    [Tooltip("Pool de foices. Se nulo, usa Instantiate como fallback.")]
     public ScythePool scythePool;
     
     [Header("Trilha Sonora")]
@@ -176,9 +175,14 @@ public class BossController : MonoBehaviour
     // Charge/Anchor
     private bool anchorTouchedThisCharge = false;
 
-    // Dash em execução (para cancelar on-hit)
+    // Dash em execução
     private bool isChargingDash = false;
     private bool dashWasCancelled = false;
+
+    // Tutorial
+    private bool firstDashDone = false;
+    private bool tutorialMode = false;
+    private BossCutsceneManager cutsceneManager;
     #endregion
 
     #region Unity
@@ -204,12 +208,22 @@ public class BossController : MonoBehaviour
 
     private void Start()
     {
-        BeginIntro();
+        // NÃO inicia automaticamente - espera o cutscene manager
+        cutsceneManager = FindFirstObjectByType<BossCutsceneManager>();
     }
 
     #endregion
 
-    #region Ciclo da luta
+    #region Inicialização
+
+    /// <summary>
+    /// Chamado pelo BossCutsceneManager após a cutscene
+    /// </summary>
+    public void StartBossFight()
+    {
+        if (dead) return;
+        BeginIntro();
+    }
 
     public void BeginIntro()
     {
@@ -233,7 +247,11 @@ public class BossController : MonoBehaviour
 
     private void GoToPhase(int idx)
     {
-        if (phases == null || phases.Count == 0) { Debug.LogWarning("Sem fases configuradas."); return; }
+        if (phases == null || phases.Count == 0)
+        {
+            Debug.LogWarning("Sem fases configuradas.");
+            return;
+        }
         phaseIndex = Mathf.Clamp(idx, 0, phases.Count - 1);
         phaseTimer = 0f;
         StopAllCoroutines();
@@ -279,6 +297,138 @@ public class BossController : MonoBehaviour
         int next = phaseIndex + 1;
         if (next < phases.Count) GoToPhase(next);
         else phaseTimer = 0f;
+    }
+
+    #endregion
+
+    #region Tutorial - Primeiro Dash
+
+    /// <summary>
+    /// Executa o primeiro dash com tutorial de parry
+    /// Chamado pelo BossCutsceneManager
+    /// </summary>
+    public IEnumerator ExecuteFirstDashWithTutorial(BossCutsceneManager manager)
+    {
+        tutorialMode = true;
+        cutsceneManager = manager;
+
+        // Pega o primeiro ataque Charge
+        Attack chargeAttack = null;
+        if (phases.Count > 0 && phases[0].attacks.Count > 0)
+        {
+            foreach (var atk in phases[0].attacks)
+            {
+                if (atk.type == AttackType.Charge)
+                {
+                    chargeAttack = atk;
+                    break;
+                }
+            }
+        }
+
+        if (chargeAttack == null)
+        {
+            Debug.LogWarning("[Boss] Nenhum ataque Charge encontrado para tutorial!");
+            tutorialMode = false;
+            yield break;
+        }
+
+        // Windup maior para o tutorial
+        float tutorialWindup = chargeAttack.windup * 2f;
+
+        // Telegraph
+        if (bossSprite) Flash(telegraphColor, tutorialWindup);
+
+        // Olho brilha
+        if (eyeGlowSprite)
+        {
+            StartCoroutine(EyeGlow());
+        }
+
+        yield return new WaitForSeconds(tutorialWindup);
+
+        // Inicia o dash
+        yield return StartCoroutine(Attack_Charge_Tutorial(chargeAttack));
+
+        tutorialMode = false;
+        firstDashDone = true;
+    }
+
+    private IEnumerator EyeGlow()
+    {
+        if (!eyeGlowSprite) yield break;
+
+        Color originalColor = eyeGlowSprite.color;
+        eyeGlowSprite.color = eyeGlowColor;
+
+        float elapsed = 0f;
+        while (elapsed < eyeGlowDuration)
+        {
+            elapsed += Time.deltaTime;
+            float intensity = Mathf.PingPong(elapsed * 4f, 1f);
+            eyeGlowSprite.color = Color.Lerp(Color.clear, eyeGlowColor, intensity);
+            yield return null;
+        }
+
+        eyeGlowSprite.color = originalColor;
+    }
+
+    private IEnumerator Attack_Charge_Tutorial(Attack a)
+    {
+        FacePlayerX();
+
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        float checkDistance = a.chargeHitbox.x + 0.5f;
+
+        Vector2 dir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
+        float elapsed = 0f;
+
+        isChargingDash = true;
+        dashWasCancelled = false;
+
+        while (elapsed < a.dashDuration && !dashWasCancelled)
+        {
+            elapsed += Time.deltaTime;
+
+            // Movimento do dash
+            rb.linearVelocity = new Vector2(dir.x * a.dashSpeed, rb.linearVelocity.y);
+
+            // Verifica distância para triggar o prompt
+            if (player != null)
+            {
+                distanceToPlayer = Vector2.Distance(transform.position, player.position);
+
+                if (distanceToPlayer <= checkDistance && cutsceneManager != null)
+                {
+                    // TRIGGER DO PROMPT
+                    yield return StartCoroutine(cutsceneManager.TriggerParryPrompt());
+                    break;
+                }
+            }
+
+            // Hit detection
+            var hits = Physics2D.OverlapBoxAll(transform.position, a.chargeHitbox, 0f, a.hitMask);
+            foreach (var h in hits) ApplyPlayerHitIfAny(h.gameObject, a);
+
+            yield return null;
+        }
+
+        isChargingDash = false;
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+    }
+
+    /// <summary>
+    /// Cancela o dash atual (chamado pelo parry)
+    /// </summary>
+    public void CancelCurrentDash()
+    {
+        dashWasCancelled = true;
+        isChargingDash = false;
+        rb.linearVelocity = Vector2.zero;
+
+        // Knockback para trás
+        float dir = transform.localScale.x >= 0 ? -1f : 1f;
+        rb.AddForce(new Vector2(dir * dashCancelKnockback, 0f), ForceMode2D.Impulse);
     }
 
     #endregion
@@ -346,7 +496,6 @@ public class BossController : MonoBehaviour
         float dx0 = chargeAnchor.position.x - transform.position.x;
         float absDx0 = Mathf.Abs(dx0);
 
-        // A) já perto do anchor
         if (absDx0 <= chargeAnchorXTolerance)
         {
             yield return StartCoroutine(WaitUntilGrounded(0.8f));
@@ -381,7 +530,6 @@ public class BossController : MonoBehaviour
             yield break;
         }
 
-        // B) longe do anchor -> salto até lá
         FaceX(chargeAnchor.position.x);
 
         float initialDirX = Mathf.Sign(chargeAnchor.position.x - transform.position.x);
@@ -560,7 +708,6 @@ public class BossController : MonoBehaviour
     {
         if (bulletPattern == null || (bulletPrefab == null && scythePool == null)) yield break;
 
-        // 1) RETREAT se colado demais
         if (player != null)
         {
             float dx = Mathf.Abs(player.position.x - transform.position.x);
@@ -583,7 +730,6 @@ public class BossController : MonoBehaviour
             }
         }
 
-        // 2) PARA o boss e começa a atirar parado
         rb.linearVelocity = Vector2.zero;
 
         float duration = bulletHellDurationOverride > 0f ? bulletHellDurationOverride : bulletPattern.duration;
@@ -610,7 +756,7 @@ public class BossController : MonoBehaviour
 
     #endregion
 
-    #region Helpers (câmera / chão / âncora / bullet)
+    #region Helpers
 
     private void SpawnBullets(List<Vector2> dirs, BulletPatternSO so)
     {
@@ -621,22 +767,13 @@ public class BossController : MonoBehaviour
 
         foreach (var d in dirs)
         {
-            // ======== POOL ========
             if (scythePool != null)
             {
-                var sc = scythePool.Spawn(
-                    spawnPos,
-                    d,
-                    so.bulletSpeed,
-                    so.bulletLifeTime,
-                    bulletHitMask
-                );
-
+                var sc = scythePool.Spawn(spawnPos, d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
                 sc.Initialize(d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
                 continue;
             }
 
-            // ======== Fallback: Instantiate ========
             var go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
 
             var scythe = go.GetComponent<ScytheProjectile>();
@@ -953,7 +1090,7 @@ public class BossController : MonoBehaviour
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawWireSphere(transform.position, atk.smashRadiusSuper);
             }
-            else // BulletHell
+            else
             {
                 Gizmos.color = new Color(0.2f, 1f, 1f, 0.65f);
                 Gizmos.DrawWireSphere(transform.position, 0.25f);
