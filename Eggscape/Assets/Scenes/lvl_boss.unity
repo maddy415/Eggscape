@@ -1628,7 +1628,7 @@ MonoBehaviour:
   boss: {fileID: 1922796071}
   player: {fileID: 1585589549}
   bossSpawnPoint: {fileID: 779371756}
-  chickenWalkDuration: 3
+  chickenWalkDuration: 1.5
   chickenWalkSpeed: 5
   bossEntranceForce: 15
   bossEntranceDirection: {x: -1, y: 0.5}
@@ -1636,7 +1636,7 @@ MonoBehaviour:
   parryKey: 324
   slowMotionScale: 0.15
   slowMotionDuration: 2
-  promptDistance: 3
+  promptDistance: 0.5
   chickenIntroDialogue:
   - speakerName: Chicken
     text: Esse lugar...
@@ -1647,7 +1647,7 @@ MonoBehaviour:
     delayAfter: 0
   afterParryDialogue:
   - speakerName: "Plum\xEDdia"
-    text: "N\xE3o esperava menosd da l\xEDder da revolu\xE7\xE3o."
+    text: "N\xE3o esperava menos da l\xEDder da revolu\xE7\xE3o."
     delayAfter: 0
   shakeIntensity: 0.3
   shakeDuration: 0.5
@@ -3811,7 +3811,7 @@ MonoBehaviour:
   typingSpeed: 0.05
   typingSound: {fileID: 0}
   typingSoundInterval: 0.1
-  advanceKey: 324
+  advanceKey: 101
   skipKey: 13
 --- !u!1 &1280134790
 GameObject:
@@ -7018,11 +7018,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.94
+      value: 2.84
       objectReference: {fileID: 0}
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.13
+      value: 2.54
       objectReference: {fileID: 0}
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.z

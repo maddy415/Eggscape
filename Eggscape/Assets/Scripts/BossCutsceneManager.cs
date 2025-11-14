@@ -182,6 +182,7 @@ public class BossCutsceneManager : MonoBehaviour
     {
         // Ativa slow motion
         Time.timeScale = slowMotionScale;
+        Time.fixedDeltaTime = 0.02f * Time.timeScale; // Mantém física estável
 
         // Mostra prompt
         if (parryPrompt) parryPrompt.SetActive(true);
@@ -192,7 +193,7 @@ public class BossCutsceneManager : MonoBehaviour
 
         while (timer < slowMotionDuration && !parried)
         {
-            timer += Time.unscaledDeltaTime;
+            timer += Time.unscaledDeltaTime; // USA UNSCALED
 
             if (Input.GetKeyDown(parryKey))
             {
@@ -211,6 +212,7 @@ public class BossCutsceneManager : MonoBehaviour
 
         // Retorna tempo normal
         Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f; // Reset
         if (parryPrompt) parryPrompt.SetActive(false);
 
         parryTutorialComplete = true;

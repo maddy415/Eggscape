@@ -97,6 +97,7 @@ public class BossController : MonoBehaviour
     [Header("Alvos / Refs")]
     public float speed = 6f;
     public Transform player;
+    public Player playerScript; // NOVO: referência ao script do Player
     public SpriteRenderer bossSprite;
     public Color telegraphColor = Color.red;
 
@@ -210,6 +211,12 @@ public class BossController : MonoBehaviour
     {
         // NÃO inicia automaticamente - espera o cutscene manager
         cutsceneManager = FindFirstObjectByType<BossCutsceneManager>();
+        
+        // Pega referência do Player script se não foi atribuída
+        if (playerScript == null && player != null)
+        {
+            playerScript = player.GetComponent<Player>();
+        }
     }
 
     #endregion

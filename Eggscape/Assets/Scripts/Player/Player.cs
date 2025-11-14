@@ -46,6 +46,7 @@ public class Player : MonoBehaviour
     [Header("State Flags")]
     [SerializeField] private bool canMove = true;
     [HideInInspector] public bool canJump = true;
+    [HideInInspector] public bool canAttack = true;  // PÚBLICO - controlado pela cutscene
 
     [Header("Misc.")]
     [SerializeField] private float torqueForce;
@@ -65,9 +66,9 @@ public class Player : MonoBehaviour
     // [NEW] Controle de giro do SPRITE ao morrer (sem mexer no corpo)
     [Header("Death Spin (Sprite Only)")]
     [SerializeField, Tooltip("Velocidade de rotação do SPRITE após morrer (graus/seg).")]
-    private float deathSpinSpeed = 720f; // [NEW]
-    private bool spinOnDeathActive = false; // [NEW]
-    private float currentSpriteRotation = 0f; // [NEW]
+    private float deathSpinSpeed = 720f;
+    private bool spinOnDeathActive = false;
+    private float currentSpriteRotation = 0f;
 
     // Internal state values -------------------------------------------------
     private bool playerDead;
@@ -75,7 +76,7 @@ public class Player : MonoBehaviour
     private bool isJumping;
     private bool isFalling;
     private bool isAttacking;
-    private bool canAttack = true;
+    private bool attackReady = true;  // RENOMEADO - cooldown interno do ataque
     private bool isKnockbacking;
 
     // Timers ---------------------------------------------------------------
@@ -136,6 +137,11 @@ public class Player : MonoBehaviour
         {
             HandleHorizontalMovement();
             HandleJump();
+            HandleAttackInput();
+        }
+        else
+        {
+            // MESMO SEM CANMOVE, permite ataque durante slow motion
             HandleAttackInput();
         }
 
@@ -296,7 +302,10 @@ public class Player : MonoBehaviour
 
     private void HandleAttackInput()
     {
-        if (Input.GetMouseButtonDown(0) && canAttack)
+        // USA UNSCALED TIME para funcionar durante slow motion
+        bool attackInput = Input.GetMouseButtonDown(0);
+        
+        if (attackInput && attackReady && canAttack)
         {
             BeginAttack();
         }
@@ -307,7 +316,7 @@ public class Player : MonoBehaviour
 
     private void BeginAttack()
     {
-        canAttack = false;
+        attackReady = false;
         attackHB.enabled = true;
 
         attackTimer = 0f;
@@ -331,6 +340,7 @@ public class Player : MonoBehaviour
 
         if (!isKnockbacking)
         {
+            // USA UNSCALED para funcionar em slow motion
             rb.linearVelocity = new Vector2(attackForce, 0f);
 
             if (!isGrounded && Input.GetKeyDown(KeyCode.S))
@@ -340,27 +350,28 @@ public class Player : MonoBehaviour
             }
         }
 
-        // GIRO DURANTE O ATAQUE
+        // GIRO DURANTE O ATAQUE - usa unscaledDeltaTime
         if (attackSpinEnabled && attackSpinActive && attackSpinTarget != null && !playerDead)
         {
             float dir = sprite != null && sprite.flipX ? -1f : 1f;
-            attackSpinAngle += attackSpinSpeed * Time.deltaTime * dir;
+            attackSpinAngle += attackSpinSpeed * Time.unscaledDeltaTime * dir;
             attackSpinTarget.localRotation = Quaternion.Euler(0f, 0f, attackSpinAngle);
         }
     }
 
     private void UpdateAttackCooldown()
     {
-        if (canAttack)
+        if (attackReady)
         {
             return;
         }
 
-        attackCDTimer += Time.deltaTime;
+        // USA UNSCALED para funcionar em slow motion
+        attackCDTimer += Time.unscaledDeltaTime;
 
         if (attackCDTimer >= attackCD)
         {
-            canAttack = true;
+            attackReady = true;
             attackCDTimer = 0f;
             isKnockbacking = false;
         }
@@ -373,7 +384,8 @@ public class Player : MonoBehaviour
             return;
         }
 
-        attackTimer += Time.deltaTime;
+        // USA UNSCALED para funcionar em slow motion
+        attackTimer += Time.unscaledDeltaTime;
 
         if (attackTimer >= attackAirTime)
         {
