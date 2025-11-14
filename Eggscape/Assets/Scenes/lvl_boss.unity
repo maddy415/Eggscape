@@ -1634,9 +1634,9 @@ MonoBehaviour:
   bossEntranceDirection: {x: -1, y: 0.5}
   parryPrompt: {fileID: 501184765}
   parryKey: 324
-  slowMotionScale: 0.15
-  slowMotionDuration: 2
-  promptDistance: 0.5
+  slowMotionScale: 0.04
+  slowMotionDuration: 4
+  promptTriggerDistance: 5
   chickenIntroDialogue:
   - speakerName: Chicken
     text: Esse lugar...

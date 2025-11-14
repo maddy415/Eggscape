@@ -302,11 +302,18 @@ public class Player : MonoBehaviour
 
     private void HandleAttackInput()
     {
-        // USA UNSCALED TIME para funcionar durante slow motion
+        // Detecta input de ataque
         bool attackInput = Input.GetMouseButtonDown(0);
+        
+        // DEBUG
+        if (attackInput)
+        {
+            Debug.Log($"[Player] Input detectado! attackReady={attackReady}, canAttack={canAttack}");
+        }
         
         if (attackInput && attackReady && canAttack)
         {
+            Debug.Log("[Player] ATAQUE INICIADO!");
             BeginAttack();
         }
 
@@ -317,11 +324,18 @@ public class Player : MonoBehaviour
     private void BeginAttack()
     {
         attackReady = false;
-        attackHB.enabled = true;
+        
+        // FORÇA a ativação imediata do hitbox
+        if (attackHB != null)
+        {
+            attackHB.enabled = true;
+        }
 
         attackTimer = 0f;
         isAttacking = true;
         rb.gravityScale = 0f;
+
+        Debug.Log($"[Player] ATAQUE INICIADO! IsAttackActive={IsAttackActive}, HitBox={attackHB != null && attackHB.enabled}");
 
         // ativa spin do ataque
         if (attackSpinEnabled)

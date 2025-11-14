@@ -384,31 +384,33 @@ public class BossController : MonoBehaviour
     {
         FacePlayerX();
 
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-        float checkDistance = a.chargeHitbox.x + 0.5f;
-
         Vector2 dir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
         float elapsed = 0f;
 
         isChargingDash = true;
         dashWasCancelled = false;
 
+        bool slowMotionTriggered = false;
+
         while (elapsed < a.dashDuration && !dashWasCancelled)
         {
             elapsed += Time.deltaTime;
 
-            // Movimento do dash
+            // Movimento do dash (VELOCIDADE NORMAL até triggar slow motion)
             rb.linearVelocity = new Vector2(dir.x * a.dashSpeed, rb.linearVelocity.y);
 
-            // Verifica distância para triggar o prompt
-            if (player != null)
+            // Verifica distância para triggar o slow motion
+            if (!slowMotionTriggered && player != null && cutsceneManager != null)
             {
-                distanceToPlayer = Vector2.Distance(transform.position, player.position);
+                float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-                if (distanceToPlayer <= checkDistance && cutsceneManager != null)
+                if (distanceToPlayer <= cutsceneManager.promptTriggerDistance)
                 {
-                    // TRIGGER DO PROMPT
+                    slowMotionTriggered = true;
+                    // TRIGGA O SLOW MOTION E ESPERA O RESULTADO
                     yield return StartCoroutine(cutsceneManager.TriggerParryPrompt());
+                    
+                    // Após o parry (ou timeout), sai do dash
                     break;
                 }
             }
