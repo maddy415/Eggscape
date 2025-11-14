@@ -25,7 +25,7 @@ public class SettingsMenu : MonoBehaviour
     private float lastMusicValue = 1f;
     private float lastSfxValue = 1f;
     private float lastSfxTestTime = 0f;
-    private const float SFX_TEST_COOLDOWN = 0.5f; // 200ms entre cada som
+    private const float SFX_TEST_COOLDOWN = 0.5f; 
 
     private void Awake()
     {

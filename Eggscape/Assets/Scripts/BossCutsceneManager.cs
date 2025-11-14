@@ -22,7 +22,6 @@ public class BossCutsceneManager : MonoBehaviour
 
     [Header("Tutorial Parry")]
     public GameObject parryPrompt;
-    public KeyCode parryKey = KeyCode.Mouse1;
     public float slowMotionScale = 0.15f;
     public float slowMotionDuration = 2f;
     public float promptTriggerDistance = 3f; // Distância para triggar o slow motion
@@ -161,11 +160,14 @@ public class BossCutsceneManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
     }
 
+    private bool parryHitConfirmed = false; // Nova flag
+
     private IEnumerator ParryTutorial()
     {
         if (!boss || !player) yield break;
 
         parryTutorialComplete = false;
+        parryHitConfirmed = false; // Reset
 
         // GARANTE que o player pode atacar ANTES do dash começar
         if (player)
@@ -178,8 +180,19 @@ public class BossCutsceneManager : MonoBehaviour
         boss.enabled = true;
         StartCoroutine(boss.ExecuteFirstDashWithTutorial(this));
 
-        // Aguarda o parry ser executado
-        yield return new WaitUntil(() => parryTutorialComplete);
+        // Aguarda o parry ser executado E o hit ser confirmado
+        yield return new WaitUntil(() => parryTutorialComplete && parryHitConfirmed);
+        
+        Debug.Log("[Cutscene] Parry confirmado com HIT no boss! Continuando...");
+    }
+
+    /// <summary>
+    /// Chamado pelo Boss quando ele levar hit durante o tutorial
+    /// </summary>
+    public void ConfirmParryHit()
+    {
+        parryHitConfirmed = true;
+        Debug.Log("[Cutscene] ConfirmParryHit() - Boss levou o hit!");
     }
 
     /// <summary>
@@ -193,11 +206,13 @@ public class BossCutsceneManager : MonoBehaviour
         Time.timeScale = slowMotionScale;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
 
-        // GARANTE que o ataque está liberado
+        // REMOVE TODAS AS RESTRIÇÕES DO PLAYER
         if (player)
         {
+            player.CanMove = true;
+            player.canJump = true;
             player.canAttack = true;
-            Debug.Log($"[Cutscene] canAttack setado para: {player.canAttack}");
+            Debug.Log("[Cutscene] TODAS restrições removidas! Player totalmente livre!");
         }
 
         // Mostra prompt
@@ -205,48 +220,71 @@ public class BossCutsceneManager : MonoBehaviour
 
         // Aguarda input do player
         float timer = 0f;
-        bool attackInputDetected = false;
+        bool attackExecuted = false;
 
         while (timer < slowMotionDuration)
         {
             timer += Time.unscaledDeltaTime;
 
-            // Detecta quando o ATAQUE ESTÁ ATIVO (não só o input)
-            if (player != null && player.IsAttackActive)
+            // DETECTA O INPUT (não espera o ataque estar ativo)
+            if (Input.GetMouseButtonDown(0) && !attackExecuted)
             {
-                Debug.Log("[Cutscene] PARRY EXECUTADO! Ataque está ativo!");
-                OnParrySuccess();
+                attackExecuted = true;
+                Debug.Log("[Cutscene] INPUT DETECTADO! Cancelando slow motion AGORA!");
                 
-                // ESPERA 1 FRAME para o ataque processar ANTES de voltar o tempo
+                // CANCELA SLOW MOTION IMEDIATAMENTE
+                Time.timeScale = 1f;
+                Time.fixedDeltaTime = 0.02f;
+                
+                // Esconde o prompt
+                if (parryPrompt) parryPrompt.SetActive(false);
+                
+                Debug.Log("[Cutscene] Aguardando normalização do tempo...");
+                
+                // Espera alguns frames para tudo estabilizar
                 yield return null;
+                yield return null;
+                
+                // FORÇA O ATAQUE DO PLAYER
+                if (player != null)
+                {
+                    Debug.Log("[Cutscene] Chamando ForceAttack()...");
+                    player.ForceAttack();
+                    
+                    // Espera o ataque iniciar
+                    yield return null;
+                    yield return null;
+                    
+                    // Verifica se o ataque está ativo
+                    Debug.Log($"[Cutscene] Após ForceAttack: IsAttackActive={player.IsAttackActive}");
+                }
+                else
+                {
+                    Debug.LogError("[Cutscene] Player é NULL!");
+                }
+                
+                OnParrySuccess();
                 break;
-            }
-
-            // Detecta input mas não quebra o loop ainda
-            if (Input.GetMouseButtonDown(0) && !attackInputDetected)
-            {
-                /*Time.timeScale = 1f;
-                Time.fixedDeltaTime = 0.02f;*/
-                attackInputDetected = true;
-                Debug.Log("[Cutscene] Input detectado - aguardando ataque ativar...");
             }
 
             yield return null;
         }
 
-        // Se não conseguiu parry
-        if (player == null || !player.IsAttackActive)
+        // Se não atacou no tempo
+        if (!attackExecuted)
         {
-            Debug.Log("[Cutscene] Tempo esgotado - falhou no parry");
+            Debug.Log("[Cutscene] Tempo esgotado - não atacou a tempo");
+            
+            // VOLTA O TEMPO AO NORMAL
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02f;
+            
+            if (parryPrompt) parryPrompt.SetActive(false);
+            
             OnParryFailed();
         }
 
-        // Retorna tempo normal DEPOIS do ataque estar ativo
-        Time.timeScale = 1f;
-        Time.fixedDeltaTime = 0.02f;
-        if (parryPrompt) parryPrompt.SetActive(false);
-
-        Debug.Log("[Cutscene] Tempo voltou ao normal!");
+        Debug.Log("[Cutscene] Sequência de parry finalizada!");
 
         parryTutorialComplete = true;
     }

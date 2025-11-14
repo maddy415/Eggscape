@@ -318,6 +318,7 @@ public class BossController : MonoBehaviour
     {
         tutorialMode = true;
         cutsceneManager = manager;
+        invulnerable = false; // GARANTE que pode levar dano
 
         // Pega o primeiro ataque Charge
         Attack chargeAttack = null;
@@ -909,6 +910,14 @@ public class BossController : MonoBehaviour
     {
         if (dead || invulnerable) return;
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Abs(amount));
+        
+        // Se estiver no modo tutorial, notifica o cutscene manager
+        if (tutorialMode && cutsceneManager != null)
+        {
+            Debug.Log("[Boss] Dano recebido durante tutorial! Notificando cutscene...");
+            cutsceneManager.ConfirmParryHit();
+        }
+        
         if (currentHealth <= 0) Die();
     }
 

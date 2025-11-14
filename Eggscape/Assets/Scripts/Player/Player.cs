@@ -131,8 +131,6 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (!CanMove || PauseMenu.IsPaused)
-            return;
         HandleOngoingAttackMovement();
 
         if (CanMove)
@@ -347,6 +345,28 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Método público para forçar início do ataque (usado pela cutscene)
+    /// </summary>
+    public void ForceAttack()
+    {
+        Debug.Log($"[Player] ForceAttack chamado! attackReady={attackReady}, canAttack={canAttack}, CanMove={CanMove}");
+        
+        // FORÇA o ataque mesmo que attackReady seja false
+        attackReady = true; // Reseta o cooldown
+        canAttack = true;   // Garante que pode atacar
+        
+        if (attackHB != null)
+        {
+            Debug.Log("[Player] Forçando ataque diretamente...");
+            BeginAttack();
+        }
+        else
+        {
+            Debug.LogError("[Player] attackHB é NULL!");
+        }
+    }
+
     private void HandleOngoingAttackMovement()
     {
         if (!isAttacking)
@@ -357,7 +377,10 @@ public class Player : MonoBehaviour
         if (!isKnockbacking)
         {
             // USA UNSCALED para funcionar em slow motion
-            rb.linearVelocity = new Vector2(attackForce, 0f);
+            float actualAttackForce = sprite != null && sprite.flipX ? -attackForce : attackForce;
+            rb.linearVelocity = new Vector2(actualAttackForce, rb.linearVelocity.y);
+            
+            Debug.Log($"[Player] Aplicando movimento do ataque! Velocity={rb.linearVelocity.x}");
 
             if (!isGrounded && Input.GetKeyDown(KeyCode.S))
             {
