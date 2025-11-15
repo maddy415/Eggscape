@@ -1,25 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GroundGen : MonoBehaviour
+/// <summary>
+/// Gerador de chão/cerca com suporte a slow motion
+/// </summary>
+public class GroundGen : MonoBehaviour, ISlowMotionable
 {
     public GameObject prefabChao;
     public Transform genPos;
     public float larguraDoChao = 1f;
     public float velocidade = 5f;
-    //public float bordaEsquerda;
 
     private List<GameObject> blocos = new List<GameObject>();
     private Camera cam;
+    private float speedMultiplier = 1f; // Multiplicador de velocidade
 
     void Start()
     {
         cam = Camera.main;
 
         float larguraVisivel = 2f * cam.orthographicSize * cam.aspect;
-        //float x = genPos.position.x;
-
-        
         int numBlocos = Mathf.CeilToInt(larguraVisivel / larguraDoChao) + 2;
 
         for (int i = 0; i < numBlocos; i++)
@@ -29,14 +29,16 @@ public class GroundGen : MonoBehaviour
             GameObject bloco = Instantiate(prefabChao, pos, Quaternion.identity, transform);
             blocos.Add(bloco);
         }
-
     }
 
     void Update()
     {
+        // Aplica movimento com multiplicador de velocidade
+        float currentSpeed = velocidade * speedMultiplier;
+
         foreach (GameObject bloco in blocos)
         {
-            bloco.transform.Translate(Vector3.left * velocidade * Time.deltaTime, Space.World);
+            bloco.transform.Translate(Vector3.left * currentSpeed * Time.deltaTime, Space.World);
         }
         
         GameObject primeiro = blocos[0];
@@ -53,4 +55,20 @@ public class GroundGen : MonoBehaviour
             blocos.Add(primeiro);
         }
     }
+
+    #region ISlowMotionable Implementation
+
+    public void SetSlowMotion(float scale)
+    {
+        speedMultiplier = scale;
+        Debug.Log($"[GroundGen] Slow motion ativado: {scale * 100}% velocidade");
+    }
+
+    public void ResetSpeed()
+    {
+        speedMultiplier = 1f;
+        Debug.Log("[GroundGen] Velocidade normal restaurada");
+    }
+
+    #endregion
 }
