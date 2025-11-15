@@ -129,17 +129,17 @@ public class TutorialManager : MonoBehaviour
     [Header("Falas do Tutorial (padrão)")]
     public DialogueLine[] dialogues =
     {
-        new DialogueLine { speaker = "NerdEgg", text = "Chicken, precisamos correr, as outras galinhas estão nos esperando!", emotion = "" },
-        new DialogueLine { speaker = "NerdEgg", text = "Primeiro, vou te ensinar a pular troncos. Tem um vindo aí, aperte 'Espaço' para pular!", emotion = "" },
+        new DialogueLine { speaker = "Ovinho", text = "Chicken, precisamos correr, as outras galinhas estão nos esperando!", emotion = "" },
+        new DialogueLine { speaker = "Ovinho", text = "Primeiro, vou te ensinar a pular troncos. Tem um vindo aí, aperte 'Espaço' para pular!", emotion = "" },
         new DialogueLine { speaker = "Chicken", text = "Entendido! Estou pronta!", emotion = "happy" },
-        new DialogueLine { speaker = "NerdEgg", text = "Perfeito. Agora, siga em frente sem hesitar!", emotion = "" }
+        new DialogueLine { speaker = "Ovinho", text = "Perfeito. Agora, siga em frente sem hesitar!", emotion = "" }
     };
 
     [Header("Falas da General")]
     public DialogueLine[] generalDialogues =
     {
-        new DialogueLine { speaker = "General", text = "Soldada Chicken, situação crítica!", emotion = "" },
-        new DialogueLine { speaker = "General", text = "Mantenha a calma e continue a missão.", emotion = "" }
+        new DialogueLine { speaker = "Tenente Clara", text = "Soldada Chicken, situação crítica!", emotion = "" },
+        new DialogueLine { speaker = "Tenente Clara", text = "Mantenha a calma e continue a missão.", emotion = "" }
     };
 
     // Sequência ativa (começa nas falas do tutorial)
@@ -498,7 +498,7 @@ public class TutorialManager : MonoBehaviour
     {
         // Só mostra se for o NerdEgg falando e a fala contiver a palavra-chave (case-insensitive)
         if (line.speaker != null && line.text != null &&
-            line.speaker.Trim().Equals("NerdEgg", System.StringComparison.OrdinalIgnoreCase) &&
+            line.speaker.Trim().Equals("Ovinho", System.StringComparison.OrdinalIgnoreCase) &&
             line.text.ToUpperInvariant().Contains(jumpKeyword.ToUpperInvariant()))
         {
             ShowJumpPrompt(jumpPromptMessage, jumpPromptDuration);
