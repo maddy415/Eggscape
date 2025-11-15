@@ -1635,8 +1635,8 @@ MonoBehaviour:
   bossEntranceDirection: {x: -1, y: 0.5}
   parryPrompt: {fileID: 501184765}
   parryWindupMultiplier: 2
-  promptTriggerDistance: 4
-  parryTimeWindow: 6
+  promptTriggerDistance: 4.3
+  parryTimeWindow: 8
   chickenIntroDialogue:
   - speakerName: Chicken
     text: Esse lugar...
@@ -3139,7 +3139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa68e7cdabf185c4f99d4d251c4d532a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowMotionScale: 0.309
+  slowMotionScale: 0.102
   slowMotionObjects:
   - {fileID: 0}
   - {fileID: 1922796071}
@@ -6225,7 +6225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 569b96f2ba57cd7438bf33aa815d1ee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  storeAndRestoreVelocity: 1
+  scaleGravity: 0
 --- !u!1 &1941320287
 GameObject:
   m_ObjectHideFlags: 0
