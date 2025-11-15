@@ -159,6 +159,12 @@ public class TutorialManager : MonoBehaviour
         // começa usando as falas do tutorial
         activeDialogues = dialogues;
 
+        // 🔒 tutorial inteiro sem ataque
+        if (player != null)
+        {
+            player.canAttack = false;
+        }
+
         // deixa o prompt oculto no início
         if (jumpPromptGroup != null)
         {
@@ -166,6 +172,7 @@ public class TutorialManager : MonoBehaviour
             jumpPromptGroup.gameObject.SetActive(false);
         }
     }
+
 
     private void BuildPortraitMaps()
     {

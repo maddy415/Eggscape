@@ -480,7 +480,7 @@ public class Player : MonoBehaviour
 
         GameObject explosionInstance = Instantiate(explosion, transform.position, Quaternion.identity);
         AudioManager.audioInstance.ExplodeSFX();
-        Destroy(explosionInstance, 1.1f);
+        Destroy(explosionInstance, 1f);
 
         playerDead = true;
         CanMove = false;
