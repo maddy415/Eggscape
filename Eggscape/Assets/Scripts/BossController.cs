@@ -97,14 +97,9 @@ public class BossController : MonoBehaviour
     [Header("Alvos / Refs")]
     public float speed = 6f;
     public Transform player;
-    public Player playerScript; // NOVO: referência ao script do Player
+    public Player playerScript; // Referência ao script do Player
     public SpriteRenderer bossSprite;
     public Color telegraphColor = Color.red;
-
-    [Header("Tutorial - Eye Glow")]
-    public SpriteRenderer eyeGlowSprite;
-    public Color eyeGlowColor = Color.red;
-    public float eyeGlowDuration = 0.5f;
 
     [Header("Fases (na ordem)")]
     public List<Phase> phases = new List<Phase>();
@@ -179,11 +174,6 @@ public class BossController : MonoBehaviour
     // Dash em execução
     private bool isChargingDash = false;
     private bool dashWasCancelled = false;
-
-    // Tutorial
-    private bool firstDashDone = false;
-    private bool tutorialMode = false;
-    private BossCutsceneManager cutsceneManager;
     #endregion
 
     #region Unity
@@ -209,9 +199,6 @@ public class BossController : MonoBehaviour
 
     private void Start()
     {
-        // NÃO inicia automaticamente - espera o cutscene manager
-        cutsceneManager = FindFirstObjectByType<BossCutsceneManager>();
-        
         // Pega referência do Player script se não foi atribuída
         if (playerScript == null && player != null)
         {
@@ -304,141 +291,6 @@ public class BossController : MonoBehaviour
         int next = phaseIndex + 1;
         if (next < phases.Count) GoToPhase(next);
         else phaseTimer = 0f;
-    }
-
-    #endregion
-
-    #region Tutorial - Primeiro Dash
-
-    /// <summary>
-    /// Executa o primeiro dash com tutorial de parry
-    /// Chamado pelo BossCutsceneManager
-    /// </summary>
-    public IEnumerator ExecuteFirstDashWithTutorial(BossCutsceneManager manager)
-    {
-        tutorialMode = true;
-        cutsceneManager = manager;
-        invulnerable = false; // GARANTE que pode levar dano
-
-        // Pega o primeiro ataque Charge
-        Attack chargeAttack = null;
-        if (phases.Count > 0 && phases[0].attacks.Count > 0)
-        {
-            foreach (var atk in phases[0].attacks)
-            {
-                if (atk.type == AttackType.Charge)
-                {
-                    chargeAttack = atk;
-                    break;
-                }
-            }
-        }
-
-        if (chargeAttack == null)
-        {
-            Debug.LogWarning("[Boss] Nenhum ataque Charge encontrado para tutorial!");
-            tutorialMode = false;
-            yield break;
-        }
-
-        // Windup maior para o tutorial
-        float tutorialWindup = chargeAttack.windup * 2f;
-
-        // Telegraph
-        if (bossSprite) Flash(telegraphColor, tutorialWindup);
-
-        // Olho brilha
-        if (eyeGlowSprite)
-        {
-            StartCoroutine(EyeGlow());
-        }
-
-        yield return new WaitForSeconds(tutorialWindup);
-
-        // Inicia o dash
-        yield return StartCoroutine(Attack_Charge_Tutorial(chargeAttack));
-
-        tutorialMode = false;
-        firstDashDone = true;
-    }
-
-    private IEnumerator EyeGlow()
-    {
-        if (!eyeGlowSprite) yield break;
-
-        Color originalColor = eyeGlowSprite.color;
-        eyeGlowSprite.color = eyeGlowColor;
-
-        float elapsed = 0f;
-        while (elapsed < eyeGlowDuration)
-        {
-            elapsed += Time.deltaTime;
-            float intensity = Mathf.PingPong(elapsed * 4f, 1f);
-            eyeGlowSprite.color = Color.Lerp(Color.clear, eyeGlowColor, intensity);
-            yield return null;
-        }
-
-        eyeGlowSprite.color = originalColor;
-    }
-
-    private IEnumerator Attack_Charge_Tutorial(Attack a)
-    {
-        FacePlayerX();
-
-        Vector2 dir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
-        float elapsed = 0f;
-
-        isChargingDash = true;
-        dashWasCancelled = false;
-
-        bool slowMotionTriggered = false;
-
-        while (elapsed < a.dashDuration && !dashWasCancelled)
-        {
-            elapsed += Time.deltaTime;
-
-            // Movimento do dash (VELOCIDADE NORMAL até triggar slow motion)
-            rb.linearVelocity = new Vector2(dir.x * a.dashSpeed, rb.linearVelocity.y);
-
-            // Verifica distância para triggar o slow motion
-            if (!slowMotionTriggered && player != null && cutsceneManager != null)
-            {
-                float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-
-                if (distanceToPlayer <= cutsceneManager.promptTriggerDistance)
-                {
-                    slowMotionTriggered = true;
-                    // TRIGGA O SLOW MOTION E ESPERA O RESULTADO
-                    yield return StartCoroutine(cutsceneManager.TriggerParryPrompt());
-                    
-                    // Após o parry (ou timeout), sai do dash
-                    break;
-                }
-            }
-
-            // Hit detection
-            var hits = Physics2D.OverlapBoxAll(transform.position, a.chargeHitbox, 0f, a.hitMask);
-            foreach (var h in hits) ApplyPlayerHitIfAny(h.gameObject, a);
-
-            yield return null;
-        }
-
-        isChargingDash = false;
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-    }
-
-    /// <summary>
-    /// Cancela o dash atual (chamado pelo parry)
-    /// </summary>
-    public void CancelCurrentDash()
-    {
-        dashWasCancelled = true;
-        isChargingDash = false;
-        rb.linearVelocity = Vector2.zero;
-
-        // Knockback para trás
-        float dir = transform.localScale.x >= 0 ? -1f : 1f;
-        rb.AddForce(new Vector2(dir * dashCancelKnockback, 0f), ForceMode2D.Impulse);
     }
 
     #endregion
@@ -910,14 +762,6 @@ public class BossController : MonoBehaviour
     {
         if (dead || invulnerable) return;
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Abs(amount));
-        
-        // Se estiver no modo tutorial, notifica o cutscene manager
-        if (tutorialMode && cutsceneManager != null)
-        {
-            Debug.Log("[Boss] Dano recebido durante tutorial! Notificando cutscene...");
-            cutsceneManager.ConfirmParryHit();
-        }
-        
         if (currentHealth <= 0) Die();
     }
 

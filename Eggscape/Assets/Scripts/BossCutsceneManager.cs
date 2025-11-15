@@ -85,8 +85,6 @@ public class BossCutsceneManager : MonoBehaviour
         }
 
         // 5. Tutorial de Parry (primeiro dash)
-        yield return StartCoroutine(ParryTutorial());
-
         // 6. Diálogos após parry
         if (afterParryDialogue != null && afterParryDialogue.Count > 0)
         {
@@ -162,29 +160,7 @@ public class BossCutsceneManager : MonoBehaviour
 
     private bool parryHitConfirmed = false; // Nova flag
 
-    private IEnumerator ParryTutorial()
-    {
-        if (!boss || !player) yield break;
-
-        parryTutorialComplete = false;
-        parryHitConfirmed = false; // Reset
-
-        // GARANTE que o player pode atacar ANTES do dash começar
-        if (player)
-        {
-            player.canAttack = true;
-            Debug.Log("[Cutscene] canAttack garantido como TRUE antes do dash");
-        }
-
-        // Faz o boss iniciar o primeiro dash manualmente
-        boss.enabled = true;
-        StartCoroutine(boss.ExecuteFirstDashWithTutorial(this));
-
-        // Aguarda o parry ser executado E o hit ser confirmado
-        yield return new WaitUntil(() => parryTutorialComplete && parryHitConfirmed);
-        
-        Debug.Log("[Cutscene] Parry confirmado com HIT no boss! Continuando...");
-    }
+    
 
     /// <summary>
     /// Chamado pelo Boss quando ele levar hit durante o tutorial
@@ -296,7 +272,7 @@ public class BossCutsceneManager : MonoBehaviour
         // Cancela o dash do boss
         if (boss)
         {
-            boss.CancelCurrentDash();
+            //boss.CancelCurrentDash();
         }
 
         // Feedback visual/sonoro aqui (partículas, som, etc)
