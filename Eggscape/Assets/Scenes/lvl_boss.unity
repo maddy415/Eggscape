@@ -1633,7 +1633,6 @@ MonoBehaviour:
   bossEntranceForce: 15
   bossEntranceDirection: {x: -1, y: 0.5}
   parryPrompt: {fileID: 501184765}
-  parryKey: 324
   slowMotionScale: 0.04
   slowMotionDuration: 4
   promptTriggerDistance: 5
@@ -2082,14 +2081,14 @@ RectTransform:
   m_GameObject: {fileID: 723551618}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.2740703, y: 7.0154095, z: 2.005368}
+  m_LocalScale: {x: 2.868904, y: 6.1472526, z: 1.7572038}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1170541728}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -280, y: 298}
+  m_AnchoredPosition: {x: -333, y: 392}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &723551620
@@ -2121,8 +2120,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4279374584
-  m_fontColor: {r: 0.9716981, g: 0.068752214, b: 0.068752214, a: 1}
+    rgba: 4284083711
+  m_fontColor: {r: 1, g: 0.92941177, b: 0.34901962, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4851,14 +4850,14 @@ RectTransform:
   m_GameObject: {fileID: 1536043615}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.9770544, y: 8.521707, z: 2.4359457}
+  m_LocalScale: {x: 3.1930585, y: 6.841824, z: 1.9557481}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1170541728}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -212, y: -26}
+  m_AnchoredPosition: {x: -302, y: 216}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1536043617
@@ -4946,7 +4945,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -171.18913, w: -33.905552}
+  m_margin: {x: 0, y: 0, z: -303.93265, w: -66.218124}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -7018,11 +7017,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.84
+      value: 4.27
       objectReference: {fileID: 0}
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.54
+      value: 2.31
       objectReference: {fileID: 0}
     - target: {fileID: 2781397346387801662, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: m_LocalPosition.z

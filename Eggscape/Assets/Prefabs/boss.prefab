@@ -137,9 +137,6 @@ MonoBehaviour:
   playerScript: {fileID: 0}
   bossSprite: {fileID: 0}
   telegraphColor: {r: 1, g: 0, b: 0, a: 1}
-  eyeGlowSprite: {fileID: 0}
-  eyeGlowColor: {r: 1, g: 0, b: 0, a: 1}
-  eyeGlowDuration: 0.5
   phases: []
   introDuration: 1.2
   groundMask:
