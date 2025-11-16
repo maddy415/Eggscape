@@ -510,15 +510,26 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (!other.gameObject.CompareTag("Obstacle") || GameManager.Instance.isCheatOn)
+            return;
+
+        // =======================
+        //     🔥 VERSÃO FINA 🔥
+        // =======================
+        // Se o ataque está ativo OU se estou no knockback (ou seja, acertei algo)
+        // então IGNORA a colisão física com o obstáculo.
+        if (IsAttackActive || isKnockbacking)
         {
+            Debug.Log("[Player] Colisão com obstáculo ignorada (ataque/knockback ativo).");
             return;
         }
+        // =======================
 
         GameManager.Instance.playerAlive = false;
         Debug.Log("morreu burro");
         GameManager.Instance.StopScene();
         Death();
     }
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {

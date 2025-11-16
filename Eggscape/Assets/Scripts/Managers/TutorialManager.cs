@@ -84,8 +84,8 @@ public class TutorialManager : MonoBehaviour
 
     // 🔒 Falas que não podem ser puladas
     [Header("Bloqueio de Skip")]
-    [Tooltip("Diálogos nestes índices não podem ser pulados (nem pular digitação, nem avançar).")]
-    public int[] nonSkippableIndices = { 3 };
+    [Tooltip("Diálogos nestes índices NÃO podem ser pulados (nem pular digitação, nem avançar) ENQUANTO estiver nos diálogos do tutorial.")]
+    public int[] nonSkippableIndices = { 1 }; // 2º diálogo inicial (index 1)
 
     // ========== CONTROLE ==========
     private float walkTimer;
@@ -98,6 +98,9 @@ public class TutorialManager : MonoBehaviour
     private Coroutine typingCoroutine;
     private bool isTyping = false;
     private bool skipTyping = false;
+
+    // Flag pra saber se estamos usando as falas da General
+    private bool usingGeneralDialogues = false;
 
     // ========== UI DE PROMPT DE AÇÃO ==========
     [Header("Prompt de Ação (ex.: APERTE ESPAÇO)")]
@@ -158,6 +161,7 @@ public class TutorialManager : MonoBehaviour
 
         // começa usando as falas do tutorial
         activeDialogues = dialogues;
+        usingGeneralDialogues = false;
 
         // 🔒 tutorial inteiro sem ataque
         if (player != null)
@@ -172,7 +176,6 @@ public class TutorialManager : MonoBehaviour
             jumpPromptGroup.gameObject.SetActive(false);
         }
     }
-
 
     private void BuildPortraitMaps()
     {
@@ -235,6 +238,7 @@ public class TutorialManager : MonoBehaviour
 
     private void HandleInput()
     {
+        // Se o diálogo atual estiver travado (ex.: 2º diálogo do tutorial), ignora cliques
         if (IsCurrentDialogueLocked()) return;
 
         if (Input.GetMouseButtonDown(0))
@@ -478,14 +482,19 @@ public class TutorialManager : MonoBehaviour
 
     private bool IsCurrentDialogueLocked()
     {
+        // 🔓 Assim que entra no diálogo da General, nenhuma fala é travada
+        if (usingGeneralDialogues) return false;
+
         foreach (int idx in nonSkippableIndices)
             if (currentIndex == idx) return true;
+
         return false;
     }
 
     // ======= MÉTODO PÚBLICO: chamar as falas da General =======
     public void ShowGeneralDialogue()
     {
+        usingGeneralDialogues = true;   // a partir daqui, nada é "não pulável"
         activeDialogues = generalDialogues; // troca sequência ativa
         currentIndex = 0;
         OpenDialogueBox();
@@ -493,7 +502,6 @@ public class TutorialManager : MonoBehaviour
     }
 
     // ======= PROMPT "APERTE ESPAÇO" =======
-
     private void TryShowJumpPromptIfNeeded(DialogueLine line)
     {
         // Só mostra se for o NerdEgg falando e a fala contiver a palavra-chave (case-insensitive)
@@ -540,7 +548,6 @@ public class TutorialManager : MonoBehaviour
         jumpPromptGroup.gameObject.SetActive(false);
         jumpPromptRoutine = null;
     }
-
 
     private IEnumerator FadeCanvasGroup(CanvasGroup cg, float from, float to, float time)
     {
