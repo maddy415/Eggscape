@@ -169,79 +169,91 @@ public class BossCutsceneManager : MonoBehaviour
     }
 
     public IEnumerator TriggerParrySlowMotion()
+{
+    Debug.Log("[Cutscene] SLOW MOTION ATIVADO!");
+
+    if (SlowMotionManager.Instance != null)
     {
-        Debug.Log("[Cutscene] SLOW MOTION ATIVADO!");
+        SlowMotionManager.Instance.ActivateSlowMotion();
+    }
 
-        if (SlowMotionManager.Instance != null)
+    if (parryPrompt) parryPrompt.SetActive(true);
+
+    float elapsed = 0f;
+    bool attackDetected = false;
+
+    while (elapsed < parryTimeWindow && !attackDetected)
+    {
+        elapsed += Time.deltaTime;
+
+        if (Input.GetMouseButtonDown(0))
         {
-            SlowMotionManager.Instance.ActivateSlowMotion();
-        }
+            Debug.Log("[Cutscene] ATAQUE DETECTADO!");
+            attackDetected = true;
+            parrySuccessful = true;
 
-        if (parryPrompt) parryPrompt.SetActive(true);
-
-        float elapsed = 0f;
-        bool attackDetected = false;
-
-        while (elapsed < parryTimeWindow && !attackDetected)
-        {
-            elapsed += Time.deltaTime;
-
-            if (Input.GetMouseButtonDown(0))
-            {
-                Debug.Log("[Cutscene] ATAQUE DETECTADO!");
-                attackDetected = true;
-                parrySuccessful = true;
-
-                if (SlowMotionManager.Instance != null)
-                {
-                    SlowMotionManager.Instance.DeactivateSlowMotion();
-                }
-
-                if (parryPrompt) parryPrompt.SetActive(false);
-
-                yield return null;
-                yield return null;
-
-                if (player != null)
-                {
-                    Debug.Log("[Cutscene] Ataque do player executado naturalmente");
-                }
-
-                if (boss != null)
-                {
-                    Debug.Log("[Cutscene] Aplicando knockback no boss...");
-                    
-                    float dir = Mathf.Sign(boss.transform.position.x - player.transform.position.x);
-                    if (dir == 0f) dir = (boss.transform.localScale.x >= 0) ? -1f : 1f;
-                    
-                    Rigidbody2D bossRb = boss.GetComponent<Rigidbody2D>();
-                    if (bossRb != null)
-                    {
-                        bossRb.linearVelocity = new Vector2(0f, bossRb.linearVelocity.y);
-                        bossRb.AddForce(new Vector2(dir * boss.dashCancelKnockback, 0f), ForceMode2D.Impulse);
-                    }
-                }
-
-                break;
-            }
-
-            yield return null;
-        }
-
-        if (!attackDetected)
-        {
-            Debug.Log("[Cutscene] Tempo esgotado!");
-            
             if (SlowMotionManager.Instance != null)
             {
                 SlowMotionManager.Instance.DeactivateSlowMotion();
             }
 
             if (parryPrompt) parryPrompt.SetActive(false);
+
+            yield return null;
+            yield return null;
+
+            if (player != null)
+            {
+                Debug.Log("[Cutscene] Ataque do player executado naturalmente");
+            }
+
+            // APLICA KNOCKBACK NO BOSS
+            if (boss != null)
+            {
+                Debug.Log("[Cutscene] Aplicando knockback no boss...");
+                
+                // Calcula direção do knockback (boss é empurrado para trás)
+                float dir = Mathf.Sign(boss.transform.position.x - player.transform.position.x);
+                if (dir == 0f) dir = (boss.transform.localScale.x >= 0) ? -1f : 1f;
+                
+                Rigidbody2D bossRb = boss.GetComponent<Rigidbody2D>();
+                if (bossRb != null)
+                {
+                    bossRb.linearVelocity = new Vector2(0f, bossRb.linearVelocity.y);
+                    bossRb.AddForce(new Vector2(dir * boss.dashCancelKnockback, 0f), ForceMode2D.Impulse);
+                }
+                
+                // Cancela o dash
+                boss.dashWasCancelled = true;
+            }
+
+            // TOCA SOM DE PARRY
+            if (AudioManager.audioInstance != null)
+            {
+                AudioManager.audioInstance.BossParrySFX();
+                Debug.Log("[Cutscene] Som de parry tocado!");
+            }
+
+            break;
         }
 
-        parryTutorialComplete = true;
+        yield return null;
     }
+
+    if (!attackDetected)
+    {
+        Debug.Log("[Cutscene] Tempo esgotado!");
+        
+        if (SlowMotionManager.Instance != null)
+        {
+            SlowMotionManager.Instance.DeactivateSlowMotion();
+        }
+
+        if (parryPrompt) parryPrompt.SetActive(false);
+    }
+
+    parryTutorialComplete = true;
+}
 
     private IEnumerator CameraShake()
     {

@@ -175,6 +175,7 @@ MonoBehaviour:
   bossTheme: {fileID: 0}
   phaseChangeTheme: {fileID: 0}
   deathTheme: {fileID: 0}
+  dashWasCancelled: 0
 --- !u!61 &6285176174509000561
 BoxCollider2D:
   m_ObjectHideFlags: 0

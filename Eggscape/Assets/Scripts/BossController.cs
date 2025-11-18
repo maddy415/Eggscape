@@ -173,7 +173,7 @@ public class BossController : MonoBehaviour
 
     // Dash em execução
     private bool isChargingDash = false;
-    private bool dashWasCancelled = false;
+    [HideInInspector] public bool dashWasCancelled = false;
     #endregion
 
     #region Unity
