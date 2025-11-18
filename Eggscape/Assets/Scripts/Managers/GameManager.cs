@@ -62,8 +62,14 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        victoryText.enabled = false;
+        groundRef.SetActive(false);
         // cache de refs
-        if (frog != null) frogJumper = frog.GetComponent<FrogIdleJumper>();
+        //if (frog != null) frogJumper = frog.GetComponent<FrogIdleJumper>();
+
+        frogJumper = GetComponent<FrogIdleJumper>();
+        
+        frogJumper.enabled = true;
 
         if (groundRef != null) groundRef.SetActive(false);
         if (victoryText != null) victoryText.text = "";
@@ -157,6 +163,7 @@ public class GameManager : MonoBehaviour
             if (ground) ground.GetComponent<GroundGen>().enabled = false;
             if (fence) fence.GetComponent<GroundGen>().enabled = false;
             if (barn) barn.GetComponent<ObstacleMove>().enabled = false;
+            //if (frog) frog.GetComponent<FrogIdleJumper>().enabled = false;
 
             foreach (GameObject obj in GameManager.Instance.objsOnScene)
             {

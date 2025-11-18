@@ -802,11 +802,11 @@ Transform:
   m_GameObject: {fileID: 277874644}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.853802, y: 3.2582717, z: -9.981733}
+  m_LocalPosition: {x: -8.922361, y: 1.6305038, z: -322.7546}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1988584649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &304386134
 GameObject:
@@ -1242,11 +1242,11 @@ Transform:
   m_GameObject: {fileID: 335005981}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.853802, y: 3.2582717, z: -9.981733}
+  m_LocalPosition: {x: -8.922361, y: 1.6305038, z: -322.7546}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1988584649}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &366919371
 GameObject:
@@ -8083,7 +8083,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 335005982}
         m_TargetAssemblyTypeName: GameMenu, Assembly-CSharp
         m_MethodName: ReturnToMenu
         m_Mode: 1
@@ -8178,7 +8178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vicCanvas: {fileID: 588403104}
-  frogJumper: {fileID: 0}
+  frogJumper: {fileID: -6432850150247976287, guid: 630d6f9717d68e44d9d147eb3a56aa28, type: 3}
   barn: {fileID: 1763577831}
   frog: {fileID: 7672838025917734753, guid: 630d6f9717d68e44d9d147eb3a56aa28, type: 3}
   spawnerLog: {fileID: 304386134}
@@ -9637,7 +9637,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 335005982}
         m_TargetAssemblyTypeName: GameMenu, Assembly-CSharp
         m_MethodName: ResetSceneMenu
         m_Mode: 1
@@ -10284,6 +10284,8 @@ Transform:
   - {fileID: 1723841630}
   - {fileID: 788158580}
   - {fileID: 1941320289}
+  - {fileID: 277874646}
+  - {fileID: 335005983}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1997852185
@@ -11233,5 +11235,3 @@ SceneRoots:
   - {fileID: 1520647463}
   - {fileID: 1906364880}
   - {fileID: 812157043}
-  - {fileID: 277874646}
-  - {fileID: 335005983}
