@@ -7,7 +7,7 @@ public class AttackCollisionHandler : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // 1) Se for “Obstacle”, mantém seu comportamento atual
+        // 1) Se for "Obstacle", mantém seu comportamento atual
         if (other.CompareTag("Obstacle"))
         {
             Destroy(other.gameObject);
@@ -27,20 +27,19 @@ public class AttackCollisionHandler : MonoBehaviour
             var player = GetComponentInParent<Player>();
             if (player != null && player.IsAttackActive)
             {
-                // tira vida do boss
+                // Notifica o BossCutsceneManager se estiver em tutorial
+                var cutsceneManager = FindFirstObjectByType<BossCutsceneManager>();
+                if (cutsceneManager != null && !cutsceneManager.IsCutsceneComplete())
+                {
+                    Debug.Log("[AttackCollision] COLISÃO DETECTADA durante tutorial!");
+                    cutsceneManager.OnBossHitByPlayer();
+                }
+
+                // Tira vida do boss
                 boss.TakeDamage(player.attackDamage);
 
-                // feedback opcional
-                /*if (explosion) {
-                    var fx = Instantiate(explosion, other.bounds.ClosestPoint(transform.position), Quaternion.identity);
-                    Destroy(fx, 1.1f);
-                }*/
-
-                // dá knockback no player como “recoil” do golpe
+                // Dá knockback no player como "recoil" do golpe
                 player.Knockback();
-
-                // (opcional) som de hit
-                // AudioManager.audioInstance.HitSFX();
 
                 return;
             }

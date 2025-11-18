@@ -42,6 +42,7 @@ public class BossCutsceneManager : MonoBehaviour
     public bool parryTutorialComplete = false;
     private bool parrySuccessful = false;
     private Rigidbody2D bossRb;
+    private bool bossWasHit = false;
 
     private void Start()
     {
@@ -168,7 +169,7 @@ public class BossCutsceneManager : MonoBehaviour
         yield return new WaitUntil(() => parryTutorialComplete);
     }
 
-    public IEnumerator TriggerParrySlowMotion()
+   public IEnumerator TriggerParrySlowMotion()
 {
     Debug.Log("[Cutscene] SLOW MOTION ATIVADO!");
 
@@ -181,17 +182,26 @@ public class BossCutsceneManager : MonoBehaviour
 
     float elapsed = 0f;
     bool attackDetected = false;
+    bossWasHit = false; // Reset
 
     while (elapsed < parryTimeWindow && !attackDetected)
     {
         elapsed += Time.deltaTime;
 
+        // Detecta INPUT de ataque
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("[Cutscene] ATAQUE DETECTADO!");
+            Debug.Log("[Cutscene] Input de ataque detectado, aguardando colisão...");
+        }
+
+        // SÓ CONTA COMO PARRY se o BOSS FOI ATINGIDO
+        if (bossWasHit)
+        {
+            Debug.Log("[Cutscene] PARRY BEM-SUCEDIDO! Boss foi atingido!");
             attackDetected = true;
             parrySuccessful = true;
 
+            // DESATIVA SLOW MOTION
             if (SlowMotionManager.Instance != null)
             {
                 SlowMotionManager.Instance.DeactivateSlowMotion();
@@ -199,23 +209,18 @@ public class BossCutsceneManager : MonoBehaviour
 
             if (parryPrompt) parryPrompt.SetActive(false);
 
-            // CANCELA O DASH PRIMEIRO
+            // CANCELA O DASH
             if (boss != null)
             {
                 boss.dashWasCancelled = true;
             }
 
-            // Espera alguns frames para o boss parar o dash
+            // Espera alguns frames
             yield return null;
             yield return null;
             yield return null;
 
-            if (player != null)
-            {
-                Debug.Log("[Cutscene] Ataque do player executado naturalmente");
-            }
-
-            // AGORA APLICA KNOCKBACK NO BOSS
+            // APLICA KNOCKBACK NO BOSS
             if (boss != null)
             {
                 Debug.Log("[Cutscene] Aplicando knockback no boss...");
@@ -223,14 +228,10 @@ public class BossCutsceneManager : MonoBehaviour
                 Rigidbody2D bossRb = boss.GetComponent<Rigidbody2D>();
                 if (bossRb != null)
                 {
-                    // Calcula direção (boss é empurrado para trás, longe do player)
                     float dir = Mathf.Sign(boss.transform.position.x - player.transform.position.x);
                     if (dir == 0f) dir = (boss.transform.localScale.x >= 0) ? -1f : 1f;
                     
-                    // Para o boss completamente
                     bossRb.linearVelocity = Vector2.zero;
-                    
-                    // Aplica knockback
                     bossRb.AddForce(new Vector2(dir * boss.dashCancelKnockback, 0f), ForceMode2D.Impulse);
                     
                     Debug.Log($"[Cutscene] Knockback aplicado! Direção: {dir}, Força: {boss.dashCancelKnockback}");
@@ -252,7 +253,7 @@ public class BossCutsceneManager : MonoBehaviour
 
     if (!attackDetected)
     {
-        Debug.Log("[Cutscene] Tempo esgotado!");
+        Debug.Log("[Cutscene] Tempo esgotado - parry falhou!");
         
         if (SlowMotionManager.Instance != null)
         {
@@ -286,6 +287,12 @@ public class BossCutsceneManager : MonoBehaviour
         }
 
         cam.transform.position = originalPos;
+    }
+    
+    public void OnBossHitByPlayer()
+    {
+        bossWasHit = true;
+        Debug.Log("[Cutscene] Boss foi atingido pelo player!");
     }
 
     public bool IsCutsceneComplete()
