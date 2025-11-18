@@ -6,12 +6,7 @@ using UnityEditor;
 using Random = UnityEngine.Random;
 
 /// <summary>
-/// Boss 2D com fases e ataques:
-/// - Charge (com âncora; dash pode ser cancelado por ataque do player)
-/// - JumpSmash (clássico)
-/// - JumpSuperHigh (lock-on/meteoro + shockwaves ao pousar)
-/// - BulletHell (recuo opcional + padrões via BulletPatternSO + OBJECT POOL)
-/// Player morre com 1 hit ao encostar (exceto enquanto está atacando).
+/// Boss 2D com fases, ataques e integração com sistema de cutscene/tutorial
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class BossController : MonoBehaviour
@@ -30,7 +25,7 @@ public class BossController : MonoBehaviour
         public float windup = 0.5f;
         public float recovery = 0.5f;
 
-        [Header("One-hit on touch (sempre que encostar)")]
+        [Header("One-hit on touch")]
         public bool killOnTouch = true;
         public LayerMask playerLayers = 0;
 
@@ -85,7 +80,7 @@ public class BossController : MonoBehaviour
         public float minDelayBetween = 0.6f;
         public float maxDelayBetween = 1.4f;
 
-        [Header("Transição de fase (use um ou ambos)")]
+        [Header("Transição de fase")]
         [Range(0, 1f)] public float hpThreshold = 0f;
         public float timeLimit = 0f;
     }
@@ -102,6 +97,7 @@ public class BossController : MonoBehaviour
     [Header("Alvos / Refs")]
     public float speed = 6f;
     public Transform player;
+    public Player playerScript; // Referência ao script do Player
     public SpriteRenderer bossSprite;
     public Color telegraphColor = Color.red;
 
@@ -116,7 +112,7 @@ public class BossController : MonoBehaviour
     public float groundProbeDistance = 0.15f;
 
     // ======= Charge Anchor =======
-    [Header("Charge Anchor (ponto fixo do dash)")]
+    [Header("Charge Anchor")]
     public bool useChargeAnchor = true;
     public Transform chargeAnchor;
     public Collider2D chargeAnchorTrigger;
@@ -127,13 +123,13 @@ public class BossController : MonoBehaviour
     public float chargePreDashHold = 0.35f;
     public float chargeAnchorXTolerance = 0.15f;
 
-    // ======= Cancel do dash ao ser atingido =======
+    // ======= Cancel do dash =======
     [Header("Charge Cancel ao ser atingido")]
     public LayerMask playerAttackMask;
     public float dashCancelKnockback = 10f;
     public float dashCancelStun = 0.2f;
 
-    // ======= Shockwave do JumpSuperHigh =======
+    // ======= Shockwave =======
     [Header("Shockwave (JumpSuperHigh landing)")]
     public GameObject shockwavePrefab;
     public float shockwaveSpawnYOffset = 0.15f;
@@ -156,7 +152,6 @@ public class BossController : MonoBehaviour
     public float bulletSpawnYOffset = 0.25f;
 
     [Header("Bullet Hell – OBJECT POOL")]
-    [Tooltip("Pool de foices. Se nulo, usa Instantiate como fallback.")]
     public ScythePool scythePool;
     
     [Header("Trilha Sonora")]
@@ -176,9 +171,9 @@ public class BossController : MonoBehaviour
     // Charge/Anchor
     private bool anchorTouchedThisCharge = false;
 
-    // Dash em execução (para cancelar on-hit)
+    // Dash em execução
     private bool isChargingDash = false;
-    private bool dashWasCancelled = false;
+    [HideInInspector] public bool dashWasCancelled = false;
     #endregion
 
     #region Unity
@@ -204,12 +199,25 @@ public class BossController : MonoBehaviour
 
     private void Start()
     {
-        BeginIntro();
+        // Pega referência do Player script se não foi atribuída
+        if (playerScript == null && player != null)
+        {
+            playerScript = player.GetComponent<Player>();
+        }
     }
 
     #endregion
 
-    #region Ciclo da luta
+    #region Inicialização
+
+    /// <summary>
+    /// Chamado pelo BossCutsceneManager após a cutscene
+    /// </summary>
+    public void StartBossFight()
+    {
+        if (dead) return;
+        BeginIntro();
+    }
 
     public void BeginIntro()
     {
@@ -233,7 +241,11 @@ public class BossController : MonoBehaviour
 
     private void GoToPhase(int idx)
     {
-        if (phases == null || phases.Count == 0) { Debug.LogWarning("Sem fases configuradas."); return; }
+        if (phases == null || phases.Count == 0)
+        {
+            Debug.LogWarning("Sem fases configuradas.");
+            return;
+        }
         phaseIndex = Mathf.Clamp(idx, 0, phases.Count - 1);
         phaseTimer = 0f;
         StopAllCoroutines();
@@ -282,6 +294,106 @@ public class BossController : MonoBehaviour
     }
 
     #endregion
+
+    #region Tutorial Dash
+
+   
+
+    #endregion
+
+    #region Tutorial Dash
+
+public IEnumerator ExecuteTutorialDash(BossCutsceneManager cutsceneManager)
+{
+    Attack chargeAttack = null;
+    if (phases.Count > 0 && phases[0].attacks.Count > 0)
+    {
+        foreach (var atk in phases[0].attacks)
+        {
+            if (atk.type == AttackType.Charge)
+            {
+                chargeAttack = atk;
+                break;
+            }
+        }
+    }
+
+    if (chargeAttack == null)
+    {
+        Debug.LogWarning("[Boss] Nenhum ataque Charge encontrado para tutorial!");
+        yield break;
+    }
+
+    float tutorialWindup = chargeAttack.windup * cutsceneManager.parryWindupMultiplier;
+
+    if (bossSprite) Flash(telegraphColor, tutorialWindup);
+    yield return new WaitForSeconds(tutorialWindup);
+
+    FacePlayerX();
+    Vector2 dashDir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
+    float elapsed = 0f;
+
+    isChargingDash = true;
+    dashWasCancelled = false;
+    bool slowMotionTriggered = false;
+
+    // Loop INFINITO até colidir ou ser cancelado
+    while (!dashWasCancelled)
+    {
+        elapsed += Time.deltaTime;
+
+        // Pega o multiplicador atual do SlowMotionManager
+        float speedMultiplier = 1f;
+        if (SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive())
+        {
+            speedMultiplier = SlowMotionManager.Instance.slowMotionScale;
+        }
+
+        // SEMPRE aplica velocidade (nunca para!)
+        rb.linearVelocity = new Vector2(dashDir.x * chargeAttack.dashSpeed * speedMultiplier, rb.linearVelocity.y);
+
+        // Verifica distância para triggar slow motion APENAS UMA VEZ
+        if (!slowMotionTriggered && player != null)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
+
+            if (distance <= cutsceneManager.promptTriggerDistance)
+            {
+                slowMotionTriggered = true;
+                Debug.Log($"[Boss] Distância alcançada ({distance:F2}), triggando slow motion!");
+                
+                // Inicia slow motion sem bloquear
+                StartCoroutine(cutsceneManager.TriggerParrySlowMotion());
+            }
+        }
+
+        // Hit detection - ao colidir, SAI DO LOOP
+        var hits = Physics2D.OverlapBoxAll(transform.position, chargeAttack.chargeHitbox, 0f, chargeAttack.hitMask);
+        if (hits.Length > 0)
+        {
+            foreach (var h in hits)
+            {
+                // Se colidiu com o player, processa hit e SAI
+                if (h.CompareTag("Player") || (chargeAttack.playerMask.value & (1 << h.gameObject.layer)) != 0)
+                {
+                    Debug.Log("[Boss] COLIDIU COM O PLAYER! Saindo do dash.");
+                    ApplyPlayerHitIfAny(h.gameObject, chargeAttack);
+                    dashWasCancelled = true; // Força saída do loop
+                    break;
+                }
+            }
+        }
+
+        yield return null;
+    }
+
+    isChargingDash = false;
+    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
+    Debug.Log("[Boss] Tutorial dash finalizado!");
+}
+
+#endregion
 
     #region Ataques
 
@@ -346,7 +458,6 @@ public class BossController : MonoBehaviour
         float dx0 = chargeAnchor.position.x - transform.position.x;
         float absDx0 = Mathf.Abs(dx0);
 
-        // A) já perto do anchor
         if (absDx0 <= chargeAnchorXTolerance)
         {
             yield return StartCoroutine(WaitUntilGrounded(0.8f));
@@ -381,7 +492,6 @@ public class BossController : MonoBehaviour
             yield break;
         }
 
-        // B) longe do anchor -> salto até lá
         FaceX(chargeAnchor.position.x);
 
         float initialDirX = Mathf.Sign(chargeAnchor.position.x - transform.position.x);
@@ -560,7 +670,6 @@ public class BossController : MonoBehaviour
     {
         if (bulletPattern == null || (bulletPrefab == null && scythePool == null)) yield break;
 
-        // 1) RETREAT se colado demais
         if (player != null)
         {
             float dx = Mathf.Abs(player.position.x - transform.position.x);
@@ -583,7 +692,6 @@ public class BossController : MonoBehaviour
             }
         }
 
-        // 2) PARA o boss e começa a atirar parado
         rb.linearVelocity = Vector2.zero;
 
         float duration = bulletHellDurationOverride > 0f ? bulletHellDurationOverride : bulletPattern.duration;
@@ -610,7 +718,7 @@ public class BossController : MonoBehaviour
 
     #endregion
 
-    #region Helpers (câmera / chão / âncora / bullet)
+    #region Helpers
 
     private void SpawnBullets(List<Vector2> dirs, BulletPatternSO so)
     {
@@ -621,22 +729,13 @@ public class BossController : MonoBehaviour
 
         foreach (var d in dirs)
         {
-            // ======== POOL ========
             if (scythePool != null)
             {
-                var sc = scythePool.Spawn(
-                    spawnPos,
-                    d,
-                    so.bulletSpeed,
-                    so.bulletLifeTime,
-                    bulletHitMask
-                );
-
+                var sc = scythePool.Spawn(spawnPos, d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
                 sc.Initialize(d, so.bulletSpeed, so.bulletLifeTime, bulletHitMask);
                 continue;
             }
 
-            // ======== Fallback: Instantiate ========
             var go = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
 
             var scythe = go.GetComponent<ScytheProjectile>();
@@ -953,7 +1052,7 @@ public class BossController : MonoBehaviour
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawWireSphere(transform.position, atk.smashRadiusSuper);
             }
-            else // BulletHell
+            else
             {
                 Gizmos.color = new Color(0.2f, 1f, 1f, 0.65f);
                 Gizmos.DrawWireSphere(transform.position, 0.25f);

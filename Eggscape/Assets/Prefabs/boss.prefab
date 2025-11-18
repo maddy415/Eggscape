@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 2809721784010619720, guid: 0d85ee8b1a983cf40a86cbe3b7e66995, type: 3}
-  m_Color: {r: 1, g: 2.5814491e-14, b: 2.5814491e-14, a: 1}
+  m_Color: {r: 1, g: 2.3132602e-18, b: 2.3132602e-18, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -134,6 +134,7 @@ MonoBehaviour:
   invulnerable: 0
   speed: 0
   player: {fileID: 0}
+  playerScript: {fileID: 0}
   bossSprite: {fileID: 0}
   telegraphColor: {r: 1, g: 0, b: 0, a: 1}
   phases: []
@@ -174,6 +175,7 @@ MonoBehaviour:
   bossTheme: {fileID: 0}
   phaseChangeTheme: {fileID: 0}
   deathTheme: {fileID: 0}
+  dashWasCancelled: 0
 --- !u!61 &6285176174509000561
 BoxCollider2D:
   m_ObjectHideFlags: 0

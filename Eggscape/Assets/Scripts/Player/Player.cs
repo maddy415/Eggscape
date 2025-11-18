@@ -39,12 +39,31 @@ public class Player : MonoBehaviour
 
     [Header("Knockback")]
     [SerializeField] private float kbForce;
+    
+    [Header("Squash & Stretch")]
+    [SerializeField] private bool enableSquashStretch = true;
+
+    [SerializeField] private float jumpStretchX = 0.85f;
+    [SerializeField] private float jumpStretchY = 1.15f;
+
+    [SerializeField] private float landSquashX = 1.2f;
+    [SerializeField] private float landSquashY = 0.8f;
+
+    [SerializeField] private float stretchReturnSpeed = 10f;
+
+    // controle interno
+    private bool squashStretchActive = false;
+    private Vector3 defaultScale;
+    private bool wasGroundedLastFrame = false;
+
 
     [Header("Effects")]
     [SerializeField] private GameObject explosion;
 
     [Header("State Flags")]
     [SerializeField] private bool canMove = true;
+    [HideInInspector] public bool canJump = true;
+    [HideInInspector] public bool canAttack = true;  // PÚBLICO - controlado pela cutscene
 
     [Header("Misc.")]
     [SerializeField] private float torqueForce;
@@ -64,9 +83,9 @@ public class Player : MonoBehaviour
     // [NEW] Controle de giro do SPRITE ao morrer (sem mexer no corpo)
     [Header("Death Spin (Sprite Only)")]
     [SerializeField, Tooltip("Velocidade de rotação do SPRITE após morrer (graus/seg).")]
-    private float deathSpinSpeed = 720f; // [NEW]
-    private bool spinOnDeathActive = false; // [NEW]
-    private float currentSpriteRotation = 0f; // [NEW]
+    private float deathSpinSpeed = 720f;
+    private bool spinOnDeathActive = false;
+    private float currentSpriteRotation = 0f;
 
     // Internal state values -------------------------------------------------
     private bool playerDead;
@@ -74,7 +93,7 @@ public class Player : MonoBehaviour
     private bool isJumping;
     private bool isFalling;
     private bool isAttacking;
-    private bool canAttack = true;
+    private bool attackReady = true;  // RENOMEADO - cooldown interno do ataque
     private bool isKnockbacking;
 
     // Timers ---------------------------------------------------------------
@@ -96,6 +115,7 @@ public class Player : MonoBehaviour
     {
         CacheComponents();
         rb.gravityScale = defaultGS;
+        defaultScale = sprite.transform.localScale;
     }
 
     private void CacheComponents()
@@ -137,6 +157,11 @@ public class Player : MonoBehaviour
             HandleJump();
             HandleAttackInput();
         }
+        else
+        {
+            // MESMO SEM CANMOVE, permite ataque durante slow motion
+            HandleAttackInput();
+        }
 
         HandleVictorySequence();
 
@@ -146,6 +171,8 @@ public class Player : MonoBehaviour
             currentSpriteRotation += deathSpinSpeed * Time.deltaTime;
             sprite.transform.localRotation = Quaternion.Euler(0f, 0f, currentSpriteRotation);
         }
+        //HandleSquashStretch();
+
     }
 
     #region Jump Logic
@@ -295,8 +322,18 @@ public class Player : MonoBehaviour
 
     private void HandleAttackInput()
     {
-        if (Input.GetMouseButtonDown(0) && canAttack)
+        // Detecta input de ataque
+        bool attackInput = Input.GetMouseButtonDown(0);
+        
+        // DEBUG
+        if (attackInput)
         {
+            Debug.Log($"[Player] Input detectado! attackReady={attackReady}, canAttack={canAttack}");
+        }
+        
+        if (attackInput && attackReady && canAttack)
+        {
+            Debug.Log("[Player] ATAQUE INICIADO!");
             BeginAttack();
         }
 
@@ -306,18 +343,54 @@ public class Player : MonoBehaviour
 
     private void BeginAttack()
     {
-        canAttack = false;
-        attackHB.enabled = true;
+        attackReady = false;
+    
+        // FORÇA a ativação imediata do hitbox
+        if (attackHB != null)
+        {
+            attackHB.enabled = true;
+        }
 
         attackTimer = 0f;
         isAttacking = true;
         rb.gravityScale = 0f;
+    
+        // 🔧 Cancela o pulo sustentado
+        isJumping = false;
+        jumpTimer = 0f;
+    
+        // 🔧 Zera a velocidade vertical
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+
+        Debug.Log($"[Player] ATAQUE INICIADO! IsAttackActive={IsAttackActive}, HitBox={attackHB != null && attackHB.enabled}");
 
         // ativa spin do ataque
         if (attackSpinEnabled)
         {
             attackSpinActive = true;
             attackSpinAngle = 0f;
+        }
+    }
+
+    /// <summary>
+    /// Método público para forçar início do ataque (usado pela cutscene)
+    /// </summary>
+    public void ForceAttack()
+    {
+        Debug.Log($"[Player] ForceAttack chamado! attackReady={attackReady}, canAttack={canAttack}, CanMove={CanMove}");
+        
+        // FORÇA o ataque mesmo que attackReady seja false
+        attackReady = true; // Reseta o cooldown
+        canAttack = true;   // Garante que pode atacar
+        
+        if (attackHB != null)
+        {
+            Debug.Log("[Player] Forçando ataque diretamente...");
+            BeginAttack();
+        }
+        else
+        {
+            Debug.LogError("[Player] attackHB é NULL!");
         }
     }
 
@@ -330,7 +403,11 @@ public class Player : MonoBehaviour
 
         if (!isKnockbacking)
         {
-            rb.linearVelocity = new Vector2(attackForce, 0f);
+            // USA UNSCALED para funcionar em slow motion
+            float actualAttackForce = sprite != null && sprite.flipX ? -attackForce : attackForce;
+            rb.linearVelocity = new Vector2(actualAttackForce, rb.linearVelocity.y);
+            
+            Debug.Log($"[Player] Aplicando movimento do ataque! Velocity={rb.linearVelocity.x}");
 
             if (!isGrounded && Input.GetKeyDown(KeyCode.S))
             {
@@ -339,27 +416,28 @@ public class Player : MonoBehaviour
             }
         }
 
-        // GIRO DURANTE O ATAQUE
+        // GIRO DURANTE O ATAQUE - usa unscaledDeltaTime
         if (attackSpinEnabled && attackSpinActive && attackSpinTarget != null && !playerDead)
         {
             float dir = sprite != null && sprite.flipX ? -1f : 1f;
-            attackSpinAngle += attackSpinSpeed * Time.deltaTime * dir;
+            attackSpinAngle += attackSpinSpeed * Time.unscaledDeltaTime * dir;
             attackSpinTarget.localRotation = Quaternion.Euler(0f, 0f, attackSpinAngle);
         }
     }
 
     private void UpdateAttackCooldown()
     {
-        if (canAttack)
+        if (attackReady)
         {
             return;
         }
 
-        attackCDTimer += Time.deltaTime;
+        // USA UNSCALED para funcionar em slow motion
+        attackCDTimer += Time.unscaledDeltaTime;
 
         if (attackCDTimer >= attackCD)
         {
-            canAttack = true;
+            attackReady = true;
             attackCDTimer = 0f;
             isKnockbacking = false;
         }
@@ -372,7 +450,8 @@ public class Player : MonoBehaviour
             return;
         }
 
-        attackTimer += Time.deltaTime;
+        // USA UNSCALED para funcionar em slow motion
+        attackTimer += Time.unscaledDeltaTime;
 
         if (attackTimer >= attackAirTime)
         {
@@ -428,7 +507,7 @@ public class Player : MonoBehaviour
 
         GameObject explosionInstance = Instantiate(explosion, transform.position, Quaternion.identity);
         AudioManager.audioInstance.ExplodeSFX();
-        Destroy(explosionInstance, 1.1f);
+        Destroy(explosionInstance, 1f);
 
         playerDead = true;
         CanMove = false;
@@ -458,15 +537,26 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (!other.gameObject.CompareTag("Obstacle") || GameManager.Instance.isCheatOn)
+            return;
+
+        // =======================
+        //     🔥 VERSÃO FINA 🔥
+        // =======================
+        // Se o ataque está ativo OU se estou no knockback (ou seja, acertei algo)
+        // então IGNORA a colisão física com o obstáculo.
+        if (IsAttackActive || isKnockbacking)
         {
+            Debug.Log("[Player] Colisão com obstáculo ignorada (ataque/knockback ativo).");
             return;
         }
+        // =======================
 
         GameManager.Instance.playerAlive = false;
         Debug.Log("morreu burro");
         GameManager.Instance.StopScene();
         Death();
     }
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -489,5 +579,38 @@ public class Player : MonoBehaviour
         isKnockbacking = true;
     }
 
+    #endregion
+    
+    #region Misc.
+    
+    private void HandleSquashStretch()
+    {
+        if (!enableSquashStretch || sprite == null)
+            return;
+
+        // STRETCH ao iniciar salto
+        if (!wasGroundedLastFrame && isGrounded) 
+        {
+            // acabou de aterrissar → squash
+            sprite.transform.localScale = new Vector3(landSquashX, landSquashY, 1f);
+        }
+        else if (wasGroundedLastFrame && !isGrounded)
+        {
+            // acabou de sair do chão → stretch
+            sprite.transform.localScale = new Vector3(jumpStretchX, jumpStretchY, 1f);
+        }
+
+        // Voltar pro tamanho normal suavemente
+        sprite.transform.localScale = Vector3.Lerp(
+            sprite.transform.localScale,
+            defaultScale,
+            Time.deltaTime * stretchReturnSpeed
+        );
+
+        wasGroundedLastFrame = isGrounded;
+    }
+
+    
+    
     #endregion
 }

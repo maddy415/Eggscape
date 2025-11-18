@@ -84,8 +84,8 @@ public class TutorialManager : MonoBehaviour
 
     // 🔒 Falas que não podem ser puladas
     [Header("Bloqueio de Skip")]
-    [Tooltip("Diálogos nestes índices não podem ser pulados (nem pular digitação, nem avançar).")]
-    public int[] nonSkippableIndices = { 3 };
+    [Tooltip("Diálogos nestes índices NÃO podem ser pulados (nem pular digitação, nem avançar) ENQUANTO estiver nos diálogos do tutorial.")]
+    public int[] nonSkippableIndices = { 1 }; // 2º diálogo inicial (index 1)
 
     // ========== CONTROLE ==========
     private float walkTimer;
@@ -98,6 +98,9 @@ public class TutorialManager : MonoBehaviour
     private Coroutine typingCoroutine;
     private bool isTyping = false;
     private bool skipTyping = false;
+
+    // Flag pra saber se estamos usando as falas da General
+    private bool usingGeneralDialogues = false;
 
     // ========== UI DE PROMPT DE AÇÃO ==========
     [Header("Prompt de Ação (ex.: APERTE ESPAÇO)")]
@@ -129,17 +132,17 @@ public class TutorialManager : MonoBehaviour
     [Header("Falas do Tutorial (padrão)")]
     public DialogueLine[] dialogues =
     {
-        new DialogueLine { speaker = "NerdEgg", text = "Chicken, precisamos correr, as outras galinhas estão nos esperando!", emotion = "" },
-        new DialogueLine { speaker = "NerdEgg", text = "Primeiro, vou te ensinar a pular troncos. Tem um vindo aí, aperte 'Espaço' para pular!", emotion = "" },
+        new DialogueLine { speaker = "Ovinho", text = "Chicken, precisamos correr, as outras galinhas estão nos esperando!", emotion = "" },
+        new DialogueLine { speaker = "Ovinho", text = "Primeiro, vou te ensinar a pular troncos. Tem um vindo aí, aperte 'Espaço' para pular!", emotion = "" },
         new DialogueLine { speaker = "Chicken", text = "Entendido! Estou pronta!", emotion = "happy" },
-        new DialogueLine { speaker = "NerdEgg", text = "Perfeito. Agora, siga em frente sem hesitar!", emotion = "" }
+        new DialogueLine { speaker = "Ovinho", text = "Perfeito. Agora, siga em frente sem hesitar!", emotion = "" }
     };
 
     [Header("Falas da General")]
     public DialogueLine[] generalDialogues =
     {
-        new DialogueLine { speaker = "General", text = "Soldada Chicken, situação crítica!", emotion = "" },
-        new DialogueLine { speaker = "General", text = "Mantenha a calma e continue a missão.", emotion = "" }
+        new DialogueLine { speaker = "Tenente Clara", text = "Soldada Chicken, situação crítica!", emotion = "" },
+        new DialogueLine { speaker = "Tenente Clara", text = "Mantenha a calma e continue a missão.", emotion = "" }
     };
 
     // Sequência ativa (começa nas falas do tutorial)
@@ -158,6 +161,13 @@ public class TutorialManager : MonoBehaviour
 
         // começa usando as falas do tutorial
         activeDialogues = dialogues;
+        usingGeneralDialogues = false;
+
+        // 🔒 tutorial inteiro sem ataque
+        if (player != null)
+        {
+            player.canAttack = false;
+        }
 
         // deixa o prompt oculto no início
         if (jumpPromptGroup != null)
@@ -228,6 +238,7 @@ public class TutorialManager : MonoBehaviour
 
     private void HandleInput()
     {
+        // Se o diálogo atual estiver travado (ex.: 2º diálogo do tutorial), ignora cliques
         if (IsCurrentDialogueLocked()) return;
 
         if (Input.GetMouseButtonDown(0))
@@ -471,14 +482,19 @@ public class TutorialManager : MonoBehaviour
 
     private bool IsCurrentDialogueLocked()
     {
+        // 🔓 Assim que entra no diálogo da General, nenhuma fala é travada
+        if (usingGeneralDialogues) return false;
+
         foreach (int idx in nonSkippableIndices)
             if (currentIndex == idx) return true;
+
         return false;
     }
 
     // ======= MÉTODO PÚBLICO: chamar as falas da General =======
     public void ShowGeneralDialogue()
     {
+        usingGeneralDialogues = true;   // a partir daqui, nada é "não pulável"
         activeDialogues = generalDialogues; // troca sequência ativa
         currentIndex = 0;
         OpenDialogueBox();
@@ -486,12 +502,11 @@ public class TutorialManager : MonoBehaviour
     }
 
     // ======= PROMPT "APERTE ESPAÇO" =======
-
     private void TryShowJumpPromptIfNeeded(DialogueLine line)
     {
         // Só mostra se for o NerdEgg falando e a fala contiver a palavra-chave (case-insensitive)
         if (line.speaker != null && line.text != null &&
-            line.speaker.Trim().Equals("NerdEgg", System.StringComparison.OrdinalIgnoreCase) &&
+            line.speaker.Trim().Equals("Ovinho", System.StringComparison.OrdinalIgnoreCase) &&
             line.text.ToUpperInvariant().Contains(jumpKeyword.ToUpperInvariant()))
         {
             ShowJumpPrompt(jumpPromptMessage, jumpPromptDuration);
@@ -533,7 +548,6 @@ public class TutorialManager : MonoBehaviour
         jumpPromptGroup.gameObject.SetActive(false);
         jumpPromptRoutine = null;
     }
-
 
     private IEnumerator FadeCanvasGroup(CanvasGroup cg, float from, float to, float time)
     {
