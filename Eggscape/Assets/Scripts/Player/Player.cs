@@ -39,6 +39,23 @@ public class Player : MonoBehaviour
 
     [Header("Knockback")]
     [SerializeField] private float kbForce;
+    
+    [Header("Squash & Stretch")]
+    [SerializeField] private bool enableSquashStretch = true;
+
+    [SerializeField] private float jumpStretchX = 0.85f;
+    [SerializeField] private float jumpStretchY = 1.15f;
+
+    [SerializeField] private float landSquashX = 1.2f;
+    [SerializeField] private float landSquashY = 0.8f;
+
+    [SerializeField] private float stretchReturnSpeed = 10f;
+
+    // controle interno
+    private bool squashStretchActive = false;
+    private Vector3 defaultScale;
+    private bool wasGroundedLastFrame = false;
+
 
     [Header("Effects")]
     [SerializeField] private GameObject explosion;
@@ -98,6 +115,7 @@ public class Player : MonoBehaviour
     {
         CacheComponents();
         rb.gravityScale = defaultGS;
+        defaultScale = sprite.transform.localScale;
     }
 
     private void CacheComponents()
@@ -153,6 +171,8 @@ public class Player : MonoBehaviour
             currentSpriteRotation += deathSpinSpeed * Time.deltaTime;
             sprite.transform.localRotation = Quaternion.Euler(0f, 0f, currentSpriteRotation);
         }
+        //HandleSquashStretch();
+
     }
 
     #region Jump Logic
@@ -559,5 +579,38 @@ public class Player : MonoBehaviour
         isKnockbacking = true;
     }
 
+    #endregion
+    
+    #region Misc.
+    
+    private void HandleSquashStretch()
+    {
+        if (!enableSquashStretch || sprite == null)
+            return;
+
+        // STRETCH ao iniciar salto
+        if (!wasGroundedLastFrame && isGrounded) 
+        {
+            // acabou de aterrissar → squash
+            sprite.transform.localScale = new Vector3(landSquashX, landSquashY, 1f);
+        }
+        else if (wasGroundedLastFrame && !isGrounded)
+        {
+            // acabou de sair do chão → stretch
+            sprite.transform.localScale = new Vector3(jumpStretchX, jumpStretchY, 1f);
+        }
+
+        // Voltar pro tamanho normal suavemente
+        sprite.transform.localScale = Vector3.Lerp(
+            sprite.transform.localScale,
+            defaultScale,
+            Time.deltaTime * stretchReturnSpeed
+        );
+
+        wasGroundedLastFrame = isGrounded;
+    }
+
+    
+    
     #endregion
 }
