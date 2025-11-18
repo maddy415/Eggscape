@@ -1629,7 +1629,7 @@ MonoBehaviour:
   boss: {fileID: 1922796071}
   player: {fileID: 1585589549}
   bossSpawnPoint: {fileID: 779371756}
-  chickenWalkDuration: 1.5
+  chickenWalkDuration: 1.7
   chickenWalkSpeed: 5
   bossEntranceForce: 15
   bossEntranceDirection: {x: -1, y: 0.5}
@@ -1652,6 +1652,7 @@ MonoBehaviour:
   shakeIntensity: 0.3
   shakeDuration: 0.5
   delayBeforeAfterParryDialogue: 0.5
+  parryTutorialComplete: 0
 --- !u!1 &648080741
 GameObject:
   m_ObjectHideFlags: 0
@@ -3139,7 +3140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa68e7cdabf185c4f99d4d251c4d532a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowMotionScale: 0.102
+  slowMotionScale: 0.062
   slowMotionObjects:
   - {fileID: 0}
   - {fileID: 1922796071}
@@ -6208,7 +6209,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1922796063}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69a2c71d04148944e9cf5d394ca0cfb5, type: 3}
   m_Name: 
@@ -6220,7 +6221,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1922796063}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 569b96f2ba57cd7438bf33aa815d1ee7, type: 3}
   m_Name: 
@@ -6260,6 +6261,7 @@ MonoBehaviour:
   logSFX: {fileID: 8300000, guid: e83c34a649e1af549ae4aa8813c26d0e, type: 3}
   deathSFX: {fileID: 8300000, guid: 2bbba8330c5685e488dd2552ac6b7288, type: 3}
   explosionSFX: {fileID: 8300000, guid: 210bc3f1e643b1c43953f56ab6468dff, type: 3}
+  parrySFX: {fileID: 0}
   sfxSource: {fileID: 0}
   musicSource: {fileID: 0}
   sfxVolume: 1

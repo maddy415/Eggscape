@@ -303,85 +303,97 @@ public class BossController : MonoBehaviour
 
     #region Tutorial Dash
 
-    /// <summary>
-    /// Executa dash tutorial com slow motion quando perto do player
-    /// </summary>
-    public IEnumerator ExecuteTutorialDash(BossCutsceneManager cutsceneManager)
+public IEnumerator ExecuteTutorialDash(BossCutsceneManager cutsceneManager)
+{
+    Attack chargeAttack = null;
+    if (phases.Count > 0 && phases[0].attacks.Count > 0)
     {
-        // Pega o primeiro ataque Charge
-        Attack chargeAttack = null;
-        if (phases.Count > 0 && phases[0].attacks.Count > 0)
+        foreach (var atk in phases[0].attacks)
         {
-            foreach (var atk in phases[0].attacks)
+            if (atk.type == AttackType.Charge)
             {
-                if (atk.type == AttackType.Charge)
-                {
-                    chargeAttack = atk;
-                    break;
-                }
+                chargeAttack = atk;
+                break;
             }
         }
-
-        if (chargeAttack == null)
-        {
-            Debug.LogWarning("[Boss] Nenhum ataque Charge encontrado para tutorial!");
-            yield break;
-        }
-
-        // Windup maior para tutorial
-        float tutorialWindup = chargeAttack.windup * cutsceneManager.parryWindupMultiplier;
-
-        if (bossSprite) Flash(telegraphColor, tutorialWindup);
-        yield return new WaitForSeconds(tutorialWindup);
-
-        // Inicia o dash em VELOCIDADE NORMAL
-        FacePlayerX();
-        Vector2 dashDir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
-        float elapsed = 0f;
-
-        isChargingDash = true;
-        dashWasCancelled = false;
-        bool slowMotionTriggered = false;
-
-        while (elapsed < chargeAttack.dashDuration && !dashWasCancelled)
-        {
-            elapsed += Time.deltaTime;
-
-            // Movimento em velocidade normal
-            rb.linearVelocity = new Vector2(dashDir.x * chargeAttack.dashSpeed, rb.linearVelocity.y);
-
-            // Verifica distância para triggar slow motion
-            if (!slowMotionTriggered && player != null)
-            {
-                float distance = Vector2.Distance(transform.position, player.position);
-
-                if (distance <= cutsceneManager.promptTriggerDistance)
-                {
-                    slowMotionTriggered = true;
-                    Debug.Log($"[Boss] Distância alcançada ({distance:F2}), triggando slow motion!");
-
-                    // TRIGGA O SLOW MOTION
-                    yield return StartCoroutine(cutsceneManager.TriggerParrySlowMotion());
-                    
-                    // Após slow motion, sai do dash
-                    break;
-                }
-            }
-
-            // Hit detection
-            var hits = Physics2D.OverlapBoxAll(transform.position, chargeAttack.chargeHitbox, 0f, chargeAttack.hitMask);
-            foreach (var h in hits) ApplyPlayerHitIfAny(h.gameObject, chargeAttack);
-
-            yield return null;
-        }
-
-        isChargingDash = false;
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-
-        Debug.Log("[Boss] Tutorial dash finalizado!");
     }
 
-    #endregion
+    if (chargeAttack == null)
+    {
+        Debug.LogWarning("[Boss] Nenhum ataque Charge encontrado para tutorial!");
+        yield break;
+    }
+
+    float tutorialWindup = chargeAttack.windup * cutsceneManager.parryWindupMultiplier;
+
+    if (bossSprite) Flash(telegraphColor, tutorialWindup);
+    yield return new WaitForSeconds(tutorialWindup);
+
+    FacePlayerX();
+    Vector2 dashDir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
+    float elapsed = 0f;
+
+    isChargingDash = true;
+    dashWasCancelled = false;
+    bool slowMotionTriggered = false;
+
+    // Loop INFINITO até colidir ou ser cancelado
+    while (!dashWasCancelled)
+    {
+        elapsed += Time.deltaTime;
+
+        // Pega o multiplicador atual do SlowMotionManager
+        float speedMultiplier = 1f;
+        if (SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive())
+        {
+            speedMultiplier = SlowMotionManager.Instance.slowMotionScale;
+        }
+
+        // SEMPRE aplica velocidade (nunca para!)
+        rb.linearVelocity = new Vector2(dashDir.x * chargeAttack.dashSpeed * speedMultiplier, rb.linearVelocity.y);
+
+        // Verifica distância para triggar slow motion APENAS UMA VEZ
+        if (!slowMotionTriggered && player != null)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
+
+            if (distance <= cutsceneManager.promptTriggerDistance)
+            {
+                slowMotionTriggered = true;
+                Debug.Log($"[Boss] Distância alcançada ({distance:F2}), triggando slow motion!");
+                
+                // Inicia slow motion sem bloquear
+                StartCoroutine(cutsceneManager.TriggerParrySlowMotion());
+            }
+        }
+
+        // Hit detection - ao colidir, SAI DO LOOP
+        var hits = Physics2D.OverlapBoxAll(transform.position, chargeAttack.chargeHitbox, 0f, chargeAttack.hitMask);
+        if (hits.Length > 0)
+        {
+            foreach (var h in hits)
+            {
+                // Se colidiu com o player, processa hit e SAI
+                if (h.CompareTag("Player") || (chargeAttack.playerMask.value & (1 << h.gameObject.layer)) != 0)
+                {
+                    Debug.Log("[Boss] COLIDIU COM O PLAYER! Saindo do dash.");
+                    ApplyPlayerHitIfAny(h.gameObject, chargeAttack);
+                    dashWasCancelled = true; // Força saída do loop
+                    break;
+                }
+            }
+        }
+
+        yield return null;
+    }
+
+    isChargingDash = false;
+    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
+    Debug.Log("[Boss] Tutorial dash finalizado!");
+}
+
+#endregion
 
     #region Ataques
 

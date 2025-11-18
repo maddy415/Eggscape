@@ -10,6 +10,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip logSFX;
     public AudioClip deathSFX;
     public AudioClip explosionSFX;
+    public AudioClip parrySFX;
 
     [Header("Sources (auto-criados se nulos)")]
     [SerializeField] private AudioSource sfxSource;
@@ -96,6 +97,12 @@ public class AudioManager : MonoBehaviour
 
         if (explosionSFX) sfxSource.PlayOneShot(explosionSFX, sfxVolume);
     }
+    
+    public void BossParrySFX()
+    {
+        if (parrySFX) sfxSource.PlayOneShot(parrySFX, sfxVolume);
+    }
+    
 
     // ======= BGM =======
     public void PlayMusic(AudioClip clip, bool loop = true, float volume01 = -1f)

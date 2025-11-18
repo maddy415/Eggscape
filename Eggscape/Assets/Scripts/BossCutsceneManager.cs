@@ -39,7 +39,7 @@ public class BossCutsceneManager : MonoBehaviour
     public float delayBeforeAfterParryDialogue = 0.5f;
 
     private bool cutsceneComplete = false;
-    private bool parryTutorialComplete = false;
+    public bool parryTutorialComplete = false;
     private bool parrySuccessful = false;
     private Rigidbody2D bossRb;
 
@@ -155,7 +155,7 @@ public class BossCutsceneManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
     }
 
-    private IEnumerator ParryTutorial()
+    public IEnumerator ParryTutorial()
     {
         if (!boss || !player) yield break;
 

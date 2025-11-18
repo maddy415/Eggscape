@@ -324,7 +324,7 @@ public class Player : MonoBehaviour
     private void BeginAttack()
     {
         attackReady = false;
-        
+    
         // FORÇA a ativação imediata do hitbox
         if (attackHB != null)
         {
@@ -334,6 +334,13 @@ public class Player : MonoBehaviour
         attackTimer = 0f;
         isAttacking = true;
         rb.gravityScale = 0f;
+    
+        // 🔧 Cancela o pulo sustentado
+        isJumping = false;
+        jumpTimer = 0f;
+    
+        // 🔧 Zera a velocidade vertical
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
 
         Debug.Log($"[Player] ATAQUE INICIADO! IsAttackActive={IsAttackActive}, HitBox={attackHB != null && attackHB.enabled}");
 
