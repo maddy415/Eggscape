@@ -231,10 +231,10 @@ public class BossController : MonoBehaviour
         invulnerable = true;
         if (bossSprite) Flash(telegraphColor, introDuration);
 
-        rb.linearVelocity = Vector2.left * speed;
+        //rb.linearVelocity = Vector2.left * speed;
         yield return new WaitForSeconds(introDuration);
 
-        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        //rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         invulnerable = false;
         GoToPhase(0);
     }

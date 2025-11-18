@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class TutorialManager : MonoBehaviour
 {
@@ -77,6 +78,12 @@ public class TutorialManager : MonoBehaviour
     public int spawnIndex = 1;
     public float generalSpeed = 5f;
 
+    [Header("Troca de Cena")]
+    [Tooltip("Nome da próxima cena a ser carregada após o último diálogo")]
+    public string nextSceneName = "MainGame";
+    [Tooltip("Tempo de espera (em segundos) após o último diálogo antes de trocar de cena")]
+    public float delayBeforeSceneChange = 1.5f;
+
     [Header("Máquina de Escrever")]
     public float typingSpeed = 0.03f;
     public bool allowSkipTypingWithClick = true;
@@ -106,7 +113,7 @@ public class TutorialManager : MonoBehaviour
     [Header("Prompt de Ação (ex.: APERTE ESPAÇO)")]
     [Tooltip("Objeto de UI (no Canvas) que contém o texto grande do prompt. Pode ser um painel com TMP grande.")]
     public CanvasGroup jumpPromptGroup;     // use um CanvasGroup no objeto do prompt
-    public TextMeshProUGUI jumpPromptText;  // o TMP grandão do “APERTE ESPAÇO”
+    public TextMeshProUGUI jumpPromptText;  // o TMP grandão do "APERTE ESPAÇO"
     [Tooltip("Quanto tempo o prompt permanece na tela antes de ocultar.")]
     public float jumpPromptDuration = 2.0f;
     [Tooltip("Duração do fade-in/out do prompt.")]
@@ -264,6 +271,8 @@ public class TutorialManager : MonoBehaviour
                 else
                 {
                     CloseDialogueBox();
+                    // Quando terminar os diálogos, carrega a próxima cena
+                    StartCoroutine(LoadNextSceneAfterDelay());
                 }
             }
         }
@@ -562,5 +571,28 @@ public class TutorialManager : MonoBehaviour
             yield return null;
         }
         cg.alpha = to;
+    }
+
+    // ======= TROCA DE CENA =======
+    private IEnumerator LoadNextSceneAfterDelay()
+    {
+        yield return new WaitForSeconds(delayBeforeSceneChange);
+    
+        if (!string.IsNullOrWhiteSpace(nextSceneName))
+        {
+            // Usa o SceneTransition se existir, senão carrega direto
+            if (SceneTransition.Instance != null)
+            {
+                SceneTransition.Instance.LoadScene(nextSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("TutorialManager: Nome da próxima cena não foi configurado!");
+        }
     }
 }

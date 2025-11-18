@@ -10800,6 +10800,8 @@ MonoBehaviour:
   spawnTime: 2.2
   spawnIndex: 1
   generalSpeed: 13.5
+  nextSceneName: lvl_1
+  delayBeforeSceneChange: 1.5
   typingSpeed: 0.03
   allowSkipTypingWithClick: 1
   typeBlip: {fileID: 0}
@@ -11510,6 +11512,7 @@ MonoBehaviour:
   logSFX: {fileID: 8300000, guid: e83c34a649e1af549ae4aa8813c26d0e, type: 3}
   deathSFX: {fileID: 8300000, guid: 2bbba8330c5685e488dd2552ac6b7288, type: 3}
   explosionSFX: {fileID: 8300000, guid: 210bc3f1e643b1c43953f56ab6468dff, type: 3}
+  parrySFX: {fileID: 0}
   sfxSource: {fileID: 0}
   musicSource: {fileID: 0}
   sfxVolume: 1

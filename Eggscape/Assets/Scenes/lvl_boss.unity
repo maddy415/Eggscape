@@ -1635,15 +1635,15 @@ MonoBehaviour:
   parryTimeWindow: 8
   chickenIntroDialogue:
   - speakerName: Chicken
-    text: Esse lugar...
+    text: dialog mt foda
     delayAfter: 0
   afterBossAppearDialogue:
   - speakerName: "Plum\xEDdia"
-    text: "...Voc\xEA."
+    text: dialogo radical 1
     delayAfter: 0
   afterParryDialogue:
   - speakerName: "Plum\xEDdia"
-    text: "N\xE3o esperava menos da l\xEDder da revolu\xE7\xE3o."
+    text: dialogo radical 2
     delayAfter: 0
   shakeIntensity: 0.3
   shakeDuration: 0.5

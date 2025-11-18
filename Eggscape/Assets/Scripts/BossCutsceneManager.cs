@@ -57,6 +57,8 @@ public class BossCutsceneManager : MonoBehaviour
     private IEnumerator InitialCutscene()
     {
         if (player) player.CanMove = false;
+        if (player) player.canAttack = false;
+
 
         if (boss)
         {
@@ -83,7 +85,8 @@ public class BossCutsceneManager : MonoBehaviour
             yield return new WaitUntil(() => dialogueDone);
         }
 
-        if (player) player.CanMove = true;
+        if (player) player.canAttack = true;
+
 
         yield return StartCoroutine(ParryTutorial());
 
@@ -101,6 +104,7 @@ public class BossCutsceneManager : MonoBehaviour
         if (boss)
         {
             boss.enabled = true;
+            if (player) player.CanMove = true;
             boss.StartBossFight();
         }
     }
