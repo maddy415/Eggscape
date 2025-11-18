@@ -100,6 +100,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("cabo os bixo ganhou");
             waitingForVictory = false;
+            victoryText.enabled = true;
             victoryAchieved = true;
         }
 
@@ -205,7 +206,7 @@ public class GameManager : MonoBehaviour
     {
         victoryTriggered = true;
         waitingForVictory = true;
-
+        
         StopSpawners();
 
         // salvar progresso ao vencer
