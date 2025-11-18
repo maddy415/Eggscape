@@ -199,6 +199,14 @@ public class BossCutsceneManager : MonoBehaviour
 
             if (parryPrompt) parryPrompt.SetActive(false);
 
+            // CANCELA O DASH PRIMEIRO
+            if (boss != null)
+            {
+                boss.dashWasCancelled = true;
+            }
+
+            // Espera alguns frames para o boss parar o dash
+            yield return null;
             yield return null;
             yield return null;
 
@@ -207,24 +215,26 @@ public class BossCutsceneManager : MonoBehaviour
                 Debug.Log("[Cutscene] Ataque do player executado naturalmente");
             }
 
-            // APLICA KNOCKBACK NO BOSS
+            // AGORA APLICA KNOCKBACK NO BOSS
             if (boss != null)
             {
                 Debug.Log("[Cutscene] Aplicando knockback no boss...");
                 
-                // Calcula direção do knockback (boss é empurrado para trás)
-                float dir = Mathf.Sign(boss.transform.position.x - player.transform.position.x);
-                if (dir == 0f) dir = (boss.transform.localScale.x >= 0) ? -1f : 1f;
-                
                 Rigidbody2D bossRb = boss.GetComponent<Rigidbody2D>();
                 if (bossRb != null)
                 {
-                    bossRb.linearVelocity = new Vector2(0f, bossRb.linearVelocity.y);
+                    // Calcula direção (boss é empurrado para trás, longe do player)
+                    float dir = Mathf.Sign(boss.transform.position.x - player.transform.position.x);
+                    if (dir == 0f) dir = (boss.transform.localScale.x >= 0) ? -1f : 1f;
+                    
+                    // Para o boss completamente
+                    bossRb.linearVelocity = Vector2.zero;
+                    
+                    // Aplica knockback
                     bossRb.AddForce(new Vector2(dir * boss.dashCancelKnockback, 0f), ForceMode2D.Impulse);
+                    
+                    Debug.Log($"[Cutscene] Knockback aplicado! Direção: {dir}, Força: {boss.dashCancelKnockback}");
                 }
-                
-                // Cancela o dash
-                boss.dashWasCancelled = true;
             }
 
             // TOCA SOM DE PARRY
