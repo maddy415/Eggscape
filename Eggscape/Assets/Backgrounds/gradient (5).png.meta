@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      gradient (5)_0: -5396498977845174890
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
