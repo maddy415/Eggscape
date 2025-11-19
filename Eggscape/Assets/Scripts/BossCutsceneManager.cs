@@ -243,11 +243,11 @@ public class BossCutsceneManager : MonoBehaviour
             }
 
             // TOCA SOM DE PARRY
-            if (AudioManager.audioInstance != null)
+            /*if (AudioManager.audioInstance != null)
             {
                 AudioManager.audioInstance.BossParrySFX();
                 Debug.Log("[Cutscene] Som de parry tocado!");
-            }
+            }*/
 
             break;
         }
@@ -296,6 +296,11 @@ public class BossCutsceneManager : MonoBehaviour
     public void OnBossHitByPlayer()
     {
         bossWasHit = true;
+        if (AudioManager.audioInstance != null)
+        {
+            AudioManager.audioInstance.BossParrySFX();
+            Debug.Log("[Cutscene] Som de parry tocado!");
+        }
         Debug.Log("[Cutscene] Boss foi atingido pelo player!");
     }
 
