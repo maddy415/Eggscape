@@ -49,6 +49,11 @@ public class PauseMenu : MonoBehaviour
         else PauseGame();
     }
 
+    public void TogglePauseFromUI()
+    {
+        TogglePause();
+    }
+
     public void PauseGame()
     {
         if (IsPaused) return;

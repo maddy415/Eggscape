@@ -18,10 +18,12 @@ public class TelegraphedStrikeSpawner : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (Input.GetKeyDown(triggerKey))
         {
             SpawnStrike();
         }
+#endif
     }
 
     private void SpawnStrike()
