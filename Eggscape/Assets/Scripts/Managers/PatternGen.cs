@@ -138,6 +138,7 @@ public class PatternGen : MonoBehaviour
 
         // Instancia o chunk/pattern
         GameObject patternClone = Instantiate(chosenPattern, spawnPoint.transform.position, Quaternion.identity);
+        
 
         // Injeção do LevelSegment nos ObstacleMove
         if (propagateSegmentToChildren)
@@ -147,8 +148,9 @@ public class PatternGen : MonoBehaviour
         foreach (Transform child in patternClone.transform)
             GameManager.Instance.objsOnScene.Add(child.gameObject);
 
-        Debug.Log($"[PatternGen] Spawned pattern: {chosenPattern.name} | Tier: {activeSegment.patternTier.name} | Vel: {activeSegment.velocidade}");
-
+        // DEBUG: posição do spawn
+        Vector3 pos = spawnPoint.transform.position;
+        Debug.Log($"[PatternGen] 📦 Pattern '{chosenPattern.name}' instanciado em: X={pos.x:F2}, Y={pos.y:F2}, Z={pos.z:F2} | Segmento #{currentSegmentIndex}");
         // Contabiliza e verifica avanço de segmento
         patternsSpawnedInSegment++;
         if (patternsSpawnedInSegment >= activeSegment.patternsToSpawn)

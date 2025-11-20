@@ -4374,7 +4374,7 @@ MonoBehaviour:
   prefabChao: {fileID: 3968084449692828038, guid: 24326d3ef77812b42a93912931fb5e09, type: 3}
   genPos: {fileID: 881868769}
   larguraDoChao: 32
-  velocidade: 9.5
+  velocidade: 9
 --- !u!4 &881868769
 Transform:
   m_ObjectHideFlags: 0
@@ -5079,7 +5079,7 @@ MonoBehaviour:
   prefabChao: {fileID: 135512634361200147, guid: 8ce9d96510ec7ad488695cf0b714d744, type: 3}
   genPos: {fileID: 1007758268}
   larguraDoChao: 24.3
-  velocidade: 7
+  velocidade: 8
 --- !u!4 &1007758268
 Transform:
   m_ObjectHideFlags: 0
