@@ -11,6 +11,7 @@ public class BossCutsceneManager : MonoBehaviour
     public BossController boss;
     public Player player;
     public Transform bossSpawnPoint;
+    public MobileInputBridge mobileInput;
 
     [Header("Chicken Walk Settings")]
     public float chickenWalkDuration = 3f;
@@ -48,6 +49,7 @@ public class BossCutsceneManager : MonoBehaviour
     {
         if (boss == null) boss = FindFirstObjectByType<BossController>();
         if (player == null) player = FindFirstObjectByType<Player>();
+        if (mobileInput == null) mobileInput = FindFirstObjectByType<MobileInputBridge>();
 
         if (parryPrompt) parryPrompt.SetActive(false);
 
@@ -193,7 +195,7 @@ public class BossCutsceneManager : MonoBehaviour
         elapsed += Time.deltaTime;
 
         // Detecta INPUT de ataque
-        if (Input.GetMouseButtonDown(0))
+        if (ReadAttackInput())
         {
             Debug.Log("[Cutscene] Input de ataque detectado, aguardando colisão...");
         }
@@ -312,5 +314,15 @@ public class BossCutsceneManager : MonoBehaviour
     public bool WasParrySuccessful()
     {
         return parrySuccessful;
+    }
+
+    private bool ReadAttackInput()
+    {
+        if (mobileInput != null && mobileInput.UseMobileInput)
+        {
+            return mobileInput.AttackPressedThisFrame;
+        }
+
+        return Input.GetMouseButtonDown(0);
     }
 }

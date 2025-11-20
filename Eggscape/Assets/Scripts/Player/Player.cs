@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform feetPos;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private BoxCollider2D attackHB;
+    [SerializeField] private MobileInputBridge mobileInput;
 
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed;
@@ -96,6 +97,8 @@ public class Player : MonoBehaviour
     private bool attackReady = true;  // RENOMEADO - cooldown interno do ataque
     private bool isKnockbacking;
 
+    private bool UsingMobileInput => mobileInput != null && mobileInput.UseMobileInput;
+
     // Timers ---------------------------------------------------------------
     private float jumpTimer;
     private float jumpBufferCounter;
@@ -114,6 +117,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         CacheComponents();
+        CacheMobileInput();
         rb.gravityScale = defaultGS;
         defaultScale = sprite.transform.localScale;
     }
@@ -145,6 +149,14 @@ public class Player : MonoBehaviour
         attackSpinTarget = (spinSpriteOnlyDuringAttack && sprite != null)
             ? sprite.transform
             : transform;
+    }
+
+    private void CacheMobileInput()
+    {
+        if (mobileInput == null)
+        {
+            mobileInput = FindFirstObjectByType<MobileInputBridge>();
+        }
     }
 
     private void Update()
@@ -181,9 +193,9 @@ public class Player : MonoBehaviour
     {
         RefreshGroundedStatus();
 
-        bool jumpPressed = Input.GetButtonDown("Jump");
-        bool jumpHeld = Input.GetButton("Jump");
-        bool jumpReleased = Input.GetButtonUp("Jump");
+        bool jumpPressed = ReadJumpPressed();
+        bool jumpHeld = ReadJumpHeld();
+        bool jumpReleased = ReadJumpReleased();
 
         UpdateJumpBuffer(jumpPressed);
         TryConsumeJumpBuffer();
@@ -278,7 +290,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        float moveInput = Input.GetAxisRaw("Horizontal");
+        float moveInput = ReadHorizontalInput();
         MoveHorizontally(moveInput);
         UpdateSpriteFacing(moveInput);
         HandleFastFall();
@@ -304,7 +316,7 @@ public class Player : MonoBehaviour
 
     private void HandleFastFall()
     {
-        if (Input.GetKeyDown(KeyCode.S) && !isGrounded)
+        if (ReadFastFallPressed() && !isGrounded)
         {
             rb.linearVelocity = new Vector2(0f, -20f);
             isFalling = true;
@@ -323,7 +335,7 @@ public class Player : MonoBehaviour
     private void HandleAttackInput()
     {
         // Detecta input de ataque
-        bool attackInput = Input.GetMouseButtonDown(0);
+        bool attackInput = ReadAttackPressed();
         
         // DEBUG
         if (attackInput)
@@ -409,7 +421,7 @@ public class Player : MonoBehaviour
             
             Debug.Log($"[Player] Aplicando movimento do ataque! Velocity={rb.linearVelocity.x}");
 
-            if (!isGrounded && Input.GetKeyDown(KeyCode.S))
+            if (!isGrounded && ReadFastFallPressed())
             {
                 CancelAttack();
                 return;
@@ -495,7 +507,7 @@ public class Player : MonoBehaviour
 
         CanMove = false;
         transform.position += Vector3.right * Time.deltaTime * 15f;
-        GameManager.Instance.victoryText.text = "Passou de fase! Aperte \"Espaço\" para continuar";
+        GameManager.Instance.victoryText.text = GetVictoryPrompt();
     }
 
     public void Death()
@@ -608,6 +620,43 @@ public class Player : MonoBehaviour
         );
 
         wasGroundedLastFrame = isGrounded;
+    }
+
+    private float ReadHorizontalInput()
+    {
+        return UsingMobileInput ? mobileInput.Horizontal : Input.GetAxisRaw("Horizontal");
+    }
+
+    private bool ReadJumpPressed()
+    {
+        return UsingMobileInput ? mobileInput.JumpPressedThisFrame : Input.GetButtonDown("Jump");
+    }
+
+    private bool ReadJumpHeld()
+    {
+        return UsingMobileInput ? mobileInput.JumpHeld : Input.GetButton("Jump");
+    }
+
+    private bool ReadJumpReleased()
+    {
+        return UsingMobileInput ? mobileInput.JumpReleasedThisFrame : Input.GetButtonUp("Jump");
+    }
+
+    private bool ReadAttackPressed()
+    {
+        return UsingMobileInput ? mobileInput.AttackPressedThisFrame : Input.GetMouseButtonDown(0);
+    }
+
+    private bool ReadFastFallPressed()
+    {
+        return UsingMobileInput ? mobileInput.FastFallPressedThisFrame : Input.GetKeyDown(KeyCode.S);
+    }
+
+    private string GetVictoryPrompt()
+    {
+        return Application.isMobilePlatform
+            ? "Passou de fase! Toque para continuar"
+            : "Passou de fase! Aperte \"Espaço\" para continuar";
     }
 
     

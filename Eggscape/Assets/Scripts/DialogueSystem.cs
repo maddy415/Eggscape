@@ -69,22 +69,31 @@ public class DialogueSystem : MonoBehaviour
 
         if (Input.GetKeyDown(advanceKey))
         {
-            if (isTyping)
-            {
-                // Completa o texto imediatamente
-                CompleteText();
-            }
-            else
-            {
-                // Avança para próxima linha
-                DisplayNextLine();
-            }
+            HandleAdvanceRequest();
         }
 
         if (Input.GetKeyDown(skipKey))
         {
             SkipDialogue();
         }
+    }
+
+    /// <summary>
+    /// Avança o diálogo a partir de um botão/touch.
+    /// </summary>
+    public void AdvanceFromUI()
+    {
+        if (!dialogueActive) return;
+        HandleAdvanceRequest();
+    }
+
+    /// <summary>
+    /// Pula o diálogo atual a partir de um botão/touch.
+    /// </summary>
+    public void SkipFromUI()
+    {
+        if (!dialogueActive) return;
+        SkipDialogue();
     }
 
     /// <summary>
@@ -178,6 +187,20 @@ public class DialogueSystem : MonoBehaviour
         {
             isTyping = false;
             if (continueIndicator) continueIndicator.SetActive(true);
+        }
+    }
+
+    private void HandleAdvanceRequest()
+    {
+        if (isTyping)
+        {
+            // Completa o texto imediatamente
+            CompleteText();
+        }
+        else
+        {
+            // Avança para próxima linha
+            DisplayNextLine();
         }
     }
 

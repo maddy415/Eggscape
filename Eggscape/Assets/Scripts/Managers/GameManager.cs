@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     private bool victoryTriggered = false;
     private bool waitingForVictory = false;
     public bool isCheatOn = false;
+    private bool mobileVictoryContinueRequested;
 
     public bool victoryAchieved = false;
 
@@ -113,7 +114,8 @@ public class GameManager : MonoBehaviour
             sceneTime += Time.deltaTime;
         }
 
-        // cheat toggle
+        // cheat toggle (editor/dev builds apenas)
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (Input.GetKeyDown(KeyCode.J) && isCheatOn == false)
         {
             CheatOn();
@@ -123,10 +125,12 @@ public class GameManager : MonoBehaviour
             isCheatOn = false;
             Debug.Log("Cheat desativado");
         }
+#endif
 
         // avançar fase (quando vitória alcançada e player travado)
-        if (victoryAchieved && player != null && player.CanMove == false && Input.GetKeyDown(KeyCode.Space))
+        if (victoryAchieved && player != null && player.CanMove == false && (Input.GetKeyDown(KeyCode.Space) || mobileVictoryContinueRequested))
         {
+            mobileVictoryContinueRequested = false;
             LoadNextScene();
         }
 
@@ -198,6 +202,19 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             // antes: SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            LoadWithTransitionByIndex(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+
+    public void ContinueVictoryFromUI()
+    {
+        mobileVictoryContinueRequested = true;
+    }
+
+    public void RestartFromUI()
+    {
+        if (playerAlive == false)
+        {
             LoadWithTransitionByIndex(SceneManager.GetActiveScene().buildIndex);
         }
     }

@@ -64,6 +64,14 @@ public class VNController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Chamado por botões/touch para avançar o diálogo.
+    /// </summary>
+    public void AdvanceFromUI()
+    {
+        OnAdvanceInput();
+    }
+
     private void OnAdvanceInput()
     {
         if (!canAdvance) return;

@@ -250,30 +250,41 @@ public class TutorialManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            // 1) se estiver digitando, completa na hora e NÃO avança ainda
-            if (isTyping && allowSkipTypingWithClick)
+            AdvanceDialogue();
+        }
+    }
+
+    public void AdvanceDialogueFromUI()
+    {
+        if (IsCurrentDialogueLocked()) return;
+        AdvanceDialogue();
+    }
+
+    private void AdvanceDialogue()
+    {
+        // 1) se estiver digitando, completa na hora e NÃO avança ainda
+        if (isTyping && allowSkipTypingWithClick)
+        {
+            CompleteTypingImmediately();
+            return;
+        }
+
+        // 2) se já mostrou tudo, agora pode avançar
+        if (firstDialogueShown)
+        {
+            currentIndex++;
+            if (currentIndex < activeDialogues.Length)
             {
-                CompleteTypingImmediately();
-                return;
+                ShowDialogue(currentIndex);
+
+                if (currentIndex == spawnIndex && !hasSpawned)
+                    StartCoroutine(SpawnDelay());
             }
-
-            // 2) se já mostrou tudo, agora pode avançar
-            if (firstDialogueShown)
+            else
             {
-                currentIndex++;
-                if (currentIndex < activeDialogues.Length)
-                {
-                    ShowDialogue(currentIndex);
-
-                    if (currentIndex == spawnIndex && !hasSpawned)
-                        StartCoroutine(SpawnDelay());
-                }
-                else
-                {
-                    CloseDialogueBox();
-                    // Quando terminar os diálogos, carrega a próxima cena
-                    StartCoroutine(LoadNextSceneAfterDelay());
-                }
+                CloseDialogueBox();
+                // Quando terminar os diálogos, carrega a próxima cena
+                StartCoroutine(LoadNextSceneAfterDelay());
             }
         }
     }

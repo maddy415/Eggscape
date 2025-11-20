@@ -24,10 +24,12 @@ public class ScytheSpawner : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (Input.GetKeyDown(KeyCode.K))
         {
             ToggleSpawnRoutine();
         }
+#endif
     }
 
     private void ToggleSpawnRoutine()
