@@ -295,8 +295,8 @@ public class TutorialManager : MonoBehaviour
 
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
-        // >>> RETRATO DO SPEAKER <<<
-        ApplyPortrait(activeDialogues[index].speaker, activeDialogues[index].emotion);
+        // >>> RETRATO DO SPEAKER (SISTEMA CORRIGIDO) <<<
+        ApplyPortrait(activeDialogues[index]);
 
         // Nome do speaker
         if (nameText != null)
@@ -314,8 +314,8 @@ public class TutorialManager : MonoBehaviour
         TryShowJumpPromptIfNeeded(activeDialogues[index]);
     }
 
-    // --------- Retrato com alinhamento + fade ----------
-    private void ApplyPortrait(string speaker, string emotion = "")
+    // --------- SISTEMA DE RETRATO CORRIGIDO (igual ao DialogueSystem) ----------
+    private void ApplyPortrait(DialogueLine line)
     {
         if (speakerPortrait == null) return;
 
@@ -323,16 +323,17 @@ public class TutorialManager : MonoBehaviour
         bool alignRight = false;
         bool found = false;
 
-        // tenta emoção primeiro
-        if (!string.IsNullOrWhiteSpace(emotion) &&
-            emotionMap.TryGetValue((speaker, emotion), out var emo))
+        // Tenta encontrar emoção específica primeiro
+        if (!string.IsNullOrWhiteSpace(line.emotion) &&
+            emotionMap.TryGetValue((line.speaker, line.emotion), out var emo))
         {
             spriteToUse = emo.portraitSprite;
             alignRight = emo.useAlignOverride ? emo.alignRightOverride
-                                              : (portraitMap.TryGetValue(speaker, out var baseP) ? baseP.alignRight : false);
+                                              : (portraitMap.TryGetValue(line.speaker, out var baseP) ? baseP.alignRight : false);
             found = spriteToUse != null;
         }
-        else if (portraitMap.TryGetValue(speaker, out var basePortrait))
+        // Se não encontrar emoção, usa o retrato padrão
+        else if (portraitMap.TryGetValue(line.speaker, out var basePortrait))
         {
             spriteToUse = basePortrait.portraitSprite;
             alignRight = basePortrait.alignRight;
@@ -341,54 +342,49 @@ public class TutorialManager : MonoBehaviour
 
         if (!found)
         {
-            // não há sprite definido para este speaker/emoção
+            // Não há sprite definido para este speaker/emoção - oculta o retrato
             if (speakerPortraitGroup != null) speakerPortraitGroup.alpha = 0f;
             speakerPortrait.gameObject.SetActive(false);
             return;
         }
 
-        // Se quiser reposicionar pelo lado, basta reativar o bloco abaixo
-        /*
-        RectTransform rt = speakerPortrait.rectTransform;
-        Vector2 p = rt.anchoredPosition;
-        p.x = (alignRight ? Mathf.Abs(portraitOffsetX) : -Mathf.Abs(portraitOffsetX));
-        rt.anchoredPosition = p;
-        */
-
-        // troca com fade
+        // Troca o sprite com efeito de fade
         if (portraitFadeCoroutine != null) StopCoroutine(portraitFadeCoroutine);
         portraitFadeCoroutine = StartCoroutine(FadePortraitTo(spriteToUse));
     }
 
     private IEnumerator FadePortraitTo(Sprite targetSprite)
     {
-        if (!speakerPortrait.gameObject.activeSelf) speakerPortrait.gameObject.SetActive(true);
+        if (!speakerPortrait.gameObject.activeSelf) 
+            speakerPortrait.gameObject.SetActive(true);
 
-        // garante CanvasGroup
+        // 🔧 GARANTE QUE O ASPECT RATIO SEJA PRESERVADO (FIX PARA IMAGENS ESTICADAS)
+        speakerPortrait.preserveAspect = true;
+
+        // Se não houver CanvasGroup, apenas troca o sprite
         if (speakerPortraitGroup == null)
         {
-            // fallback sem CanvasGroup: troca seca
             speakerPortrait.sprite = targetSprite;
             yield break;
         }
 
         float d = Mathf.Max(0.0001f, portraitFadeDuration);
 
-        // fade out
+        // Fade out
         float t = 0f;
-        float startA = speakerPortraitGroup.alpha;
+        float startAlpha = speakerPortraitGroup.alpha;
         while (t < d)
         {
             t += Time.deltaTime;
-            speakerPortraitGroup.alpha = Mathf.Lerp(startA, 0f, t / d);
+            speakerPortraitGroup.alpha = Mathf.Lerp(startAlpha, 0f, t / d);
             yield return null;
         }
         speakerPortraitGroup.alpha = 0f;
 
-        // troca sprite
+        // Troca o sprite
         speakerPortrait.sprite = targetSprite;
 
-        // fade in
+        // Fade in
         t = 0f;
         while (t < d)
         {
