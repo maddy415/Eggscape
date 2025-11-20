@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 6772904865355226610}
   - component: {fileID: 7856566067862300491}
   - component: {fileID: 2003532478292991519}
+  - component: {fileID: 955753849929808813}
   m_Layer: 0
-  m_Name: Jump detector
+  m_Name: JumpTrigger
   m_TagString: JumpDetector
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.084, y: 0.943, z: 0}
-  m_LocalScale: {x: 0.3703704, y: 1.3677084, z: 0}
+  m_LocalScale: {x: 0.704974, y: 1.3677084, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7553008177597202771}
@@ -134,6 +135,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &955753849929808813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3953529135923421902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62db4cc050578884bae138d818a93cfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tutorialManager: {fileID: 0}
 --- !u!1 &6634151051270932229
 GameObject:
   m_ObjectHideFlags: 0

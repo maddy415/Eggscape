@@ -65,11 +65,8 @@ public class GameManager : MonoBehaviour
     {
         victoryText.enabled = false;
         groundRef.SetActive(false);
-        // cache de refs
-        //if (frog != null) frogJumper = frog.GetComponent<FrogIdleJumper>();
-
+    
         frogJumper = GetComponent<FrogIdleJumper>();
-        
         frogJumper.enabled = true;
 
         if (groundRef != null) groundRef.SetActive(false);
@@ -80,9 +77,12 @@ public class GameManager : MonoBehaviour
             ? SceneTransition.Instance
             : FindObjectOfType<SceneTransition>(true);
 
-        // carregar save ao iniciar
-        SaveData loaded = SaveSystem.Load();
-        Debug.Log("Highscore carregado: " + loaded.highScore + " | levelReached: " + loaded.levelReached);
+        // ===== VERIFICAR SE SAVEMANAGER EXISTE =====
+        if (SaveManager.Instance == null)
+        {
+            Debug.LogWarning("[GameManager] SaveManager não encontrado! Crie um GameObject persistente com SaveManager.");
+        }
+        // ===========================================
     }
 
     private void Update()
@@ -223,18 +223,35 @@ public class GameManager : MonoBehaviour
     {
         victoryTriggered = true;
         waitingForVictory = true;
-        
+    
         StopSpawners();
 
-        // salvar progresso ao vencer
-        SaveData data = new SaveData();
-        data.highScore = Mathf.Max((int)score, SaveSystem.Load().highScore); // manter melhor pontuação
-        data.levelReached = SceneManager.GetActiveScene().buildIndex; // ou +1 se preferir
-        SaveSystem.Save(data);
+        // ===== INTEGRAÇÃO COM SAVEMANAGER =====
+        if (SaveManager.Instance != null)
+        {
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            int currentScore = (int)score;
+        
+            // Salvar progresso automaticamente
+            SaveManager.Instance.CompleteLevel(currentSceneIndex, currentScore);
+        
+            Debug.Log($"[GameManager] Vitória! Fase {currentSceneIndex} completada com {currentScore} pontos.");
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] SaveManager não encontrado! Progresso não será salvo.");
+        
+            // Fallback para o sistema antigo (caso SaveManager não exista)
+            SaveData data = new SaveData();
+            data.highScore = Mathf.Max((int)score, SaveSystem.Load().highScore);
+            data.levelReached = SceneManager.GetActiveScene().buildIndex;
+            SaveSystem.Save(data);
+        }
+        // =====================================
 
-        Debug.Log("Progresso salvo!");
         Debug.Log("Vitória iniciada. Esperando limpar a cena...");
     }
+
 
     public void Debug_SaveNow()
     {
@@ -381,4 +398,45 @@ public class GameManager : MonoBehaviour
         else
             SceneManager.LoadScene(sceneName);
     }
+    
+#if UNITY_EDITOR
+    [ContextMenu("Debug: Desbloquear Todas as Fases")]
+    private void DebugUnlockAllLevels()
+    {
+        if (SaveManager.Instance != null)
+        {
+            SaveData save = SaveManager.Instance.GetCurrentSave();
+            save.levelReached = 99; // Desbloqueia todas
+            for (int i = 0; i < save.levelsCompleted.Length; i++)
+            {
+                save.levelsCompleted[i] = true;
+            }
+            SaveManager.Instance.SaveGame();
+            Debug.Log("[DEBUG] Todas as fases desbloqueadas!");
+        }
+    }
+
+    [ContextMenu("Debug: Resetar Progresso")]
+    private void DebugResetProgress()
+    {
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.ResetProgress();
+            Debug.Log("[DEBUG] Progresso resetado!");
+        }
+    }
+
+    [ContextMenu("Debug: Mostrar Progresso Atual")]
+    private void DebugShowProgress()
+    {
+        if (SaveManager.Instance != null)
+        {
+            SaveData save = SaveManager.Instance.GetCurrentSave();
+            Debug.Log($"=== PROGRESSO ATUAL ===\n" +
+                      $"HighScore: {save.highScore}\n" +
+                      $"Level Reached: {save.levelReached}\n" +
+                      $"Current Level: {save.currentLevel}");
+        }
+    }
+#endif
 }

@@ -23,10 +23,12 @@ public class ObstacleGen : MonoBehaviour
 
     }
 
-    public void SpawnObstacle()
+    public GameObject SpawnObstacle()
     {
         GameObject troncoClone = Instantiate(tronco, spawner.transform.position, Quaternion.identity);
+        return troncoClone;
     }
+
     
     
     void Update()

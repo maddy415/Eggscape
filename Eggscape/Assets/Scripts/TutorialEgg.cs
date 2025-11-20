@@ -69,7 +69,7 @@ public class TutorialEgg : MonoBehaviour
             StartCoroutine(tutorialManager.GeneralWalk());
             // Cria explosão
             GameObject explosionA = Instantiate(explosion, other.transform.position, other.transform.rotation);
-            Destroy(explosionA, 2f);
+            Destroy(explosionA, 1.3f);
 
             // Impulso físico para trás e pra cima
             rb.linearVelocity = new Vector2(-30f, 25f) * impactForce * Time.deltaTime;

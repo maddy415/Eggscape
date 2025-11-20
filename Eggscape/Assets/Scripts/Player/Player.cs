@@ -551,9 +551,7 @@ public class Player : MonoBehaviour
         if (!other.gameObject.CompareTag("Obstacle") || GameManager.Instance.isCheatOn)
             return;
 
-        // =======================
-        //     🔥 VERSÃO FINA 🔥
-        // =======================
+        
         // Se o ataque está ativo OU se estou no knockback (ou seja, acertei algo)
         // então IGNORA a colisão física com o obstáculo.
         if (IsAttackActive || isKnockbacking)
