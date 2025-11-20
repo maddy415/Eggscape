@@ -18,6 +18,13 @@ public class DialogueSystem : MonoBehaviour
     public TextMeshProUGUI dialogueText;
     public GameObject continueIndicator;
 
+    [Header("Retratos (Portrait)")]
+    [Tooltip("Imagem do retrato que aparece ao lado do texto")]
+    public Image speakerPortrait;
+    [Tooltip("CanvasGroup no mesmo objeto do retrato para fade in/out")]
+    public CanvasGroup speakerPortraitGroup;
+    [Min(0f)] public float portraitFadeDuration = 0.15f;
+
     [Header("Typewriter Settings")]
     public float typingSpeed = 0.05f;
     public AudioClip typingSound;
@@ -26,6 +33,33 @@ public class DialogueSystem : MonoBehaviour
     [Header("Input")]
     public KeyCode advanceKey = KeyCode.Space;
     public KeyCode skipKey = KeyCode.Return;
+
+    [System.Serializable]
+    public struct SpeakerPortrait
+    {
+        public string speakerName;
+        public Sprite portraitSprite;
+        public bool alignRight; // true = direita, false = esquerda
+    }
+
+    [System.Serializable]
+    public struct SpeakerEmotion
+    {
+        public string speakerName;
+        public string emotionKey; // "happy", "angry", "hurt", etc.
+        public Sprite portraitSprite;
+        public bool alignRightOverride;
+        public bool useAlignOverride;
+    }
+
+    [Header("Portrait Configuration")]
+    public List<SpeakerPortrait> speakerPortraits = new List<SpeakerPortrait>();
+    public List<SpeakerEmotion> speakerEmotions = new List<SpeakerEmotion>();
+
+    private Dictionary<string, SpeakerPortrait> portraitMap = new Dictionary<string, SpeakerPortrait>();
+    private Dictionary<(string speaker, string emotion), SpeakerEmotion> emotionMap =
+        new Dictionary<(string, string), SpeakerEmotion>();
+    private Coroutine portraitFadeCoroutine;
 
     private Queue<DialogueLine> currentDialogueQueue;
     private Coroutine typingCoroutine;
@@ -44,6 +78,7 @@ public class DialogueSystem : MonoBehaviour
         public string speakerName;
         [TextArea(3, 6)]
         public string text;
+        public string emotion; // opcional: "happy", "sad", "angry", etc.
         public float delayAfter = 0f;
     }
 
@@ -64,6 +99,8 @@ public class DialogueSystem : MonoBehaviour
 
         if (dialoguePanel) dialoguePanel.SetActive(false);
         if (continueIndicator) continueIndicator.SetActive(false);
+
+        BuildPortraitMaps();
     }
 
     private void Update()
@@ -129,6 +166,9 @@ public class DialogueSystem : MonoBehaviour
         }
 
         DialogueLine line = currentDialogueQueue.Dequeue();
+
+        // Aplica o retrato do speaker
+        ApplyPortrait(line);
 
         if (speakerNameText)
         {
@@ -237,5 +277,105 @@ public class DialogueSystem : MonoBehaviour
     public bool IsDialogueActive()
     {
         return dialogueActive;
+    }
+
+    // ========== SISTEMA DE RETRATOS ==========
+
+    private void BuildPortraitMaps()
+    {
+        portraitMap.Clear();
+        foreach (var p in speakerPortraits)
+        {
+            if (!string.IsNullOrWhiteSpace(p.speakerName) && p.portraitSprite != null)
+                portraitMap[p.speakerName] = p;
+        }
+
+        emotionMap.Clear();
+        foreach (var e in speakerEmotions)
+        {
+            if (!string.IsNullOrWhiteSpace(e.speakerName) &&
+                !string.IsNullOrWhiteSpace(e.emotionKey) &&
+                e.portraitSprite != null)
+            {
+                emotionMap[(e.speakerName, e.emotionKey)] = e;
+            }
+        }
+    }
+
+    private void ApplyPortrait(DialogueLine line)
+    {
+        if (speakerPortrait == null) return;
+
+        Sprite spriteToUse = null;
+        bool alignRight = false;
+        bool found = false;
+
+        // Tenta encontrar emoção específica primeiro
+        if (!string.IsNullOrWhiteSpace(line.emotion) &&
+            emotionMap.TryGetValue((line.speakerName, line.emotion), out var emo))
+        {
+            spriteToUse = emo.portraitSprite;
+            alignRight = emo.useAlignOverride ? emo.alignRightOverride
+                                              : (portraitMap.TryGetValue(line.speakerName, out var baseP) ? baseP.alignRight : false);
+            found = spriteToUse != null;
+        }
+        // Se não encontrar emoção, usa o retrato padrão
+        else if (portraitMap.TryGetValue(line.speakerName, out var basePortrait))
+        {
+            spriteToUse = basePortrait.portraitSprite;
+            alignRight = basePortrait.alignRight;
+            found = spriteToUse != null;
+        }
+
+        if (!found)
+        {
+            // Não há sprite definido para este speaker/emoção - oculta o retrato
+            if (speakerPortraitGroup != null) speakerPortraitGroup.alpha = 0f;
+            speakerPortrait.gameObject.SetActive(false);
+            return;
+        }
+
+        // Troca o sprite com efeito de fade
+        if (portraitFadeCoroutine != null) StopCoroutine(portraitFadeCoroutine);
+        portraitFadeCoroutine = StartCoroutine(FadePortraitTo(spriteToUse));
+    }
+
+    private IEnumerator FadePortraitTo(Sprite targetSprite)
+    {
+        if (!speakerPortrait.gameObject.activeSelf) 
+            speakerPortrait.gameObject.SetActive(true);
+
+        // Se não houver CanvasGroup, apenas troca o sprite
+        if (speakerPortraitGroup == null)
+        {
+            speakerPortrait.sprite = targetSprite;
+            yield break;
+        }
+
+        float d = Mathf.Max(0.0001f, portraitFadeDuration);
+
+        // Fade out
+        float t = 0f;
+        float startAlpha = speakerPortraitGroup.alpha;
+        while (t < d)
+        {
+            t += Time.deltaTime;
+            speakerPortraitGroup.alpha = Mathf.Lerp(startAlpha, 0f, t / d);
+            yield return null;
+        }
+        speakerPortraitGroup.alpha = 0f;
+
+        // Troca o sprite
+        speakerPortrait.sprite = targetSprite;
+
+        // Fade in
+        t = 0f;
+        while (t < d)
+        {
+            t += Time.deltaTime;
+            speakerPortraitGroup.alpha = Mathf.Lerp(0f, 1f, t / d);
+            yield return null;
+        }
+        speakerPortraitGroup.alpha = 1f;
     }
 }

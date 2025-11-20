@@ -1638,41 +1638,52 @@ MonoBehaviour:
   - speakerName: Chicken
     text: "J\xE1 consigo ver o port\xE3o da fazenda daqui, eu e minhas irm\xE3s estamos
       quase l\xE1."
+    emotion: 
     delayAfter: 0
   - speakerName: Chicken
     text: "Finalmente vamos reclamar aquilo que \xE9 nosso: a liberdade de escolher
       como viver nossas vidas."
+    emotion: 
     delayAfter: 0
   afterBossAppearDialogue:
   - speakerName: "Plum\xEDdia"
     text: "Ent\xE3o \xE9 voc\xEA quem est\xE1 por tr\xE1s desse show todo, Chicken."
+    emotion: 
     delayAfter: 0
   - speakerName: Chicken
     text: "Plum\xEDdia? Eu achei que voc\xEA..."
+    emotion: 
     delayAfter: 0
   - speakerName: "Plum\xEDdia"
     text: "Pouco me importa o que voc\xEA acha. N\xE3o tenho nada pra discutir com
       voc\xEA."
+    emotion: 
     delayAfter: 0
   - speakerName: "Plum\xEDdia"
     text: "Eu vou te avisar uma \xFAnica vez, Chicken..."
+    emotion: 
     delayAfter: 0
   - speakerName: "Plum\xEDdia"
     text: "Voc\xEA e suas... irm\xE3s. Recuem. Agora."
+    emotion: 
     delayAfter: 0
   - speakerName: Chicken
     text: "Voc\xEA sabe que n\xE3o podemos fazer isso, Plum\xEDdia."
+    emotion: 
     delayAfter: 0
   - speakerName: "Plum\xEDdia"
     text: "Ent\xE3o que assim seja."
+    emotion: 
     delayAfter: 0
   afterParryDialogue:
   - speakerName: "Plum\xEDdia"
     text: "Interessante. N\xE3o esperava menos da bra\xE7o direito da Tenente Clara."
+    emotion: 
     delayAfter: 0
   - speakerName: "Plum\xEDdia"
     text: "\xC9 realmente uma pena que tenha que acabar assim... Com uma de n\xF3s
       caindo."
+    emotion: 
     delayAfter: 0
   shakeIntensity: 0.3
   shakeDuration: 0.5
@@ -4053,11 +4064,22 @@ MonoBehaviour:
   speakerNameText: {fileID: 723551620}
   dialogueText: {fileID: 1536043617}
   continueIndicator: {fileID: 0}
+  speakerPortrait: {fileID: 1362794524}
+  speakerPortraitGroup: {fileID: 0}
+  portraitFadeDuration: 0.15
   typingSpeed: 0.05
   typingSound: {fileID: 0}
   typingSoundInterval: 0.1
   advanceKey: 323
   skipKey: 13
+  speakerPortraits:
+  - speakerName: Chicken
+    portraitSprite: {fileID: 6222667781011105439, guid: 91742f60e2aa32144b93791907696204, type: 3}
+    alignRight: 0
+  - speakerName: "Plum\xEDdia"
+    portraitSprite: {fileID: 7899636533261011101, guid: 89675955a3bf90b4296e6bfb75e68fc8, type: 3}
+    alignRight: 0
+  speakerEmotions: []
 --- !u!1 &1280134790
 GameObject:
   m_ObjectHideFlags: 0
@@ -4601,7 +4623,7 @@ RectTransform:
   m_GameObject: {fileID: 1362794522}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.0210407, y: 6.8581157, z: 6.5315385}
+  m_LocalScale: {x: 3.1246915, y: 7.0934153, z: 6.7556334}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1170541728}
