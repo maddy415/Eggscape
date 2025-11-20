@@ -1625,6 +1625,7 @@ MonoBehaviour:
   boss: {fileID: 1922796071}
   player: {fileID: 1585589549}
   bossSpawnPoint: {fileID: 779371756}
+  mobileInput: {fileID: 0}
   chickenWalkDuration: 1.7
   chickenWalkSpeed: 5
   bossEntranceForce: 15
@@ -1635,15 +1636,43 @@ MonoBehaviour:
   parryTimeWindow: 8
   chickenIntroDialogue:
   - speakerName: Chicken
-    text: dialog mt foda
+    text: "J\xE1 consigo ver o port\xE3o da fazenda daqui, eu e minhas irm\xE3s estamos
+      quase l\xE1."
+    delayAfter: 0
+  - speakerName: Chicken
+    text: "Finalmente vamos reclamar aquilo que \xE9 nosso: a liberdade de escolher
+      como viver nossas vidas."
     delayAfter: 0
   afterBossAppearDialogue:
   - speakerName: "Plum\xEDdia"
-    text: dialogo radical 1
+    text: "Ent\xE3o \xE9 voc\xEA quem est\xE1 por tr\xE1s desse show todo, Chicken."
+    delayAfter: 0
+  - speakerName: Chicken
+    text: "Plum\xEDdia? Eu achei que voc\xEA..."
+    delayAfter: 0
+  - speakerName: "Plum\xEDdia"
+    text: "Pouco me importa o que voc\xEA acha. N\xE3o tenho nada pra discutir com
+      voc\xEA."
+    delayAfter: 0
+  - speakerName: "Plum\xEDdia"
+    text: "Eu vou te avisar uma \xFAnica vez, Chicken..."
+    delayAfter: 0
+  - speakerName: "Plum\xEDdia"
+    text: "Voc\xEA e suas... irm\xE3s. Recuem. Agora."
+    delayAfter: 0
+  - speakerName: Chicken
+    text: "Voc\xEA sabe que n\xE3o podemos fazer isso, Plum\xEDdia."
+    delayAfter: 0
+  - speakerName: "Plum\xEDdia"
+    text: "Ent\xE3o que assim seja."
     delayAfter: 0
   afterParryDialogue:
   - speakerName: "Plum\xEDdia"
-    text: dialogo radical 2
+    text: "Interessante. N\xE3o esperava menos da bra\xE7o direito da Tenente Clara."
+    delayAfter: 0
+  - speakerName: "Plum\xEDdia"
+    text: "\xC9 realmente uma pena que tenha que acabar assim... Com uma de n\xF3s
+      caindo."
     delayAfter: 0
   shakeIntensity: 0.3
   shakeDuration: 0.5
@@ -2080,14 +2109,14 @@ RectTransform:
   m_GameObject: {fileID: 723551618}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.868904, y: 6.1472526, z: 1.7572038}
+  m_LocalScale: {x: 2.6687477, y: 6.147252, z: 1.7572038}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1170541728}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -333, y: 392}
+  m_AnchoredPosition: {x: -309.76746, y: 392.00012}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &723551620
@@ -3811,11 +3840,12 @@ RectTransform:
   m_GameObject: {fileID: 1170541727}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6125, y: 0.28585187, z: 1}
+  m_LocalScale: {x: 0.65843755, y: 0.28585187, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1536043616}
   - {fileID: 723551619}
+  - {fileID: 1362794523}
   m_Father: {fileID: 599493707}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4026,7 +4056,7 @@ MonoBehaviour:
   typingSpeed: 0.05
   typingSound: {fileID: 0}
   typingSoundInterval: 0.1
-  advanceKey: 101
+  advanceKey: 323
   skipKey: 13
 --- !u!1 &1280134790
 GameObject:
@@ -4544,6 +4574,81 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1362794522
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1362794523}
+  - component: {fileID: 1362794525}
+  - component: {fileID: 1362794524}
+  m_Layer: 5
+  m_Name: Portrait
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1362794523
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362794522}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 3.0210407, y: 6.8581157, z: 6.5315385}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1170541728}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -771, y: 14}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1362794524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362794522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1362794525
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362794522}
+  m_CullTransparentMesh: 1
 --- !u!1 &1409538335
 GameObject:
   m_ObjectHideFlags: 0
@@ -5066,14 +5171,14 @@ RectTransform:
   m_GameObject: {fileID: 1536043615}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3.1930585, y: 6.841824, z: 1.9557481}
+  m_LocalScale: {x: 2.9702866, y: 6.841824, z: 1.9557481}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1170541728}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -302, y: 216}
+  m_AnchoredPosition: {x: -280.93024, y: 216}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1536043617

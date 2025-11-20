@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Lvl 6 Config
   m_EditorClassIdentifier: 
   segments:
-  - {fileID: 11400000, guid: 60af73f0076d9d64297733a951b953ab, type: 2}
+  - {fileID: 11400000, guid: 98f758284f95d2c48830444ddfd60072, type: 2}
   tiers:
-  - {fileID: 11400000, guid: 3154acc465610844b92096f519fe5b2b, type: 2}
+  - {fileID: 11400000, guid: d47c7ee44501f8b45bd0d483a36dd826, type: 2}

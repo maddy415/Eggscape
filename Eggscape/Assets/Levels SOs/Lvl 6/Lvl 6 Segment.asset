@@ -15,4 +15,4 @@ MonoBehaviour:
   patternsToSpawn: 5
   velocidade: 10.5
   birdSpeed: 15.5
-  patternTier: {fileID: 11400000, guid: 3154acc465610844b92096f519fe5b2b, type: 2}
+  patternTier: {fileID: 11400000, guid: d47c7ee44501f8b45bd0d483a36dd826, type: 2}

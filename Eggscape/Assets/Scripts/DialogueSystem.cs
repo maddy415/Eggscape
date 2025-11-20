@@ -33,6 +33,9 @@ public class DialogueSystem : MonoBehaviour
     private bool dialogueActive = false;
     private Action onDialogueComplete;
 
+    // Nova variável para armazenar o texto completo da linha atual
+    private string currentFullText = "";
+
     private AudioSource audioSource;
 
     [System.Serializable]
@@ -137,6 +140,8 @@ public class DialogueSystem : MonoBehaviour
             StopCoroutine(typingCoroutine);
         }
 
+        // Armazena o texto completo da linha atual
+        currentFullText = line.text;
         typingCoroutine = StartCoroutine(TypeText(line.text, line.delayAfter));
     }
 
@@ -174,32 +179,32 @@ public class DialogueSystem : MonoBehaviour
         }
     }
 
-    private void CompleteText()
+    private void CompleteTextImmediately()
     {
+        // Para a corrotina de digitação
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
         }
 
-        // Mostra o texto completo
-        DialogueLine currentLine = new DialogueLine();
-        if (dialogueText.text.Length < 500) // Proteção
-        {
-            isTyping = false;
-            if (continueIndicator) continueIndicator.SetActive(true);
-        }
+        // Mostra o texto completo imediatamente
+        dialogueText.text = currentFullText;
+        isTyping = false;
+        
+        if (continueIndicator) continueIndicator.SetActive(true);
     }
 
     private void HandleAdvanceRequest()
     {
         if (isTyping)
         {
-            // Completa o texto imediatamente
-            CompleteText();
+            // Se ainda está digitando, completa o texto imediatamente
+            CompleteTextImmediately();
         }
         else
         {
-            // Avança para próxima linha
+            // Se já terminou de digitar, avança para a próxima linha
             DisplayNextLine();
         }
     }
@@ -223,6 +228,7 @@ public class DialogueSystem : MonoBehaviour
 
         onDialogueComplete?.Invoke();
         onDialogueComplete = null;
+        currentFullText = "";
     }
 
     /// <summary>
