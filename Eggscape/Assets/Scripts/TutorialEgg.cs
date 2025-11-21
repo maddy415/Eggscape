@@ -63,15 +63,17 @@ public class TutorialEgg : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Obstacle"))
         {
+            // fecha diálogo atual do tutorial — OK manter
             tutorialManager.CloseDialogueBox();
-            tutorialManager.ShowGeneralDialogue();
-            
-            StartCoroutine(tutorialManager.GeneralWalk());
+
+            // NÃO chame mais ShowGeneralDialogue() nem GeneralWalk() aqui.
+            // Isso evita que a General apareça quando o tronco atingir o Ovinho.
+
             // Cria explosão
             GameObject explosionA = Instantiate(explosion, other.transform.position, other.transform.rotation);
             Destroy(explosionA, 1.3f);
 
-            // Impulso físico para trás e pra cima
+            // Impulso físico para trás e pra cima (mantive sua lógica original)
             rb.linearVelocity = new Vector2(-30f, 25f) * impactForce * Time.deltaTime;
 
             // Desativa colisão pra não bater de novo
@@ -83,11 +85,12 @@ public class TutorialEgg : MonoBehaviour
             // Adiciona torque físico (faz ele girar de forma mais "caótica")
             rb.AddTorque(torque);
 
-            // ⚙️ Novo: ativa rotação visual adicional
+            // Ativa rotação visual adicional
             isFlying = true;
 
             // Som de explosão
             AudioManager.audioInstance.ExplodeSFX();
         }
     }
+
 }

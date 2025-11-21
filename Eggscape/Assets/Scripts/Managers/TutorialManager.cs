@@ -7,52 +7,46 @@ using UnityEngine.SceneManagement;
 
 public class TutorialManager : MonoBehaviour
 {
-    // ========== REFERÊNCIAS ==========
+    // ========== REFERÊNCIAS DE CENA ==========
     [Header("Referências de Cena")]
     public Player player;
     public TutorialEgg nerdEgg;
     public ObstacleGen obsGen;
     public GameObject objectGen;
     public Rigidbody2D generalRb;
-    public GameObject general;
-    public Transform generalTransform;
-    
-    
+    public GameObject general;                // Tenente Clara (prefab/objeto)
+    public Transform generalTransform;        // onde a general deve aparecer (opcional)
 
     // ========== UI DE DIÁLOGO ==========
     [Header("UI de Diálogo")]
     public GameObject dialogueBox;
-    public Image dialoguePanelImage;         // fundo/caixa do diálogo (mantém cor/estilo)
+    public Image dialoguePanelImage;
     public TextMeshProUGUI dialogueText;
     public TextMeshProUGUI nameText;
 
     // ========== RETRATOS (PORTRAIT) ==========
     [Header("Retratos (Portrait)")]
-    [Tooltip("Imagem do retrato que aparece ao lado do texto")]
-    public Image speakerPortrait;            // Image do retrato no Canvas
-    [Tooltip("CanvasGroup no mesmo objeto do retrato para desaparecer/aparecer com fade")]
-    public CanvasGroup speakerPortraitGroup; // CanvasGroup para fade (opcional, mas recomendado)
+    public Image speakerPortrait;
+    public CanvasGroup speakerPortraitGroup;
     [Min(0f)] public float portraitFadeDuration = 0.15f;
-    [Tooltip("Deslocamento horizontal padrão do retrato (valor positivo). Será virado a +X (direita) ou -X (esquerda) automaticamente.")]
     public float portraitOffsetX = 380f;
 
     [System.Serializable]
     public struct SpeakerPortrait
     {
-        public string speakerName;   // "Chicken"
-        public Sprite portraitSprite;// sprite padrão
-        public bool alignRight;      // true = direita, false = esquerda
+        public string speakerName;
+        public Sprite portraitSprite;
+        public bool alignRight;
     }
 
-    // (opcional) variações por emoção/estado
     [System.Serializable]
     public struct SpeakerEmotion
     {
-        public string speakerName;   // "Chicken"
-        public string emotionKey;    // "happy", "angry", "hurt" ...
+        public string speakerName;
+        public string emotionKey;
         public Sprite portraitSprite;
-        public bool alignRightOverride; // se quiser forçar o lado nessa emoção
-        public bool useAlignOverride;   // marca se o alignRightOverride deve valer
+        public bool alignRightOverride;
+        public bool useAlignOverride;
     }
 
     public List<SpeakerPortrait> speakerPortraits = new List<SpeakerPortrait>();
@@ -72,25 +66,25 @@ public class TutorialManager : MonoBehaviour
     [Min(10)] public int nameFontSize = 26;
     public TextAlignmentOptions dialogueAlignment = TextAlignmentOptions.TopLeft;
 
-    // ========== CONFIGURAÇÕES ==========
+    // ========== CONFIGS ==========
     [Header("Configurações Gerais")]
     public float walkTime = 1.5f;
     public float spawnTime = 0.75f;
     [Tooltip("Índice do diálogo em que deve spawnar o obstáculo.")]
     public int spawnIndex = 1;
     public float generalSpeed = 5f;
-    
+
     [Header("Jump Trigger by Layer")]
     [Tooltip("Layer(s) considered as the jump trigger. Configure the JumpTrigger object to use one of these layers.")]
-    public LayerMask jumpTriggerLayer; // arrasta a layer no Inspector (ex: 'JumpTrigger')
-
+    public LayerMask jumpTriggerLayer; // setar no inspector (ex: JumpTrigger)
 
     [Header("Slow Motion do Tronco")]
     [Tooltip("Distância do tronco ao player para ativar o slow motion")]
     public float slowMotionDistance = 5f;
     [Tooltip("Velocidade reduzida do tronco (porcentagem da velocidade original, ex: 0.3 = 30%)")]
     [Range(0.1f, 1f)] public float slowMotionSpeed = 0.3f;
-    [Tooltip("Referência ao tronco spawnado (será preenchida automaticamente)")]
+
+    // runtime
     private GameObject spawnedObstacle;
     private Rigidbody2D obstacleRb;
     private ObstacleMove obstacleMove;
@@ -98,11 +92,8 @@ public class TutorialManager : MonoBehaviour
     private bool isSlowMotionActive = false;
     private bool hasPassedObstacle = false;
 
-
     [Header("Troca de Cena")]
-    [Tooltip("Nome da próxima cena a ser carregada após o último diálogo")]
     public string nextSceneName = "MainGame";
-    [Tooltip("Tempo de espera (em segundos) após o último diálogo antes de trocar de cena")]
     public float delayBeforeSceneChange = 1.5f;
 
     [Header("Máquina de Escrever")]
@@ -110,12 +101,10 @@ public class TutorialManager : MonoBehaviour
     public bool allowSkipTypingWithClick = true;
     public AudioSource typeBlip;
 
-    // 🔒 Falas que não podem ser puladas
     [Header("Bloqueio de Skip")]
-    [Tooltip("Diálogos nestes índices NÃO podem ser pulados (nem pular digitação, nem avançar) ENQUANTO estiver nos diálogos do tutorial.")]
-    public int[] nonSkippableIndices = { 1 }; // 2º diálogo inicial (index 1)
+    public int[] nonSkippableIndices = { 1 };
 
-    // ========== CONTROLE ==========
+    // controle
     private float walkTimer;
     private bool onCutscene = true;
     private bool isWalkingCutscene = true;
@@ -127,25 +116,18 @@ public class TutorialManager : MonoBehaviour
     private bool isTyping = false;
     private bool skipTyping = false;
 
-    // Flag pra saber se estamos usando as falas da General
+    // flag
     private bool usingGeneralDialogues = false;
 
-    // ========== UI DE PROMPT DE AÇÃO ==========
+    // prompt
     [Header("Prompt de Ação (ex.: APERTE ESPAÇO)")]
-    [Tooltip("Objeto de UI (no Canvas) que contém o texto grande do prompt. Pode ser um painel com TMP grande.")]
-    public CanvasGroup jumpPromptGroup;     // use um CanvasGroup no objeto do prompt
-    public TextMeshProUGUI jumpPromptText;  // o TMP grandão do "APERTE ESPAÇO"
-    [Tooltip("Quanto tempo o prompt permanece na tela antes de ocultar.")]
+    public CanvasGroup jumpPromptGroup;
+    public TextMeshProUGUI jumpPromptText;
     public float jumpPromptDuration = 2.0f;
-    [Tooltip("Duração do fade-in/out do prompt.")]
     public float jumpPromptFade = 0.2f;
-    [Tooltip("Texto exibido quando é hora de pular.")]
     public string jumpPromptMessage = "APERTE ESPAÇO";
-    [Tooltip("Palavra-chave que, quando aparecer no diálogo, dispara o prompt.")]
     public string jumpKeyword = "PULEEEE";
-    [Tooltip("Tempo (em segundos) de atraso antes do prompt aparecer.")]
     public float jumpPromptDelay = 0.5f;
-
     private Coroutine jumpPromptRoutine;
 
     // ========== DIÁLOGOS ==========
@@ -153,8 +135,8 @@ public class TutorialManager : MonoBehaviour
     public struct DialogueLine
     {
         public string speaker;
-        [TextArea(2, 4)] public string text;
-        public string emotion; // opcional: deixe vazio se não usar
+        [TextArea(2,4)] public string text;
+        public string emotion;
     }
 
     [Header("Falas do Tutorial (padrão)")]
@@ -173,7 +155,6 @@ public class TutorialManager : MonoBehaviour
         new DialogueLine { speaker = "Tenente Clara", text = "Mantenha a calma e continue a missão.", emotion = "" }
     };
 
-    // Sequência ativa (começa nas falas do tutorial)
     private DialogueLine[] activeDialogues;
 
     // ========== INICIALIZAÇÃO ==========
@@ -191,39 +172,31 @@ public class TutorialManager : MonoBehaviour
         activeDialogues = dialogues;
         usingGeneralDialogues = false;
 
-        // 🔒 tutorial inteiro sem ataque
-        if (player != null)
-        {
-            player.canAttack = false;
-        }
+        // tutorial sem ataque
+        if (player != null) player.canAttack = false;
 
-        // deixa o prompt oculto no início
+        // prompt off
         if (jumpPromptGroup != null)
         {
             jumpPromptGroup.alpha = 0f;
             jumpPromptGroup.gameObject.SetActive(false);
         }
+
+        // garante que a general esteja oculta até o trigger
+        if (general != null) general.SetActive(false);
     }
 
     private void BuildPortraitMaps()
     {
         portraitMap.Clear();
         foreach (var p in speakerPortraits)
-        {
             if (!string.IsNullOrWhiteSpace(p.speakerName) && p.portraitSprite != null)
                 portraitMap[p.speakerName] = p;
-        }
 
         emotionMap.Clear();
         foreach (var e in speakerEmotions)
-        {
-            if (!string.IsNullOrWhiteSpace(e.speakerName) &&
-                !string.IsNullOrWhiteSpace(e.emotionKey) &&
-                e.portraitSprite != null)
-            {
+            if (!string.IsNullOrWhiteSpace(e.speakerName) && !string.IsNullOrWhiteSpace(e.emotionKey) && e.portraitSprite != null)
                 emotionMap[(e.speakerName, e.emotionKey)] = e;
-            }
-        }
     }
 
     // ========== LOOP ==========
@@ -244,7 +217,6 @@ public class TutorialManager : MonoBehaviour
     private void HandleWalkingCutscene()
     {
         walkTimer += Time.deltaTime;
-
         if (isWalkingCutscene && player != null)
             player.transform.position += Vector3.right * Time.deltaTime * 5f;
 
@@ -267,13 +239,10 @@ public class TutorialManager : MonoBehaviour
 
     private void HandleInput()
     {
-        // Se o diálogo atual estiver travado (ex.: 2º diálogo do tutorial), ignora cliques
         if (IsCurrentDialogueLocked()) return;
 
         if (Input.GetMouseButtonDown(0))
-        {
             AdvanceDialogue();
-        }
     }
 
     public void AdvanceDialogueFromUI()
@@ -284,14 +253,12 @@ public class TutorialManager : MonoBehaviour
 
     private void AdvanceDialogue()
     {
-        // 1) se estiver digitando, completa na hora e NÃO avança ainda
         if (isTyping && allowSkipTypingWithClick)
         {
             CompleteTypingImmediately();
             return;
         }
 
-        // 2) se já mostrou tudo, agora pode avançar
         if (firstDialogueShown)
         {
             currentIndex++;
@@ -305,7 +272,6 @@ public class TutorialManager : MonoBehaviour
             else
             {
                 CloseDialogueBox();
-                // Quando terminar os diálogos, carrega a próxima cena
                 StartCoroutine(LoadNextSceneAfterDelay());
             }
         }
@@ -317,10 +283,8 @@ public class TutorialManager : MonoBehaviour
 
         if (typingCoroutine != null) StopCoroutine(typingCoroutine);
 
-        // >>> RETRATO DO SPEAKER (SISTEMA CORRIGIDO) <<<
         ApplyPortrait(activeDialogues[index]);
 
-        // Nome do speaker
         if (nameText != null)
         {
             bool hasName = !string.IsNullOrWhiteSpace(activeDialogues[index].speaker);
@@ -328,62 +292,49 @@ public class TutorialManager : MonoBehaviour
             if (hasName) nameText.text = activeDialogues[index].speaker;
         }
 
-        // Texto com máquina de escrever
         dialogueText.text = "";
         typingCoroutine = StartCoroutine(TypeText(activeDialogues[index].text));
 
-        // >>> PROMPT "APERTE ESPAÇO" se for a fala do PULEEEE
         TryShowJumpPromptIfNeeded(activeDialogues[index]);
     }
 
-    // --------- SISTEMA DE RETRATO CORRIGIDO (igual ao DialogueSystem) ----------
     private void ApplyPortrait(DialogueLine line)
     {
         if (speakerPortrait == null) return;
 
         Sprite spriteToUse = null;
-        bool alignRight = false;
         bool found = false;
 
-        // Tenta encontrar emoção específica primeiro
         if (!string.IsNullOrWhiteSpace(line.emotion) &&
             emotionMap.TryGetValue((line.speaker, line.emotion), out var emo))
         {
             spriteToUse = emo.portraitSprite;
-            alignRight = emo.useAlignOverride ? emo.alignRightOverride
-                                              : (portraitMap.TryGetValue(line.speaker, out var baseP) ? baseP.alignRight : false);
             found = spriteToUse != null;
         }
-        // Se não encontrar emoção, usa o retrato padrão
         else if (portraitMap.TryGetValue(line.speaker, out var basePortrait))
         {
             spriteToUse = basePortrait.portraitSprite;
-            alignRight = basePortrait.alignRight;
             found = spriteToUse != null;
         }
 
         if (!found)
         {
-            // Não há sprite definido para este speaker/emoção - oculta o retrato
             if (speakerPortraitGroup != null) speakerPortraitGroup.alpha = 0f;
             speakerPortrait.gameObject.SetActive(false);
             return;
         }
 
-        // Troca o sprite com efeito de fade
         if (portraitFadeCoroutine != null) StopCoroutine(portraitFadeCoroutine);
         portraitFadeCoroutine = StartCoroutine(FadePortraitTo(spriteToUse));
     }
 
     private IEnumerator FadePortraitTo(Sprite targetSprite)
     {
-        if (!speakerPortrait.gameObject.activeSelf) 
+        if (!speakerPortrait.gameObject.activeSelf)
             speakerPortrait.gameObject.SetActive(true);
 
-        // 🔧 GARANTE QUE O ASPECT RATIO SEJA PRESERVADO (FIX PARA IMAGENS ESTICADAS)
         speakerPortrait.preserveAspect = true;
 
-        // Se não houver CanvasGroup, apenas troca o sprite
         if (speakerPortraitGroup == null)
         {
             speakerPortrait.sprite = targetSprite;
@@ -391,8 +342,6 @@ public class TutorialManager : MonoBehaviour
         }
 
         float d = Mathf.Max(0.0001f, portraitFadeDuration);
-
-        // Fade out
         float t = 0f;
         float startAlpha = speakerPortraitGroup.alpha;
         while (t < d)
@@ -403,10 +352,8 @@ public class TutorialManager : MonoBehaviour
         }
         speakerPortraitGroup.alpha = 0f;
 
-        // Troca o sprite
         speakerPortrait.sprite = targetSprite;
 
-        // Fade in
         t = 0f;
         while (t < d)
         {
@@ -417,7 +364,6 @@ public class TutorialManager : MonoBehaviour
         speakerPortraitGroup.alpha = 1f;
     }
 
-    // --------- Máquina de escrever ----------
     private IEnumerator TypeText(string fullText)
     {
         isTyping = true;
@@ -442,7 +388,6 @@ public class TutorialManager : MonoBehaviour
 
     private void CompleteTypingImmediately()
     {
-        // encerra a coroutine e mostra tudo imediatamente
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
@@ -462,113 +407,64 @@ public class TutorialManager : MonoBehaviour
 
     // --------- Spawn de obstáculo ----------
     private IEnumerator SpawnDelay()
-{
-    onCutscene = false;
-    yield return new WaitForSeconds(spawnTime);
-
-    if (obsGen != null)
     {
-        GameObject troncoClone = obsGen.SpawnObstacle();
+        onCutscene = false;
+        yield return new WaitForSeconds(spawnTime);
 
-        spawnedObstacle = troncoClone;
-        obstacleRb = troncoClone.GetComponent<Rigidbody2D>();   // opcional
-        obstacleMove = troncoClone.GetComponent<ObstacleMove>();
-
-        if (obstacleMove != null)
+        if (obsGen != null)
         {
-            originalObstacleSpeed = obstacleMove.speed;
-            Debug.Log($"[TutorialManager] Tronco spawnado, speed base = {originalObstacleSpeed}");
-        }
-        else
-        {
-            Debug.LogWarning("[TutorialManager] Tronco spawnado, mas sem ObstacleMove!");
-        }
+            // pega o objeto criado diretamente do spawner
+            GameObject troncoClone = obsGen.SpawnObstacle();
 
-        // ---------- Procura do trigger por LAYER (em vez de por nome) ----------
-        TutorialObstacleTrigger trigger = null;
+            spawnedObstacle = troncoClone;
+            obstacleRb = troncoClone.GetComponent<Rigidbody2D>();
+            obstacleMove = troncoClone.GetComponent<ObstacleMove>();
 
-        // 1) procura filhos diretos/indiretos cujo layer bate com jumpTriggerLayer
-        if (jumpTriggerLayer != 0)
-        {
-            Transform[] children = troncoClone.GetComponentsInChildren<Transform>(true);
-            foreach (Transform child in children)
+            if (obstacleMove != null)
             {
-                // ignora o próprio objeto do tronco
-                if (child == troncoClone.transform) continue;
+                originalObstacleSpeed = obstacleMove.speed;
+                Debug.Log($"[TutorialManager] Tronco spawnado, speed base = {originalObstacleSpeed}");
+            }
+            else
+            {
+                Debug.LogWarning("[TutorialManager] Tronco spawnado, mas sem ObstacleMove!");
+            }
 
-                // testa se a layer do child está dentro do LayerMask configurado
-                if ((jumpTriggerLayer.value & (1 << child.gameObject.layer)) != 0)
+            // procura o trigger pelo LayerMask configurado (mais robusto que nome)
+            TutorialObstacleTrigger trigger = null;
+            if (jumpTriggerLayer != 0)
+            {
+                Transform[] children = troncoClone.GetComponentsInChildren<Transform>(true);
+                foreach (Transform child in children)
                 {
-                    trigger = child.GetComponent<TutorialObstacleTrigger>();
-                    if (trigger == null)
+                    if (child == troncoClone.transform) continue;
+                    if ((jumpTriggerLayer.value & (1 << child.gameObject.layer)) != 0)
                     {
-                        // se o objeto não tiver o componente, adiciona-o
-                        trigger = child.gameObject.AddComponent<TutorialObstacleTrigger>();
+                        trigger = child.GetComponent<TutorialObstacleTrigger>();
+                        if (trigger == null)
+                            trigger = child.gameObject.AddComponent<TutorialObstacleTrigger>();
+                        break;
                     }
-                    break; // achou um trigger válido, pode sair do loop
                 }
+            }
+
+            if (trigger == null)
+            {
+                trigger = troncoClone.GetComponentInChildren<TutorialObstacleTrigger>();
+            }
+
+            if (trigger != null)
+            {
+                trigger.tutorialManager = this;
+            }
+            else
+            {
+                Debug.LogWarning("[TutorialManager] Nenhum TutorialObstacleTrigger encontrado/adicionado no tronco (procura por layer falhou).");
             }
         }
 
-        // 2) fallback: se não achou por layer, tenta achar componente existente automaticamente
-        if (trigger == null)
-        {
-            trigger = troncoClone.GetComponentInChildren<TutorialObstacleTrigger>();
-        }
-
-        if (trigger != null)
-        {
-            trigger.tutorialManager = this;
-        }
-        else
-        {
-            Debug.LogWarning("[TutorialManager] Nenhum TutorialObstacleTrigger encontrado/adicionado no tronco (procura por layer falhou).");
-        }
+        hasSpawned = true;
     }
-
-    hasSpawned = true;
-}
-
-
-
-
-    /*private IEnumerator CaptureSpawnedObstacle()
-    {
-        // Espera um frame para garantir que o obstáculo foi criado
-        yield return null;
-        
-        // Procura pelo obstáculo spawnado (assume que tem a tag "Obstacle" ou similar)
-        GameObject[] obstacles = GameObject.FindGameObjectsWithTag("Obstacle");
-        if (obstacles.Length > 0)
-        {
-            // Pega o obstáculo mais recente (último do array)
-            spawnedObstacle = obstacles[obstacles.Length - 1];
-            obstacleRb = spawnedObstacle.GetComponent<Rigidbody2D>();
-            
-            if (obstacleRb != null)
-            {
-                // Salva a velocidade original
-                originalObstacleSpeed = Mathf.Abs(obstacleRb.linearVelocity.x);
-                
-                // Adiciona o componente de trigger ao tronco se não tiver
-                TutorialObstacleTrigger trigger = spawnedObstacle.GetComponentInChildren<TutorialObstacleTrigger>();
-                if (trigger == null)
-                {
-                    // Procura por um trigger filho
-                    Transform triggerTransform = spawnedObstacle.transform.Find("JumpTrigger");
-                    if (triggerTransform != null)
-                    {
-                        trigger = triggerTransform.gameObject.AddComponent<TutorialObstacleTrigger>();
-                    }
-                }
-                
-                if (trigger != null)
-                {
-                    trigger.tutorialManager = this;
-                }
-            }
-        }
-    }*/
 
     private void HandleObstacleSlowMotion()
     {
@@ -576,11 +472,16 @@ public class TutorialManager : MonoBehaviour
             return;
 
         float distance = Vector3.Distance(player.transform.position, spawnedObstacle.transform.position);
-        // Debug.Log($"[TutorialManager] Distância para tronco: {distance}");
 
         if (distance <= slowMotionDistance && !isSlowMotionActive)
-        {
             ActivateSlowMotion();
+
+        // fallback: se o player já ultrapassou o tronco no eixo X, considera "passou"
+        float offset = 0.2f;
+        if (!hasPassedObstacle && player.transform.position.x > spawnedObstacle.transform.position.x + offset)
+        {
+            Debug.Log("[TutorialManager] Fallback: player passou o tronco no eixo X.");
+            OnPlayerPassedObstacle(); // somente restauração, NÃO spawna General
         }
     }
 
@@ -595,11 +496,11 @@ public class TutorialManager : MonoBehaviour
         }
 
         isSlowMotionActive = true;
-        obstacleMove.SetSpeedMultiplier(slowMotionSpeed); // ex: 0.3f
+        obstacleMove.SetSpeedMultiplier(slowMotionSpeed);
         Debug.Log($"[TutorialManager] Slow motion ativado! Multiplier = {slowMotionSpeed}");
     }
 
-
+    // chamado pelo sistema de fallback / restauração (não spawna a General)
     public void OnPlayerPassedObstacle()
     {
         if (hasPassedObstacle) return;
@@ -608,14 +509,70 @@ public class TutorialManager : MonoBehaviour
         isSlowMotionActive = false;
 
         if (obstacleMove != null)
-        {
             obstacleMove.ResetSpeedMultiplier();
-        }
 
-        Debug.Log("[TutorialManager] Player passou pelo tronco! Velocidade restaurada.");
+        Debug.Log("[TutorialManager] Player passou pelo tronco (restauração). Velocidade restaurada.");
+        // NOTA: não spawnar a General aqui
     }
 
+    // chamado EXCLUSIVAMENTE pelo TutorialObstacleTrigger quando o Player sair do JumpTrigger
+    public void OnPlayerTriggeredPass()
+    {
+        // garante restauração básica
+        OnPlayerPassedObstacle();
 
+        // agora faz a parte que só o trigger deve fazer: spawn + diálogo da General
+        Debug.Log("[TutorialManager] OnPlayerTriggeredPass chamado — spawnando General e iniciando diálogo.");
+        StartCoroutine(SpawnGeneralAndTalk());
+    }
+
+    
+    // ========== Spawn da General e diálogo ==========
+    // ========== Spawn da General e diálogo ==========
+    private IEnumerator SpawnGeneralAndTalk()
+    {
+        // ativa e posiciona a general
+        if (general != null)
+        {
+            general.SetActive(true);
+
+            if (generalTransform != null)
+                general.transform.position = generalTransform.position;
+
+            // Ignora colisão entre General e Player
+            if (player != null)
+            {
+                // Busca collider na General (pode estar no próprio objeto ou em filhos)
+                Collider2D generalCollider = general.GetComponentInChildren<Collider2D>();
+                
+                // Busca collider no Player (pode estar no próprio objeto ou em filhos como GFX)
+                Collider2D playerCollider = player.GetComponentInChildren<Collider2D>();
+
+                if (generalCollider != null && playerCollider != null)
+                {
+                    Physics2D.IgnoreCollision(generalCollider, playerCollider, true);
+                    Debug.Log($"[TutorialManager] Colisão desabilitada entre {generalCollider.gameObject.name} e {playerCollider.gameObject.name}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[TutorialManager] Colliders não encontrados! General: {(generalCollider != null ? "OK" : "NULL")}, Player: {(playerCollider != null ? "OK" : "NULL")}");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[TutorialManager] SpawnGeneralAndTalk chamado, mas 'general' é nulo!");
+        }
+
+        // inicia a caminhada (não bloqueante)
+        if (generalRb != null && general != null)
+            StartCoroutine(GeneralWalk());
+
+        // troca pra falas da General e abre a caixa
+        ShowGeneralDialogue();
+
+        yield break;
+    }
     // --------- Cena da General andando ----------
     public IEnumerator GeneralWalk()
     {
@@ -624,14 +581,13 @@ public class TutorialManager : MonoBehaviour
         float timer = 0f;
         while (timer < 1.5f)
         {
-            // se estiver usando Unity 2022/2023 com physics2D changes:
-            // generalRb.velocity = Vector2.left * generalSpeed;
-            generalRb.linearVelocity = Vector2.left * generalSpeed;
+            if (generalRb != null)
+                generalRb.linearVelocity = Vector2.left * generalSpeed;
             timer += Time.deltaTime;
             yield return null;
         }
-        // generalRb.velocity = Vector2.zero;
-        generalRb.linearVelocity = Vector2.zero;
+        if (generalRb != null)
+            generalRb.linearVelocity = Vector2.zero;
     }
 
     // --------- UI Básica ----------
@@ -667,7 +623,6 @@ public class TutorialManager : MonoBehaviour
 
     private bool IsCurrentDialogueLocked()
     {
-        // 🔓 Assim que entra no diálogo da General, nenhuma fala é travada
         if (usingGeneralDialogues) return false;
 
         foreach (int idx in nonSkippableIndices)
@@ -679,8 +634,8 @@ public class TutorialManager : MonoBehaviour
     // ======= MÉTODO PÚBLICO: chamar as falas da General =======
     public void ShowGeneralDialogue()
     {
-        usingGeneralDialogues = true;   // a partir daqui, nada é "não pulável"
-        activeDialogues = generalDialogues; // troca sequência ativa
+        usingGeneralDialogues = true;
+        activeDialogues = generalDialogues;
         currentIndex = 0;
         OpenDialogueBox();
         ShowDialogue(currentIndex);
@@ -689,7 +644,6 @@ public class TutorialManager : MonoBehaviour
     // ======= PROMPT "APERTE ESPAÇO" =======
     private void TryShowJumpPromptIfNeeded(DialogueLine line)
     {
-        // Só mostra se for o NerdEgg falando e a fala contiver a palavra-chave (case-insensitive)
         if (line.speaker != null && line.text != null &&
             line.speaker.Trim().Equals("Ovinho", System.StringComparison.OrdinalIgnoreCase) &&
             line.text.ToUpperInvariant().Contains(jumpKeyword.ToUpperInvariant()))
@@ -705,22 +659,18 @@ public class TutorialManager : MonoBehaviour
 
         jumpPromptText.text = string.IsNullOrWhiteSpace(message) ? jumpPromptMessage : message;
 
-        // Se já tiver um prompt rolando, reinicia
         if (jumpPromptRoutine != null) StopCoroutine(jumpPromptRoutine);
         jumpPromptRoutine = StartCoroutine(JumpPromptRoutine(duration));
     }
 
     private IEnumerator JumpPromptRoutine(float duration)
     {
-        // ⏳ Aguarda o delay configurável antes de mostrar
         if (jumpPromptDelay > 0f)
             yield return new WaitForSeconds(jumpPromptDelay);
 
-        // Ativa e faz fade-in
         jumpPromptGroup.gameObject.SetActive(true);
         yield return FadeCanvasGroup(jumpPromptGroup, 0f, 1f, jumpPromptFade);
 
-        // Mantém na tela por 'duration'
         float t = 0f;
         while (t < duration)
         {
@@ -728,7 +678,6 @@ public class TutorialManager : MonoBehaviour
             yield return null;
         }
 
-        // Fade-out e desativa
         yield return FadeCanvasGroup(jumpPromptGroup, 1f, 0f, jumpPromptFade);
         jumpPromptGroup.gameObject.SetActive(false);
         jumpPromptRoutine = null;
@@ -750,48 +699,28 @@ public class TutorialManager : MonoBehaviour
     }
 
     // ======= TROCA DE CENA =======
-    // ==========================================
-//   SUBSTITUA O MÉTODO LoadNextSceneAfterDelay() NO SEU TutorialManager.cs
-// ==========================================
-
-// ==========================================
-//   SUBSTITUA O MÉTODO LoadNextSceneAfterDelay() NO TutorialManager.cs
-// ==========================================
-
     private IEnumerator LoadNextSceneAfterDelay()
     {
         yield return new WaitForSeconds(delayBeforeSceneChange);
 
-        // ===== SALVAR PROGRESSO DO TUTORIAL (USANDO MAPPER) =====
         if (SaveManager.Instance != null)
         {
             int tutorialBuildIndex = SceneManager.GetActiveScene().buildIndex;
-        
-            // Converte Build Index → Level Index
-            // Tutorial NÃO é uma fase jogável, então usamos -1 ou 0
-            // Mas queremos desbloquear a PRIMEIRA fase (lvl_1), que é Level Index 0
-            int levelToUnlock = 0; // Desbloqueia lvl_1
-        
+            int levelToUnlock = 0;
             SaveManager.Instance.CompleteLevel(levelToUnlock, 0);
-        
             Debug.Log($"✅ [TutorialManager] Tutorial completado! Primeira fase (Level Index 0) desbloqueada.");
         }
         else
         {
             Debug.LogError("❌ [TutorialManager] SaveManager NÃO ENCONTRADO!");
         }
-        // ========================================================
 
         if (!string.IsNullOrWhiteSpace(nextSceneName))
         {
             if (SceneTransition.Instance != null)
-            {
                 SceneTransition.Instance.LoadScene(nextSceneName);
-            }
             else
-            {
                 SceneManager.LoadScene(nextSceneName);
-            }
         }
         else
         {
@@ -799,21 +728,16 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
-
-// ==========================================
-//   ADICIONE ESTE MÉTODO DE DEBUG (OPCIONAL)
-// ==========================================
-
 #if UNITY_EDITOR
-[ContextMenu("Debug: Forçar Completar Tutorial")]
-private void DebugCompleteTutorial()
-{
-    if (SaveManager.Instance != null)
+    [ContextMenu("Debug: Forçar Completar Tutorial")]
+    private void DebugCompleteTutorial()
     {
-        int tutorialIndex = SceneManager.GetActiveScene().buildIndex;
-        SaveManager.Instance.CompleteLevel(tutorialIndex, 0);
-        Debug.Log($"[DEBUG] Tutorial forçado como completo! LevelReached: {SaveManager.Instance.GetLevelReached()}");
+        if (SaveManager.Instance != null)
+        {
+            int tutorialIndex = SceneManager.GetActiveScene().buildIndex;
+            SaveManager.Instance.CompleteLevel(tutorialIndex, 0);
+            Debug.Log($"[DEBUG] Tutorial forçado como completo! LevelReached: {SaveManager.Instance.GetLevelReached()}");
+        }
     }
-}
 #endif
 }
