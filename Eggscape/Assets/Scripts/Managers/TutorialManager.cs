@@ -709,47 +709,50 @@ public class TutorialManager : MonoBehaviour
 //   SUBSTITUA O MÉTODO LoadNextSceneAfterDelay() NO SEU TutorialManager.cs
 // ==========================================
 
-private IEnumerator LoadNextSceneAfterDelay()
-{
-    yield return new WaitForSeconds(delayBeforeSceneChange);
+// ==========================================
+//   SUBSTITUA O MÉTODO LoadNextSceneAfterDelay() NO TutorialManager.cs
+// ==========================================
 
-    // ===== SALVAR PROGRESSO ANTES DE TROCAR DE CENA =====
-    if (SaveManager.Instance != null)
+    private IEnumerator LoadNextSceneAfterDelay()
     {
-        // Pega o índice da cena atual (tutorial)
-        int tutorialSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        
-        // Calcula uma pontuação (pode ser 0 ou um valor fixo)
-        int tutorialScore = 0; // ou use algum sistema de score do tutorial
-        
-        // Marca o tutorial como completado e desbloqueia a próxima fase
-        SaveManager.Instance.CompleteLevel(tutorialSceneIndex, tutorialScore);
-        
-        Debug.Log($"✅ [TutorialManager] Tutorial completado! Save feito. LevelReached agora: {SaveManager.Instance.GetLevelReached()}");
-    }
-    else
-    {
-        Debug.LogError("❌ [TutorialManager] SaveManager NÃO ENCONTRADO! O progresso do tutorial NÃO será salvo.");
-    }
-    // ==================================================
+        yield return new WaitForSeconds(delayBeforeSceneChange);
 
-    if (!string.IsNullOrWhiteSpace(nextSceneName))
-    {
-        // Usa o SceneTransition se existir, senão carrega direto
-        if (SceneTransition.Instance != null)
+        // ===== SALVAR PROGRESSO DO TUTORIAL (USANDO MAPPER) =====
+        if (SaveManager.Instance != null)
         {
-            SceneTransition.Instance.LoadScene(nextSceneName);
+            int tutorialBuildIndex = SceneManager.GetActiveScene().buildIndex;
+        
+            // Converte Build Index → Level Index
+            // Tutorial NÃO é uma fase jogável, então usamos -1 ou 0
+            // Mas queremos desbloquear a PRIMEIRA fase (lvl_1), que é Level Index 0
+            int levelToUnlock = 0; // Desbloqueia lvl_1
+        
+            SaveManager.Instance.CompleteLevel(levelToUnlock, 0);
+        
+            Debug.Log($"✅ [TutorialManager] Tutorial completado! Primeira fase (Level Index 0) desbloqueada.");
         }
         else
         {
-            SceneManager.LoadScene(nextSceneName);
+            Debug.LogError("❌ [TutorialManager] SaveManager NÃO ENCONTRADO!");
+        }
+        // ========================================================
+
+        if (!string.IsNullOrWhiteSpace(nextSceneName))
+        {
+            if (SceneTransition.Instance != null)
+            {
+                SceneTransition.Instance.LoadScene(nextSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("TutorialManager: Nome da próxima cena não foi configurado!");
         }
     }
-    else
-    {
-        Debug.LogWarning("TutorialManager: Nome da próxima cena não foi configurado!");
-    }
-}
 
 
 // ==========================================

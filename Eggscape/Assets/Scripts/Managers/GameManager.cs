@@ -219,6 +219,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // ==========================================
+//   SUBSTITUA O MÉTODO Victory() NO GameManager.cs
+// ==========================================
+
     void Victory()
     {
         victoryTriggered = true;
@@ -226,30 +230,28 @@ public class GameManager : MonoBehaviour
     
         StopSpawners();
 
-        // ===== INTEGRAÇÃO COM SAVEMANAGER =====
+        // ===== INTEGRAÇÃO COM SAVEMANAGER (USANDO MAPPER) =====
         if (SaveManager.Instance != null)
         {
-            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            int currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
+        
+            // Converte Build Index → Level Index
+            int levelIndex = LevelIndexMapper.BuildIndexToLevelIndex(currentBuildIndex);
+        
             int currentScore = (int)score;
         
-            // Salvar progresso automaticamente
-            SaveManager.Instance.CompleteLevel(currentSceneIndex, currentScore);
+            // Salvar progresso
+            SaveManager.Instance.CompleteLevel(levelIndex, currentScore);
         
-            Debug.Log($"[GameManager] Vitória! Fase {currentSceneIndex} completada com {currentScore} pontos.");
+            Debug.Log($"✅ [GameManager] Vitória! Build Index {currentBuildIndex} → Level Index {levelIndex} | Score: {currentScore}");
         }
         else
         {
-            Debug.LogWarning("[GameManager] SaveManager não encontrado! Progresso não será salvo.");
-        
-            // Fallback para o sistema antigo (caso SaveManager não exista)
-            SaveData data = new SaveData();
-            data.highScore = Mathf.Max((int)score, SaveSystem.Load().highScore);
-            data.levelReached = SceneManager.GetActiveScene().buildIndex;
-            SaveSystem.Save(data);
+            Debug.LogError("❌ [GameManager] SaveManager NÃO ENCONTRADO!");
         }
-        // =====================================
+        // ======================================================
 
-        Debug.Log("Vitória iniciada. Esperando limpar a cena...");
+        Debug.Log("⏳ Vitória iniciada. Esperando limpar a cena...");
     }
 
 

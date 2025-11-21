@@ -66,7 +66,7 @@ public class LevelSelectManager : MonoBehaviour
         else
             SceneManager.LoadScene(sceneName);
 
-        Debug.Log($"[LevelSelect] Carregando fase: {sceneName} (Index: {levelIndex})");
+        Debug.Log($"[LevelSelect] Carregando fase: {sceneName} (Level Index: {levelIndex})");
     }
 
     /// <summary>
@@ -85,9 +85,8 @@ public class LevelSelectManager : MonoBehaviour
 //   CLASSE DO BOTÃO DE FASE
 // ==========================================
 
-/*
-[System.Serializable]
-public class LevelButton : MonoBehaviour
+/*[System.Serializable]*/
+/*public class LevelButton : MonoBehaviour
 {
     [Header("Configuração")]
     public int levelIndex;                          // Índice da fase (0, 1, 2...)
@@ -162,6 +161,4 @@ public class LevelButton : MonoBehaviour
         {
             manager.LoadLevel(levelIndex, sceneName);
         }
-    }
-*/
-
+    }*/

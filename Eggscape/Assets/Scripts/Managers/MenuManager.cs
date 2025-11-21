@@ -56,32 +56,28 @@ public class MenuManager : MonoBehaviour
     private void RefreshMenuButtons()
     {
         bool hasSaveManager = SaveManager.Instance != null;
-        
+    
         if (!hasSaveManager)
         {
-            Debug.LogWarning("[MenuManager] SaveManager não encontrado! Mostrando apenas New Game.");
             ShowOnlyNewGameMenu();
             return;
         }
 
-        // Verifica se o jogador já passou do tutorial
         int levelReached = SaveManager.Instance.GetLevelReached();
-        bool passedTutorial = levelReached > tutorialSceneIndex;
-
+    
+        // ⭐ MUDANÇA: Agora compara com Level Index 0 (primeira fase)
+        bool passedTutorial = levelReached > 0; // Se desbloqueou pelo menos a Fase 1
+    
         if (passedTutorial)
         {
-            // Jogador veterano - mostra tudo
             ShowFullMenu();
-            Debug.Log("[MenuManager] Jogador veterano detectado! Menu completo ativo.");
         }
         else
         {
-            // Primeira vez ou ainda no tutorial - só New Game
             ShowOnlyNewGameMenu();
-            Debug.Log("[MenuManager] Primeira vez jogando! Apenas New Game disponível.");
         }
     }
-
+    
     /// <summary>
     /// Mostra apenas o botão New Game (primeira vez jogando).
     /// </summary>

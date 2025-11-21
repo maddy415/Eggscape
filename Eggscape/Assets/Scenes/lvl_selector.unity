@@ -846,7 +846,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95b9ebdfe3e35db4a9d61b792f971fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalLevels: 7
+  totalLevels: 6
 --- !u!4 &1127670828
 Transform:
   m_ObjectHideFlags: 0
@@ -892,6 +892,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelButtons:
+  - {fileID: 1336925584}
   - {fileID: 1582389716}
   - {fileID: 1873914898}
   - {fileID: 1336925584}
@@ -1064,7 +1065,7 @@ GameObject:
   - component: {fileID: 1336925581}
   - component: {fileID: 1336925584}
   m_Layer: 5
-  m_Name: Button (3)
+  m_Name: lvl_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2001,7 +2002,7 @@ GameObject:
   - component: {fileID: 1873914895}
   - component: {fileID: 1873914898}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: lvl_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2156,8 +2157,9 @@ GameObject:
   - component: {fileID: 2032625687}
   - component: {fileID: 2032625686}
   - component: {fileID: 2032625685}
+  - component: {fileID: 2032625688}
   m_Layer: 5
-  m_Name: Button
+  m_Name: tutorial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2265,6 +2267,29 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2032625683}
   m_CullTransparentMesh: 1
+--- !u!114 &2032625688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032625683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e3d4b70696817445bd9996c17a40b5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelIndex: 0
+  sceneName: tutorial
+  button: {fileID: 2032625685}
+  buttonImage: {fileID: 2032625686}
+  levelText: {fileID: 454327994}
+  lockIcon: {fileID: 0}
+  checkIcon: {fileID: 0}
+  useCustomColors: 1
+  customUnlockedColor: {r: 1, g: 1, b: 1, a: 1}
+  customLockedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  customCompletedColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &2035650190
 GameObject:
   m_ObjectHideFlags: 0
