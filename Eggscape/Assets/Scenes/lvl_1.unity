@@ -3531,7 +3531,7 @@ GameObject:
   - component: {fileID: 810466514}
   - component: {fileID: 810466513}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Morning Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

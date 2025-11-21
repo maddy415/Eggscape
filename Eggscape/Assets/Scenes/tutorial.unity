@@ -3535,7 +3535,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3013908745775751571, guid: 6b247b42995a28d4aa6eb6f1500da2e0, type: 3}
+  m_Sprite: {fileID: 4616270099059756903, guid: ca414a3e0b705cb4e8b7858187e80a24, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -11286,6 +11286,8 @@ MonoBehaviour:
   musicSource: {fileID: 0}
   sfxVolume: 1
   musicVolume: 1
+  levelMusics: []
+  autoPlayLevelMusicOnLoad: 1
 --- !u!4 &1941320289
 Transform:
   m_ObjectHideFlags: 0
