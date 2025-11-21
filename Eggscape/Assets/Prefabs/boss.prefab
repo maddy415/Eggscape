@@ -136,7 +136,9 @@ MonoBehaviour:
   player: {fileID: 0}
   playerScript: {fileID: 0}
   bossSprite: {fileID: 0}
+  bossAnimator: {fileID: 0}
   telegraphColor: {r: 1, g: 0, b: 0, a: 1}
+  effectSpawnPoint: {fileID: 0}
   phases: []
   introDuration: 1.2
   groundMask:

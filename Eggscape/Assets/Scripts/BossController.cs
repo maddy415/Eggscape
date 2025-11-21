@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 
 /// <summary>
 /// Boss 2D com fases, ataques e integração com sistema de cutscene/tutorial
+/// AGORA COM SISTEMA DE EFEITOS VISUAIS/SONOROS NO WINDUP
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class BossController : MonoBehaviour
@@ -14,6 +15,72 @@ public class BossController : MonoBehaviour
     #region Tipos de dados (Inspector)
 
     public enum AttackType { Charge, JumpSmash, JumpSuperHigh, BulletHell }
+
+    /// <summary>
+    /// Configuração de efeitos visuais e sonoros para o windup de ataques
+    /// </summary>
+    [System.Serializable]
+    public class WindupEffects
+    {
+        [Header("Audio")]
+        [Tooltip("Som tocado no início do windup")]
+        public AudioClip windupSound;
+        [Range(0f, 1f)] public float windupSoundVolume = 1f;
+
+        [Header("GameObject Activation")]
+        [Tooltip("GameObject que será ativado durante o windup e desativado após")]
+        public GameObject objectToActivate;
+        
+        [Tooltip("Se true, objeto será desativado após o windup. Se false, permanecerá ativo")]
+        public bool deactivateAfterWindup = true;
+
+        [Header("Visual Effects")]
+        [Tooltip("Prefab de efeito visual a ser instanciado (ex: partículas de energia)")]
+        public GameObject visualEffectPrefab;
+        
+        [Tooltip("Posição relativa ao boss onde spawnar o efeito (local space)")]
+        public Vector3 effectSpawnOffset = Vector3.zero;
+        
+        [Tooltip("Anexar o efeito ao boss? (segue movimento)")]
+        public bool attachEffectToBoss = true;
+
+        [Header("Color Transition")]
+        [Tooltip("Fazer transição de cor no sprite durante windup?")]
+        public bool useColorTransition = false;
+        
+        [Tooltip("Cor alvo no final do windup (ex: vermelho claro)")]
+        public Color targetColor = new Color(1f, 0.5f, 0.5f, 1f);
+        
+        [Tooltip("Curva de animação da cor (0=início, 1=fim do windup)")]
+        public AnimationCurve colorCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+        [Header("Scale Pulse")]
+        [Tooltip("Pulsar o tamanho do boss durante windup?")]
+        public bool useScalePulse = false;
+        
+        [Tooltip("Multiplicador de escala máximo (ex: 1.1 = 10% maior)")]
+        public float scalePulseAmount = 1.1f;
+        
+        [Tooltip("Velocidade da pulsação (ciclos por segundo)")]
+        public float scalePulseSpeed = 4f;
+
+        [Header("Animation")]
+        [Tooltip("Nome do trigger/bool no Animator para ativar")]
+        public string animatorTrigger = "";
+        
+        [Tooltip("É um Bool? (senão, usa Trigger)")]
+        public bool animatorIsBool = false;
+        
+        [Tooltip("Se Bool, setar para false após o windup?")]
+        public bool resetBoolAfterWindup = true;
+
+        [Header("Screen Shake")]
+        [Tooltip("Intensidade do screen shake durante windup")]
+        public float shakeIntensity = 0f;
+        
+        [Tooltip("Frequência do shake (maior = mais rápido)")]
+        public float shakeFrequency = 10f;
+    }
 
     [System.Serializable]
     public class Attack
@@ -24,6 +91,9 @@ public class BossController : MonoBehaviour
         [Header("Telegraph/Timing")]
         public float windup = 0.5f;
         public float recovery = 0.5f;
+
+        [Header("Windup Effects")]
+        public WindupEffects windupEffects = new WindupEffects();
 
         [Header("One-hit on touch")]
         public bool killOnTouch = true;
@@ -97,9 +167,14 @@ public class BossController : MonoBehaviour
     [Header("Alvos / Refs")]
     public float speed = 6f;
     public Transform player;
-    public Player playerScript; // Referência ao script do Player
+    public Player playerScript;
     public SpriteRenderer bossSprite;
+    public Animator bossAnimator;
     public Color telegraphColor = Color.red;
+
+    [Header("Effect Spawn Point")]
+    [Tooltip("Transform filho para spawnar efeitos (se null, usa a posição do boss)")]
+    public Transform effectSpawnPoint;
 
     [Header("Fases (na ordem)")]
     public List<Phase> phases = new List<Phase>();
@@ -111,7 +186,6 @@ public class BossController : MonoBehaviour
     public LayerMask groundMask = ~0;
     public float groundProbeDistance = 0.15f;
 
-    // ======= Charge Anchor =======
     [Header("Charge Anchor")]
     public bool useChargeAnchor = true;
     public Transform chargeAnchor;
@@ -123,19 +197,16 @@ public class BossController : MonoBehaviour
     public float chargePreDashHold = 0.35f;
     public float chargeAnchorXTolerance = 0.15f;
 
-    // ======= Cancel do dash =======
     [Header("Charge Cancel ao ser atingido")]
     public LayerMask playerAttackMask;
     public float dashCancelKnockback = 10f;
     public float dashCancelStun = 0.2f;
 
-    // ======= Shockwave =======
     [Header("Shockwave (JumpSuperHigh landing)")]
     public GameObject shockwavePrefab;
     public float shockwaveSpawnYOffset = 0.15f;
     public float shockwaveInitialSpeed = 12f;
 
-    // ======= Bullet Hell =======
     [Header("Bullet Hell")]
     public BulletPatternSO bulletPattern;
     public GameObject bulletPrefab;
@@ -168,12 +239,15 @@ public class BossController : MonoBehaviour
     private float phaseTimer = 0f;
     private bool dead = false;
 
-    // Charge/Anchor
     private bool anchorTouchedThisCharge = false;
-
-    // Dash em execução
     private bool isChargingDash = false;
     [HideInInspector] public bool dashWasCancelled = false;
+
+    // Para controle de efeitos
+    private GameObject currentWindupEffect;
+    private Color originalSpriteColor;
+    private Vector3 originalScale;
+    private Coroutine windupEffectCoroutine;
     #endregion
 
     #region Unity
@@ -195,11 +269,13 @@ public class BossController : MonoBehaviour
 
         if (chargeAnchor != null && chargeAnchorTrigger == null)
             chargeAnchorTrigger = chargeAnchor.GetComponent<Collider2D>();
+
+        if (bossSprite) originalSpriteColor = bossSprite.color;
+        originalScale = transform.localScale;
     }
 
     private void Start()
     {
-        // Pega referência do Player script se não foi atribuída
         if (playerScript == null && player != null)
         {
             playerScript = player.GetComponent<Player>();
@@ -210,9 +286,6 @@ public class BossController : MonoBehaviour
 
     #region Inicialização
 
-    /// <summary>
-    /// Chamado pelo BossCutsceneManager após a cutscene
-    /// </summary>
     public void StartBossFight()
     {
         if (dead) return;
@@ -231,10 +304,8 @@ public class BossController : MonoBehaviour
         invulnerable = true;
         if (bossSprite) Flash(telegraphColor, introDuration);
 
-        //rb.linearVelocity = Vector2.left * speed;
         yield return new WaitForSeconds(introDuration);
 
-        //rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         invulnerable = false;
         GoToPhase(0);
     }
@@ -297,110 +368,252 @@ public class BossController : MonoBehaviour
 
     #region Tutorial Dash
 
-   
-
-    #endregion
-
-    #region Tutorial Dash
-
-public IEnumerator ExecuteTutorialDash(BossCutsceneManager cutsceneManager)
-{
-    Attack chargeAttack = null;
-    if (phases.Count > 0 && phases[0].attacks.Count > 0)
+    public IEnumerator ExecuteTutorialDash(BossCutsceneManager cutsceneManager)
     {
-        foreach (var atk in phases[0].attacks)
+        Attack chargeAttack = null;
+        if (phases.Count > 0 && phases[0].attacks.Count > 0)
         {
-            if (atk.type == AttackType.Charge)
+            foreach (var atk in phases[0].attacks)
             {
-                chargeAttack = atk;
-                break;
-            }
-        }
-    }
-
-    if (chargeAttack == null)
-    {
-        Debug.LogWarning("[Boss] Nenhum ataque Charge encontrado para tutorial!");
-        yield break;
-    }
-
-    float tutorialWindup = chargeAttack.windup * cutsceneManager.parryWindupMultiplier;
-
-    if (bossSprite) Flash(telegraphColor, tutorialWindup);
-    yield return new WaitForSeconds(tutorialWindup);
-
-    FacePlayerX();
-    Vector2 dashDir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
-    float elapsed = 0f;
-
-    isChargingDash = true;
-    dashWasCancelled = false;
-    bool slowMotionTriggered = false;
-
-    // Loop INFINITO até colidir ou ser cancelado
-    while (!dashWasCancelled)
-    {
-        elapsed += Time.deltaTime;
-
-        // Pega o multiplicador atual do SlowMotionManager
-        float speedMultiplier = 1f;
-        if (SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive())
-        {
-            speedMultiplier = SlowMotionManager.Instance.slowMotionScale;
-        }
-
-        // SEMPRE aplica velocidade (nunca para!)
-        rb.linearVelocity = new Vector2(dashDir.x * chargeAttack.dashSpeed * speedMultiplier, rb.linearVelocity.y);
-
-        // Verifica distância para triggar slow motion APENAS UMA VEZ
-        if (!slowMotionTriggered && player != null)
-        {
-            float distance = Vector2.Distance(transform.position, player.position);
-
-            if (distance <= cutsceneManager.promptTriggerDistance)
-            {
-                slowMotionTriggered = true;
-                Debug.Log($"[Boss] Distância alcançada ({distance:F2}), triggando slow motion!");
-                
-                // Inicia slow motion sem bloquear
-                StartCoroutine(cutsceneManager.TriggerParrySlowMotion());
-            }
-        }
-
-        // Hit detection - ao colidir, SAI DO LOOP
-        var hits = Physics2D.OverlapBoxAll(transform.position, chargeAttack.chargeHitbox, 0f, chargeAttack.hitMask);
-        if (hits.Length > 0)
-        {
-            foreach (var h in hits)
-            {
-                // Se colidiu com o player, processa hit e SAI
-                if (h.CompareTag("Player") || (chargeAttack.playerMask.value & (1 << h.gameObject.layer)) != 0)
+                if (atk.type == AttackType.Charge)
                 {
-                    Debug.Log("[Boss] COLIDIU COM O PLAYER! Saindo do dash.");
-                    ApplyPlayerHitIfAny(h.gameObject, chargeAttack);
-                    dashWasCancelled = true; // Força saída do loop
+                    chargeAttack = atk;
                     break;
                 }
             }
         }
 
-        yield return null;
+        if (chargeAttack == null)
+        {
+            Debug.LogWarning("[Boss] Nenhum ataque Charge encontrado para tutorial!");
+            yield break;
+        }
+
+        float tutorialWindup = chargeAttack.windup * cutsceneManager.parryWindupMultiplier;
+
+        // ===== INICIA EFEITOS DO WINDUP =====
+        yield return StartCoroutine(PlayWindupEffects(chargeAttack.windupEffects, tutorialWindup));
+        // ====================================
+
+        FacePlayerX();
+        Vector2 dashDir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
+        float elapsed = 0f;
+
+        isChargingDash = true;
+        dashWasCancelled = false;
+        bool slowMotionTriggered = false;
+
+        while (!dashWasCancelled)
+        {
+            elapsed += Time.deltaTime;
+
+            float speedMultiplier = 1f;
+            if (SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive())
+            {
+                speedMultiplier = SlowMotionManager.Instance.slowMotionScale;
+            }
+
+            rb.linearVelocity = new Vector2(dashDir.x * chargeAttack.dashSpeed * speedMultiplier, rb.linearVelocity.y);
+
+            if (!slowMotionTriggered && player != null)
+            {
+                float distance = Vector2.Distance(transform.position, player.position);
+
+                if (distance <= cutsceneManager.promptTriggerDistance)
+                {
+                    slowMotionTriggered = true;
+                    Debug.Log($"[Boss] Distância alcançada ({distance:F2}), triggando slow motion!");
+                    
+                    StartCoroutine(cutsceneManager.TriggerParrySlowMotion());
+                }
+            }
+
+            var hits = Physics2D.OverlapBoxAll(transform.position, chargeAttack.chargeHitbox, 0f, chargeAttack.hitMask);
+            if (hits.Length > 0)
+            {
+                foreach (var h in hits)
+                {
+                    if (h.CompareTag("Player") || (chargeAttack.playerMask.value & (1 << h.gameObject.layer)) != 0)
+                    {
+                        Debug.Log("[Boss] COLIDIU COM O PLAYER! Saindo do dash.");
+                        ApplyPlayerHitIfAny(h.gameObject, chargeAttack);
+                        dashWasCancelled = true;
+                        break;
+                    }
+                }
+            }
+
+            yield return null;
+        }
+
+        isChargingDash = false;
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+
+        Debug.Log("[Boss] Tutorial dash finalizado!");
     }
 
-    isChargingDash = false;
-    rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+    #endregion
 
-    Debug.Log("[Boss] Tutorial dash finalizado!");
-}
+    #region Sistema de Efeitos do Windup
 
-#endregion
+    /// <summary>
+    /// Executa todos os efeitos visuais/sonoros durante o windup
+    /// </summary>
+    private IEnumerator PlayWindupEffects(WindupEffects fx, float duration)
+    {
+        if (fx == null) yield break;
+
+        // Ativa GameObject específico
+        if (fx.objectToActivate != null)
+        {
+            fx.objectToActivate.SetActive(true);
+            Debug.Log($"[Boss Windup] Ativando objeto: {fx.objectToActivate.name}");
+        }
+
+        // Toca som
+        if (fx.windupSound != null && AudioManager.audioInstance != null)
+        {
+            AudioSource sfxSource = AudioManager.audioInstance.GetComponent<AudioSource>();
+            if (sfxSource != null)
+            {
+                sfxSource.PlayOneShot(fx.windupSound, fx.windupSoundVolume);
+            }
+        }
+
+        // Spawna efeito visual
+        if (fx.visualEffectPrefab != null)
+        {
+            Vector3 spawnPos = (effectSpawnPoint != null ? effectSpawnPoint.position : transform.position) + fx.effectSpawnOffset;
+            
+            currentWindupEffect = Instantiate(fx.visualEffectPrefab, spawnPos, Quaternion.identity);
+            
+            if (fx.attachEffectToBoss)
+            {
+                Transform parentTransform = effectSpawnPoint != null ? effectSpawnPoint : transform;
+                currentWindupEffect.transform.SetParent(parentTransform);
+                currentWindupEffect.transform.localPosition = fx.effectSpawnOffset;
+            }
+            
+            // Garante que está ativo
+            currentWindupEffect.SetActive(true);
+        }
+
+        // Ativa trigger do Animator
+        if (!string.IsNullOrEmpty(fx.animatorTrigger) && bossAnimator != null)
+        {
+            if (fx.animatorIsBool)
+            {
+                bossAnimator.SetBool(fx.animatorTrigger, true);
+            }
+            else
+            {
+                bossAnimator.SetTrigger(fx.animatorTrigger);
+            }
+        }
+
+        // Executa animações durante o windup
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            // Transição de cor
+            if (fx.useColorTransition && bossSprite != null)
+            {
+                float curveValue = fx.colorCurve.Evaluate(t);
+                bossSprite.color = Color.Lerp(originalSpriteColor, fx.targetColor, curveValue);
+            }
+
+            // Pulse de escala
+            if (fx.useScalePulse)
+            {
+                float pulse = Mathf.Sin(elapsed * fx.scalePulseSpeed * Mathf.PI * 2f) * 0.5f + 0.5f;
+                float scaleMult = Mathf.Lerp(1f, fx.scalePulseAmount, pulse * t);
+                transform.localScale = originalScale * scaleMult;
+            }
+
+            // Screen shake
+            if (fx.shakeIntensity > 0f)
+            {
+                ApplyScreenShake(fx.shakeIntensity, fx.shakeFrequency);
+            }
+
+            yield return null;
+        }
+
+        // LIMPA EFEITOS IMEDIATAMENTE APÓS O WINDUP
+        Debug.Log("[Boss Windup] Windup completo, limpando efeitos...");
+        CleanupWindupEffects(fx);
+    }
+
+    /// <summary>
+    /// Remove todos os efeitos visuais criados no windup
+    /// </summary>
+    private void CleanupWindupEffects(WindupEffects fx)
+    {
+        // Desativa GameObject específico
+        if (fx.objectToActivate != null && fx.deactivateAfterWindup)
+        {
+            fx.objectToActivate.SetActive(false);
+        }
+
+        // Destrói efeito visual instanciado
+        if (currentWindupEffect != null)
+        {
+            // Se for um sistema de partículas, para a emissão antes de destruir
+            ParticleSystem ps = currentWindupEffect.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
+            
+            Destroy(currentWindupEffect);
+            currentWindupEffect = null;
+        }
+
+        // Restaura cor original
+        if (fx.useColorTransition && bossSprite != null)
+        {
+            bossSprite.color = originalSpriteColor;
+        }
+
+        // Restaura escala original
+        if (fx.useScalePulse)
+        {
+            transform.localScale = originalScale;
+        }
+
+        // Reseta bool do Animator
+        if (fx.animatorIsBool && fx.resetBoolAfterWindup && !string.IsNullOrEmpty(fx.animatorTrigger) && bossAnimator != null)
+        {
+            bossAnimator.SetBool(fx.animatorTrigger, false);
+        }
+    }
+
+    /// <summary>
+    /// Aplica screen shake na câmera
+    /// </summary>
+    private void ApplyScreenShake(float intensity, float frequency)
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+
+        float x = Mathf.PerlinNoise(Time.time * frequency, 0f) * 2f - 1f;
+        float y = Mathf.PerlinNoise(0f, Time.time * frequency) * 2f - 1f;
+
+        cam.transform.position += new Vector3(x, y, 0f) * intensity * Time.deltaTime;
+    }
+
+    #endregion
 
     #region Ataques
 
     private IEnumerator ExecuteAttack(Attack a)
     {
-        if (bossSprite) Flash(telegraphColor, a.windup);
-        yield return new WaitForSeconds(a.windup);
+        // ===== EXECUTA EFEITOS DO WINDUP =====
+        yield return StartCoroutine(PlayWindupEffects(a.windupEffects, a.windup));
+        // =====================================
 
         switch (a.type)
         {
