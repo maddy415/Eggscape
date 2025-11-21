@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private BoxCollider2D attackHB;
     [SerializeField] private MobileInputBridge mobileInput;
+    public GameObject obstacleMove;
+    public ObstacleMove obsMove;
 
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed;
@@ -116,6 +118,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        obstacleMove.GetComponent<ObstacleMove>();
         CacheComponents();
         CacheMobileInput();
         rb.gravityScale = defaultGS;
@@ -570,6 +573,13 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        
+        if (other.gameObject.layer==13)
+        {
+            obsMove.SetSpeedMultiplier(1f);
+            Debug.Log("colidiu com o trigger");
+        }
+        
         if (!other.gameObject.CompareTag("JumpDetector"))
         {
             return;

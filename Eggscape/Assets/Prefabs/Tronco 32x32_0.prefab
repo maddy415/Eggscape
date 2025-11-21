@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7856566067862300491}
   - component: {fileID: 2003532478292991519}
   - component: {fileID: 955753849929808813}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: JumpTrigger
   m_TagString: JumpDetector
   m_Icon: {fileID: 0}
@@ -298,6 +298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 9
+  speedMultiplier: 1
   currentSegment: {fileID: 11400000, guid: 002723683d3bdd34dace350366e29b82, type: 2}
 --- !u!50 &-90832248200795915
 Rigidbody2D:

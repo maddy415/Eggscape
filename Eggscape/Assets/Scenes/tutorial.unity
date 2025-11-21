@@ -5541,6 +5541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.8
+  speedMultiplier: 1
   currentSegment: {fileID: 0}
 --- !u!212 &1015488270
 SpriteRenderer:
@@ -9564,6 +9565,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 2135293724}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: obsMove
+      value: 
+      objectReference: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: obstacleMove
+      value: 
+      objectReference: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+    - target: {fileID: 6543788433001753158, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 7055952870495538840, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
       propertyPath: m_Name
       value: Player FIX Variant
@@ -10547,8 +10564,11 @@ MonoBehaviour:
   spawnTime: 2.2
   spawnIndex: 1
   generalSpeed: 13.5
-  slowMotionDistance: 8
-  slowMotionSpeed: 0.2
+  jumpTriggerLayer:
+    serializedVersion: 2
+    m_Bits: 8192
+  slowMotionDistance: 3
+  slowMotionSpeed: 0.161
   nextSceneName: lvl_1
   delayBeforeSceneChange: 1.5
   typingSpeed: 0.03
@@ -12098,7 +12118,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4281456895
-  m_fontColor: {r: 1, g: 0.84660405, b: 0.19339621, a: 1}
+  m_fontColor: {r: 0.85882354, g: 0.060568668, b: 0.05098039, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -12167,6 +12187,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2121000915}
   m_CullTransparentMesh: 1
+--- !u!212 &2135293724 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 2506496685126979600, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+  m_PrefabInstance: {fileID: 1700792780}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &24481272751987287
 PrefabInstance:
   m_ObjectHideFlags: 0

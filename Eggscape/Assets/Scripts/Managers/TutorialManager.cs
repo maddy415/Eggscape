@@ -16,6 +16,8 @@ public class TutorialManager : MonoBehaviour
     public Rigidbody2D generalRb;
     public GameObject general;
     public Transform generalTransform;
+    
+    
 
     // ========== UI DE DIÁLOGO ==========
     [Header("UI de Diálogo")]
@@ -77,6 +79,11 @@ public class TutorialManager : MonoBehaviour
     [Tooltip("Índice do diálogo em que deve spawnar o obstáculo.")]
     public int spawnIndex = 1;
     public float generalSpeed = 5f;
+    
+    [Header("Jump Trigger by Layer")]
+    [Tooltip("Layer(s) considered as the jump trigger. Configure the JumpTrigger object to use one of these layers.")]
+    public LayerMask jumpTriggerLayer; // arrasta a layer no Inspector (ex: 'JumpTrigger')
+
 
     [Header("Slow Motion do Tronco")]
     [Tooltip("Distância do tronco ao player para ativar o slow motion")]
@@ -86,9 +93,11 @@ public class TutorialManager : MonoBehaviour
     [Tooltip("Referência ao tronco spawnado (será preenchida automaticamente)")]
     private GameObject spawnedObstacle;
     private Rigidbody2D obstacleRb;
+    private ObstacleMove obstacleMove;
     private float originalObstacleSpeed;
     private bool isSlowMotionActive = false;
     private bool hasPassedObstacle = false;
+
 
     [Header("Troca de Cena")]
     [Tooltip("Nome da próxima cena a ser carregada após o último diálogo")]
@@ -453,45 +462,74 @@ public class TutorialManager : MonoBehaviour
 
     // --------- Spawn de obstáculo ----------
     private IEnumerator SpawnDelay()
+{
+    onCutscene = false;
+    yield return new WaitForSeconds(spawnTime);
+
+    if (obsGen != null)
     {
-        onCutscene = false;
-        yield return new WaitForSeconds(spawnTime);
-    
-        if (obsGen != null)
+        GameObject troncoClone = obsGen.SpawnObstacle();
+
+        spawnedObstacle = troncoClone;
+        obstacleRb = troncoClone.GetComponent<Rigidbody2D>();   // opcional
+        obstacleMove = troncoClone.GetComponent<ObstacleMove>();
+
+        if (obstacleMove != null)
         {
-            GameObject troncoClone = obsGen.SpawnObstacle();
+            originalObstacleSpeed = obstacleMove.speed;
+            Debug.Log($"[TutorialManager] Tronco spawnado, speed base = {originalObstacleSpeed}");
+        }
+        else
+        {
+            Debug.LogWarning("[TutorialManager] Tronco spawnado, mas sem ObstacleMove!");
+        }
 
-            spawnedObstacle = troncoClone;
-            obstacleRb = troncoClone.GetComponent<Rigidbody2D>();
+        // ---------- Procura do trigger por LAYER (em vez de por nome) ----------
+        TutorialObstacleTrigger trigger = null;
 
-            if (obstacleRb != null)
+        // 1) procura filhos diretos/indiretos cujo layer bate com jumpTriggerLayer
+        if (jumpTriggerLayer != 0)
+        {
+            Transform[] children = troncoClone.GetComponentsInChildren<Transform>(true);
+            foreach (Transform child in children)
             {
-                originalObstacleSpeed = Mathf.Abs(obstacleRb.linearVelocity.x);
-            }
+                // ignora o próprio objeto do tronco
+                if (child == troncoClone.transform) continue;
 
-            // Trigger
-            TutorialObstacleTrigger trigger = troncoClone.GetComponentInChildren<TutorialObstacleTrigger>();
-            if (trigger == null)
-            {
-                Transform triggerTransform = troncoClone.transform.Find("JumpTrigger");
-                if (triggerTransform != null)
+                // testa se a layer do child está dentro do LayerMask configurado
+                if ((jumpTriggerLayer.value & (1 << child.gameObject.layer)) != 0)
                 {
-                    trigger = triggerTransform.gameObject.AddComponent<TutorialObstacleTrigger>();
+                    trigger = child.GetComponent<TutorialObstacleTrigger>();
+                    if (trigger == null)
+                    {
+                        // se o objeto não tiver o componente, adiciona-o
+                        trigger = child.gameObject.AddComponent<TutorialObstacleTrigger>();
+                    }
+                    break; // achou um trigger válido, pode sair do loop
                 }
             }
-
-            if (trigger != null)
-            {
-                trigger.tutorialManager = this;
-            }
-            else
-            {
-                Debug.LogWarning("[TutorialManager] Nenhum TutorialObstacleTrigger encontrado/adicionado no tronco!");
-            }
         }
-    
-        hasSpawned = true;
+
+        // 2) fallback: se não achou por layer, tenta achar componente existente automaticamente
+        if (trigger == null)
+        {
+            trigger = troncoClone.GetComponentInChildren<TutorialObstacleTrigger>();
+        }
+
+        if (trigger != null)
+        {
+            trigger.tutorialManager = this;
+        }
+        else
+        {
+            Debug.LogWarning("[TutorialManager] Nenhum TutorialObstacleTrigger encontrado/adicionado no tronco (procura por layer falhou).");
+        }
     }
+
+    hasSpawned = true;
+}
+
+
 
 
     /*private IEnumerator CaptureSpawnedObstacle()
@@ -534,13 +572,12 @@ public class TutorialManager : MonoBehaviour
 
     private void HandleObstacleSlowMotion()
     {
-        if (spawnedObstacle == null || obstacleRb == null || player == null || hasPassedObstacle)
+        if (spawnedObstacle == null || player == null || hasPassedObstacle)
             return;
 
-        // Calcula a distância entre o player e o obstáculo
         float distance = Vector3.Distance(player.transform.position, spawnedObstacle.transform.position);
+        // Debug.Log($"[TutorialManager] Distância para tronco: {distance}");
 
-        // Se estiver próximo o suficiente e ainda não ativou o slow motion
         if (distance <= slowMotionDistance && !isSlowMotionActive)
         {
             ActivateSlowMotion();
@@ -549,27 +586,35 @@ public class TutorialManager : MonoBehaviour
 
     private void ActivateSlowMotion()
     {
-        if (obstacleRb == null || isSlowMotionActive) return;
+        if (hasPassedObstacle || isSlowMotionActive) return;
+
+        if (obstacleMove == null)
+        {
+            Debug.LogWarning("[TutorialManager] Tentou ativar slow motion, mas ObstacleMove é nulo!");
+            return;
+        }
 
         isSlowMotionActive = true;
-        // Reduz a velocidade do obstáculo
-        obstacleRb.linearVelocity = new Vector2(-originalObstacleSpeed * slowMotionSpeed, obstacleRb.linearVelocity.y);
-        
-        Debug.Log($"[TutorialManager] Slow motion ativado! Velocidade: {originalObstacleSpeed} -> {originalObstacleSpeed * slowMotionSpeed}");
+        obstacleMove.SetSpeedMultiplier(slowMotionSpeed); // ex: 0.3f
+        Debug.Log($"[TutorialManager] Slow motion ativado! Multiplier = {slowMotionSpeed}");
     }
+
 
     public void OnPlayerPassedObstacle()
     {
-        if (obstacleRb == null || hasPassedObstacle) return;
+        if (hasPassedObstacle) return;
 
         hasPassedObstacle = true;
         isSlowMotionActive = false;
-        
-        // Restaura a velocidade original
-        obstacleRb.linearVelocity = new Vector2(-originalObstacleSpeed, obstacleRb.linearVelocity.y);
-        
-        Debug.Log($"[TutorialManager] Player passou! Velocidade restaurada: {originalObstacleSpeed}");
+
+        if (obstacleMove != null)
+        {
+            obstacleMove.ResetSpeedMultiplier();
+        }
+
+        Debug.Log("[TutorialManager] Player passou pelo tronco! Velocidade restaurada.");
     }
+
 
     // --------- Cena da General andando ----------
     public IEnumerator GeneralWalk()
