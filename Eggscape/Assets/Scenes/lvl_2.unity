@@ -9809,7 +9809,7 @@ MonoBehaviour:
   jumpSFX: {fileID: 8300000, guid: 849ff2e04f6f12344bf9d764f9100ceb, type: 3}
   logSFX: {fileID: 8300000, guid: e83c34a649e1af549ae4aa8813c26d0e, type: 3}
   deathSFX: {fileID: 8300000, guid: 2bbba8330c5685e488dd2552ac6b7288, type: 3}
-  explosionSFX: {fileID: 8300000, guid: 210bc3f1e643b1c43953f56ab6468dff, type: 3}
+  explosionSFX: {fileID: 8300000, guid: ce568ae9b90486646aae80bdcc22dc5d, type: 3}
   parrySFX: {fileID: 0}
   sfxSource: {fileID: 0}
   musicSource: {fileID: 0}
