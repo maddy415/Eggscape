@@ -9,10 +9,17 @@ public class MenuManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private GameObject settingsRoot;   // painel de configurações
     
-    [Header("Botões do Menu Principal")]
-    [SerializeField] private Button continueButton;     // Botão "Continue"
-    [SerializeField] private Button newGameButton;      // Botão "New Game"
-    [SerializeField] private Button levelSelectButton;  // Botão "Level Select"
+    [Header("Botões Progressivos (aparecem após tutorial)")]
+    [SerializeField] private GameObject continueButton;     // Botão "Continue" - OCULTO inicialmente
+    [SerializeField] private GameObject levelSelectButton;  // Botão "Level Select" - OCULTO inicialmente
+    
+    [Header("Botões Sempre Visíveis")]
+    [SerializeField] private Button newGameButton;          // Botão "New Game" - sempre visível
+
+    [Header("Configuração")]
+    [SerializeField] private string storySceneName = "story";      // Nome da cena de lore
+    [SerializeField] private string tutorialSceneName = "tutorial"; // Nome da cena de tutorial
+    [SerializeField] private int tutorialSceneIndex = 1;            // Índice do tutorial no Build Settings
 
     private SceneTransition transition;
 
@@ -30,66 +37,124 @@ public class MenuManager : MonoBehaviour
 
         transition = FindObjectOfType<SceneTransition>();
 
-        // Configura só o settings:
+        // Configura settings
         if (settingsRoot != null) settingsRoot.SetActive(false);
     }
 
     void Start()
     {
-        RefreshContinueButton();
+        RefreshMenuButtons();
     }
 
     // =====================================================
-    //   NOVO: SISTEMA DE CONTINUE
+    //   SISTEMA DE DESBLOQUEIO PROGRESSIVO DO MENU
     // =====================================================
 
     /// <summary>
-    /// Atualiza a visibilidade/interatividade do botão Continue.
+    /// Atualiza a visibilidade dos botões baseado no progresso do save.
     /// </summary>
-    private void RefreshContinueButton()
+    private void RefreshMenuButtons()
     {
-        if (continueButton == null) return;
+        bool hasSaveManager = SaveManager.Instance != null;
+        
+        if (!hasSaveManager)
+        {
+            Debug.LogWarning("[MenuManager] SaveManager não encontrado! Mostrando apenas New Game.");
+            ShowOnlyNewGameMenu();
+            return;
+        }
 
-        // Se existe save e o jogador passou da primeira fase
-        bool hasSave = SaveManager.Instance != null && SaveManager.Instance.GetLevelReached() > 0;
+        // Verifica se o jogador já passou do tutorial
+        int levelReached = SaveManager.Instance.GetLevelReached();
+        bool passedTutorial = levelReached > tutorialSceneIndex;
 
-        continueButton.gameObject.SetActive(hasSave);
-        continueButton.interactable = hasSave;
-
-        Debug.Log($"[MenuManager] Continue button: {(hasSave ? "ATIVO" : "INATIVO")}");
+        if (passedTutorial)
+        {
+            // Jogador veterano - mostra tudo
+            ShowFullMenu();
+            Debug.Log("[MenuManager] Jogador veterano detectado! Menu completo ativo.");
+        }
+        else
+        {
+            // Primeira vez ou ainda no tutorial - só New Game
+            ShowOnlyNewGameMenu();
+            Debug.Log("[MenuManager] Primeira vez jogando! Apenas New Game disponível.");
+        }
     }
 
     /// <summary>
-    /// Continua do último nível jogado.
+    /// Mostra apenas o botão New Game (primeira vez jogando).
+    /// </summary>
+    private void ShowOnlyNewGameMenu()
+    {
+        if (continueButton != null) 
+            continueButton.SetActive(false);
+        
+        if (levelSelectButton != null) 
+            levelSelectButton.SetActive(false);
+        
+        if (newGameButton != null) 
+            newGameButton.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// Mostra menu completo (Continue + Level Select + New Game).
+    /// </summary>
+    private void ShowFullMenu()
+    {
+        if (continueButton != null) 
+            continueButton.SetActive(true);
+        
+        if (levelSelectButton != null) 
+            levelSelectButton.SetActive(true);
+        
+        if (newGameButton != null) 
+            newGameButton.gameObject.SetActive(true);
+    }
+
+    // =====================================================
+    //   NAVEGAÇÃO DO MENU
+    // =====================================================
+
+    /// <summary>
+    /// New Game - sempre vai para a cena de lore (story).
+    /// </summary>
+    public void NewGame()
+    {
+        // Reseta o progresso para começar do zero
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.ResetProgress();
+            Debug.Log("[MenuManager] Novo jogo iniciado - progresso resetado.");
+        }
+
+        LoadSceneByName(storySceneName);
+    }
+
+    /// <summary>
+    /// Continue - vai para a última fase que o jogador parou.
     /// </summary>
     public void Continue()
     {
         if (SaveManager.Instance == null)
         {
             Debug.LogWarning("[MenuManager] SaveManager não encontrado!");
-            LoadGame(); // Fallback para primeira fase
+            NewGame(); // Fallback
             return;
         }
 
         int lastLevel = SaveManager.Instance.GetLevelReached();
-        
-        // Se completou tudo, volta para a última fase
-        // Se não, carrega a próxima fase não completada
         string sceneName = GetSceneNameByIndex(lastLevel);
 
         if (!string.IsNullOrEmpty(sceneName))
         {
-            if (transition != null) 
-                transition.LoadScene(sceneName);
-            else 
-                SceneManager.LoadScene(sceneName);
-
+            LoadSceneByName(sceneName);
             Debug.Log($"[MenuManager] Continue: Carregando {sceneName} (Index: {lastLevel})");
         }
         else
         {
             Debug.LogWarning($"[MenuManager] Cena com índice {lastLevel} não encontrada!");
-            LoadGame(); // Fallback
+            NewGame(); // Fallback
         }
     }
 
@@ -98,48 +163,31 @@ public class MenuManager : MonoBehaviour
     /// </summary>
     public void OpenLevelSelect()
     {
-        if (transition != null) 
-            transition.LoadScene("LevelSelect"); // Nome da sua cena de seleção
-        else 
-            SceneManager.LoadScene("LevelSelect");
-
-        Debug.Log("[MenuManager] Level Select aberto");
+        LoadSceneByName("lvl_selector");
     }
 
     // =====================================================
-    //   MÉTODOS ORIGINAIS
+    //   MÉTODOS ORIGINAIS (mantidos para compatibilidade)
     // =====================================================
 
     public void LoadGame()
     {
-        if (transition != null) transition.LoadScene("lvl_1");
-        else SceneManager.LoadScene("lvl_1");
-
-        Debug.Log("lvl_1 Loaded");
+        LoadSceneByName("lvl_1");
     }
 
     public void LoadStory()
     {
-        if (transition != null) transition.LoadScene("story");
-        else SceneManager.LoadScene("story");
-
-        Debug.Log("story Loaded");
+        LoadSceneByName(storySceneName);
     }
 
     public void LoadTutorial()
     {
-        if (transition != null) transition.LoadScene("tutorial");
-        else SceneManager.LoadScene("tutorial");
-
-        Debug.Log("tutorial Loaded");
+        LoadSceneByName(tutorialSceneName);
     }
 
     public void LoadGame2()
     {
-        if (transition != null) transition.LoadScene("lvl_2");
-        else SceneManager.LoadScene("lvl_2");
-
-        Debug.Log("lvl_2 Loaded");
+        LoadSceneByName("lvl_2");
     }
 
     // =====================================================
@@ -162,9 +210,16 @@ public class MenuManager : MonoBehaviour
     //   HELPERS
     // =====================================================
 
-    /// <summary>
-    /// Retorna o nome da cena baseado no índice do Build Settings.
-    /// </summary>
+    private void LoadSceneByName(string sceneName)
+    {
+        if (transition != null) 
+            transition.LoadScene(sceneName);
+        else 
+            SceneManager.LoadScene(sceneName);
+
+        Debug.Log($"[MenuManager] {sceneName} carregado");
+    }
+
     private string GetSceneNameByIndex(int index)
     {
         if (index < 0 || index >= SceneManager.sceneCountInBuildSettings)
@@ -175,19 +230,40 @@ public class MenuManager : MonoBehaviour
     }
 
     // =====================================================
-    //   DEBUG (OPCIONAL)
+    //   DEBUG (EDITOR ONLY)
     // =====================================================
 
 #if UNITY_EDITOR
-    [ContextMenu("Reset Save")]
-    private void DebugResetSave()
+    [ContextMenu("Debug: Simular Primeira Vez")]
+    private void DebugSimulateFirstTime()
     {
         if (SaveManager.Instance != null)
         {
             SaveManager.Instance.ResetProgress();
-            RefreshContinueButton();
-            Debug.Log("[MenuManager] Save resetado!");
+            RefreshMenuButtons();
+            Debug.Log("[DEBUG] Progresso resetado - simulando primeira vez!");
         }
+    }
+
+    [ContextMenu("Debug: Simular Veterano")]
+    private void DebugSimulateVeteran()
+    {
+        if (SaveManager.Instance != null)
+        {
+            // Simula que passou do tutorial
+            SaveData save = SaveManager.Instance.GetCurrentSave();
+            save.levelReached = tutorialSceneIndex + 1; // Passa do tutorial
+            SaveManager.Instance.SaveGame();
+            RefreshMenuButtons();
+            Debug.Log("[DEBUG] Simulando veterano - Continue/Level Select ativos!");
+        }
+    }
+
+    [ContextMenu("Debug: Refresh Menu")]
+    private void DebugRefreshMenu()
+    {
+        RefreshMenuButtons();
+        Debug.Log("[DEBUG] Menu atualizado manualmente!");
     }
 #endif
 }

@@ -705,25 +705,67 @@ public class TutorialManager : MonoBehaviour
     }
 
     // ======= TROCA DE CENA =======
-    private IEnumerator LoadNextSceneAfterDelay()
+    // ==========================================
+//   SUBSTITUA O MÉTODO LoadNextSceneAfterDelay() NO SEU TutorialManager.cs
+// ==========================================
+
+private IEnumerator LoadNextSceneAfterDelay()
+{
+    yield return new WaitForSeconds(delayBeforeSceneChange);
+
+    // ===== SALVAR PROGRESSO ANTES DE TROCAR DE CENA =====
+    if (SaveManager.Instance != null)
     {
-        yield return new WaitForSeconds(delayBeforeSceneChange);
-    
-        if (!string.IsNullOrWhiteSpace(nextSceneName))
+        // Pega o índice da cena atual (tutorial)
+        int tutorialSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        
+        // Calcula uma pontuação (pode ser 0 ou um valor fixo)
+        int tutorialScore = 0; // ou use algum sistema de score do tutorial
+        
+        // Marca o tutorial como completado e desbloqueia a próxima fase
+        SaveManager.Instance.CompleteLevel(tutorialSceneIndex, tutorialScore);
+        
+        Debug.Log($"✅ [TutorialManager] Tutorial completado! Save feito. LevelReached agora: {SaveManager.Instance.GetLevelReached()}");
+    }
+    else
+    {
+        Debug.LogError("❌ [TutorialManager] SaveManager NÃO ENCONTRADO! O progresso do tutorial NÃO será salvo.");
+    }
+    // ==================================================
+
+    if (!string.IsNullOrWhiteSpace(nextSceneName))
+    {
+        // Usa o SceneTransition se existir, senão carrega direto
+        if (SceneTransition.Instance != null)
         {
-            // Usa o SceneTransition se existir, senão carrega direto
-            if (SceneTransition.Instance != null)
-            {
-                SceneTransition.Instance.LoadScene(nextSceneName);
-            }
-            else
-            {
-                SceneManager.LoadScene(nextSceneName);
-            }
+            SceneTransition.Instance.LoadScene(nextSceneName);
         }
         else
         {
-            Debug.LogWarning("TutorialManager: Nome da próxima cena não foi configurado!");
+            SceneManager.LoadScene(nextSceneName);
         }
     }
+    else
+    {
+        Debug.LogWarning("TutorialManager: Nome da próxima cena não foi configurado!");
+    }
+}
+
+
+// ==========================================
+//   ADICIONE ESTE MÉTODO DE DEBUG (OPCIONAL)
+// ==========================================
+
+#if UNITY_EDITOR
+[ContextMenu("Debug: Forçar Completar Tutorial")]
+private void DebugCompleteTutorial()
+{
+    if (SaveManager.Instance != null)
+    {
+        int tutorialIndex = SceneManager.GetActiveScene().buildIndex;
+        SaveManager.Instance.CompleteLevel(tutorialIndex, 0);
+        Debug.Log($"[DEBUG] Tutorial forçado como completo! LevelReached: {SaveManager.Instance.GetLevelReached()}");
+    }
+}
+#endif
 }

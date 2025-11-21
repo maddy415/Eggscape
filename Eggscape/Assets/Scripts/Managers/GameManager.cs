@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
         groundRef.SetActive(false);
     
         frogJumper = GetComponent<FrogIdleJumper>();
-        frogJumper.enabled = true;
+        //frogJumper.enabled = true;
 
         if (groundRef != null) groundRef.SetActive(false);
         if (victoryText != null) victoryText.text = "";

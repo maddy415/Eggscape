@@ -846,7 +846,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95b9ebdfe3e35db4a9d61b792f971fa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalLevels: 10
+  totalLevels: 7
 --- !u!4 &1127670828
 Transform:
   m_ObjectHideFlags: 0
@@ -1184,7 +1184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e3d4b70696817445bd9996c17a40b5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelIndex: 5
+  levelIndex: 3
   sceneName: lvl_3
   button: {fileID: 1336925581}
   buttonImage: {fileID: 1336925582}
@@ -1552,7 +1552,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e3d4b70696817445bd9996c17a40b5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelIndex: 3
+  levelIndex: 1
   sceneName: lvl_1
   button: {fileID: 1582389713}
   buttonImage: {fileID: 1582389714}
@@ -2133,7 +2133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e3d4b70696817445bd9996c17a40b5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelIndex: 4
+  levelIndex: 2
   sceneName: lvl_2
   button: {fileID: 1873914895}
   buttonImage: {fileID: 1873914896}

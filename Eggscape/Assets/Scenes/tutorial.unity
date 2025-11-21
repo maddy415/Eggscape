@@ -9957,9 +9957,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vicCanvas: {fileID: 113985168}
-  frogJumper: {fileID: 0}
-  barn: {fileID: 0}
-  frog: {fileID: 0}
+  frogJumper: {fileID: 2035011614}
+  barn: {fileID: 1015488268}
+  frog: {fileID: 2035011613}
   spawnerLog: {fileID: 304386134}
   spawnerBird: {fileID: 1411324291}
   ground: {fileID: 881868767}
@@ -11842,6 +11842,93 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2012374324}
   m_CullTransparentMesh: 1
+--- !u!1 &2035011613
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2035011616}
+  - component: {fileID: 2035011615}
+  - component: {fileID: 2035011614}
+  m_Layer: 0
+  m_Name: a
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &2035011614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035011613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2b7a4a82d4d9a84dba792098980e6e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpForce: 9.5
+  speed: 3
+  minInterval: 2
+  maxInterval: 3
+  jumpOnAwake: 1
+  preJumpDelay: 0.35
+  groundCheck: {fileID: 0}
+  groundRadius: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  animator: {fileID: 0}
+  animTriggerPreJump: PreJump
+  animTriggerJump: Jump
+  animBoolGrounded: Grounded
+--- !u!50 &2035011615
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035011613}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!4 &2035011616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035011613}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -18.407887, y: -3.5770113, z: -0.044085674}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2052032091
 GameObject:
   m_ObjectHideFlags: 0
@@ -12550,3 +12637,4 @@ SceneRoots:
   - {fileID: 471556214}
   - {fileID: 1426985341}
   - {fileID: 5601547508024123873}
+  - {fileID: 2035011616}
