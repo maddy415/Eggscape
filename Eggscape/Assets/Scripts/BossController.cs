@@ -246,6 +246,14 @@ public class BossController : MonoBehaviour
     public AudioClip phaseChangeTheme;
     public AudioClip deathTheme;
 
+    [Header("Damage Feedback")]
+    [Tooltip("Cor do flash quando toma dano")]
+    public Color damageFlashColor = Color.white;
+    [Tooltip("Duração do flash de dano (em segundos)")]
+    public float damageFlashDuration = 0.15f;
+    [Tooltip("Número de vezes que a cor pisca")]
+    public int damageFlashBlinks = 2;
+
     #endregion
 
     #region Internals
@@ -286,8 +294,19 @@ public class BossController : MonoBehaviour
         if (chargeAnchor != null && chargeAnchorTrigger == null)
             chargeAnchorTrigger = chargeAnchor.GetComponent<Collider2D>();
 
-        if (bossSprite) originalSpriteColor = bossSprite.color;
+        // Captura cor e escala originais
+        if (bossSprite)
+        {
+            originalSpriteColor = bossSprite.color;
+            Debug.Log($"[Boss Awake] Cor original capturada: {originalSpriteColor}");
+        }
+        else
+        {
+            Debug.LogWarning("[Boss Awake] bossSprite está NULL! Cor não será alterada.");
+        }
+        
         originalScale = transform.localScale;
+        Debug.Log($"[Boss Awake] Escala original capturada: {originalScale}");
     }
 
     private void Start()
@@ -318,7 +337,8 @@ public class BossController : MonoBehaviour
     {
         AudioManager.audioInstance.Crossfade(bossTheme, 1f);
         invulnerable = true;
-        if (bossSprite) Flash(telegraphColor, introDuration);
+        
+        // Flash removido - não pisca mais na intro
 
         yield return new WaitForSeconds(introDuration);
 
@@ -529,6 +549,10 @@ public class BossController : MonoBehaviour
 
         // Executa animações durante o windup
         float elapsed = 0f;
+        
+        Debug.Log($"[Boss Windup] Iniciando loop de animação. Duration: {duration}s");
+        Debug.Log($"[Boss Windup] useColorTransition: {fx.useColorTransition}, useSquash: {fx.useSquash}, useScalePulse: {fx.useScalePulse}");
+        
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
@@ -538,15 +562,44 @@ public class BossController : MonoBehaviour
             if (fx.useColorTransition && bossSprite != null)
             {
                 float curveValue = fx.colorCurve.Evaluate(t);
-                bossSprite.color = Color.Lerp(originalSpriteColor, fx.targetColor, curveValue);
+                Color newColor = Color.Lerp(originalSpriteColor, fx.targetColor, curveValue);
+                bossSprite.color = newColor;
+                
+                // Log apenas a cada 0.1 segundos para não encher o console
+                if (Mathf.Abs(elapsed % 0.1f) < Time.deltaTime)
+                {
+                    Debug.Log($"[Boss Windup] t={t:F2}, curveValue={curveValue:F2}, cor={newColor}");
+                }
             }
 
-            // Pulse de escala
-            if (fx.useScalePulse)
+            // Pulse de escala (NÃO COMBINAR COM SQUASH!)
+            if (fx.useScalePulse && !fx.useSquash)
             {
                 float pulse = Mathf.Sin(elapsed * fx.scalePulseSpeed * Mathf.PI * 2f) * 0.5f + 0.5f;
                 float scaleMult = Mathf.Lerp(1f, fx.scalePulseAmount, pulse * t);
                 transform.localScale = originalScale * scaleMult;
+            }
+
+            // Squash (Amassamento Vertical)
+            if (fx.useSquash)
+            {
+                float squashAmount = fx.squashCurve.Evaluate(t);
+                
+                // Interpola entre escala normal e escala amassada
+                float scaleY = Mathf.Lerp(1f, fx.squashScaleY, squashAmount);
+                float scaleX = Mathf.Lerp(1f, fx.squashScaleX, squashAmount);
+                
+                Vector3 squashedScale = originalScale;
+                squashedScale.x *= scaleX;
+                squashedScale.y *= scaleY;
+                
+                transform.localScale = squashedScale;
+                
+                // Log apenas a cada 0.1 segundos
+                if (Mathf.Abs(elapsed % 0.1f) < Time.deltaTime)
+                {
+                    Debug.Log($"[Boss Windup] t={t:F2}, squashAmount={squashAmount:F2}, scale={squashedScale}");
+                }
             }
 
             // Screen shake
@@ -556,6 +609,15 @@ public class BossController : MonoBehaviour
             }
 
             yield return null;
+        }
+
+        Debug.Log("[Boss Windup] Loop de animação completo!");
+
+        // Se releaseSquashAtEnd estiver ativo, retorna à escala normal
+        if (fx.useSquash && fx.releaseSquashAtEnd)
+        {
+            transform.localScale = originalScale;
+            Debug.Log($"[Boss Windup] Restaurando escala para: {originalScale}");
         }
 
         // LIMPA EFEITOS IMEDIATAMENTE APÓS O WINDUP
@@ -598,8 +660,8 @@ public class BossController : MonoBehaviour
             bossSprite.color = originalSpriteColor;
         }
 
-        // Restaura escala original
-        if (fx.useScalePulse)
+        // Restaura escala original (sempre restaura no cleanup)
+        if (fx.useScalePulse || fx.useSquash)
         {
             transform.localScale = originalScale;
         }
@@ -632,6 +694,8 @@ public class BossController : MonoBehaviour
     private IEnumerator ExecuteAttack(Attack a)
     {
         // ===== EXECUTA EFEITOS DO WINDUP =====
+        // NOTA: Não use Flash() aqui, pois conflita com windupEffects.useColorTransition
+        // Se você quiser o flash antigo, desative useColorTransition no windupEffects
         yield return StartCoroutine(PlayWindupEffects(a.windupEffects, a.windup));
         // =====================================
 
@@ -1093,9 +1157,54 @@ public class BossController : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        if (dead || invulnerable) return;
+        Debug.Log($"[Boss] TakeDamage chamado! Amount: {amount}, Dead: {dead}, Invulnerable: {invulnerable}");
+        
+        if (dead || invulnerable)
+        {
+            Debug.Log("[Boss] Dano ignorado (morto ou invulnerável)");
+            return;
+        }
+        
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Abs(amount));
+        Debug.Log($"[Boss] HP: {currentHealth}/{maxHealth}");
+        
+        // Flash de dano
+        if (bossSprite != null && damageFlashDuration > 0f)
+        {
+            Debug.Log("[Boss] Iniciando damage flash!");
+            StartCoroutine(DamageFlash());
+        }
+        else
+        {
+            if (bossSprite == null) Debug.LogWarning("[Boss] bossSprite está NULL, não pode fazer flash!");
+            if (damageFlashDuration <= 0f) Debug.LogWarning("[Boss] damageFlashDuration está 0 ou negativo!");
+        }
+        
         if (currentHealth <= 0) Die();
+    }
+
+    /// <summary>
+    /// Efeito de flash rápido quando o boss toma dano
+    /// </summary>
+    private IEnumerator DamageFlash()
+    {
+        Color originalColor = bossSprite.color;
+        Debug.Log($"[Boss Flash] Cor original: {originalColor}, cor de dano: {damageFlashColor}");
+        
+        for (int i = 0; i < damageFlashBlinks; i++)
+        {
+            // Pisca para a cor de dano
+            bossSprite.color = damageFlashColor;
+            yield return new WaitForSeconds(damageFlashDuration / (damageFlashBlinks * 2f));
+            
+            // Volta para a cor original
+            bossSprite.color = originalColor;
+            yield return new WaitForSeconds(damageFlashDuration / (damageFlashBlinks * 2f));
+        }
+        
+        // Garante que termina na cor original
+        bossSprite.color = originalColor;
+        Debug.Log("[Boss Flash] Flash de dano completo!");
     }
 
     private void Die()
