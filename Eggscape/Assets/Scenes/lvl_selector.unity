@@ -1065,7 +1065,7 @@ GameObject:
   - component: {fileID: 1336925581}
   - component: {fileID: 1336925584}
   m_Layer: 5
-  m_Name: lvl_2
+  m_Name: lvl_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1189,7 +1189,7 @@ MonoBehaviour:
   sceneName: lvl_3
   button: {fileID: 1336925581}
   buttonImage: {fileID: 1336925582}
-  levelText: {fileID: 1792891377}
+  levelText: {fileID: 0}
   lockIcon: {fileID: 0}
   checkIcon: {fileID: 0}
   useCustomColors: 1
@@ -1557,7 +1557,7 @@ MonoBehaviour:
   sceneName: lvl_1
   button: {fileID: 1582389713}
   buttonImage: {fileID: 1582389714}
-  levelText: {fileID: 1872990775}
+  levelText: {fileID: 0}
   lockIcon: {fileID: 1059169259}
   checkIcon: {fileID: 1520915262}
   useCustomColors: 1
@@ -2138,7 +2138,7 @@ MonoBehaviour:
   sceneName: lvl_2
   button: {fileID: 1873914895}
   buttonImage: {fileID: 1873914896}
-  levelText: {fileID: 1075885059}
+  levelText: {fileID: 0}
   lockIcon: {fileID: 0}
   checkIcon: {fileID: 0}
   useCustomColors: 1
@@ -2283,7 +2283,7 @@ MonoBehaviour:
   sceneName: tutorial
   button: {fileID: 2032625685}
   buttonImage: {fileID: 2032625686}
-  levelText: {fileID: 454327994}
+  levelText: {fileID: 0}
   lockIcon: {fileID: 0}
   checkIcon: {fileID: 0}
   useCustomColors: 1

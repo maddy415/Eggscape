@@ -14,7 +14,7 @@ public static class LevelIndexMapper
     /// Build Index da PRIMEIRA fase jogável (lvl_1).
     /// No seu caso, provavelmente é 3 (depois de MainMenu, story, tutorial).
     /// </summary>
-    public const int FIRST_LEVEL_BUILD_INDEX = 3;
+    public const int FIRST_LEVEL_BUILD_INDEX = 2;
 
     // ====================================
     //   MÉTODOS DE CONVERSÃO
