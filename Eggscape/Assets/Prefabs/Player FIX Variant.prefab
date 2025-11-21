@@ -121,9 +121,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5178038782234751267}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: sprite
+      value: 
+      objectReference: {fileID: 2506496685126979600}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: kbForce
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: obsMove
+      value: 
+      objectReference: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: attackCD
       value: 1
@@ -168,6 +176,10 @@ PrefabInstance:
       propertyPath: bodyCollider
       value: 
       objectReference: {fileID: 5178038782234751267}
+    - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+      propertyPath: obstacleMove
+      value: 
+      objectReference: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
     - target: {fileID: 3838078916985751798, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
       propertyPath: attackAirTime
       value: 0.2
@@ -264,6 +276,11 @@ PrefabInstance:
       addedObject: {fileID: 5270507117092303834}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+--- !u!212 &2506496685126979600 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 6512184536916511377, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}
+  m_PrefabInstance: {fileID: 8689466927833373313}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3089985569905209911 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5942189237180508342, guid: 7860feece130bb84388e21676f3d3dfb, type: 3}

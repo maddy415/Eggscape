@@ -3409,6 +3409,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1305202521}
     - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: obsMove
+      value: 
+      objectReference: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
       propertyPath: landSquashX
       value: 2
       objectReference: {fileID: 0}
@@ -3428,6 +3432,10 @@ PrefabInstance:
       propertyPath: jumpStretchY
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: obstacleMove
+      value: 
+      objectReference: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
     - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
       propertyPath: stretchReturnSpeed
       value: 10
@@ -8899,6 +8907,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.8
+  speedMultiplier: 1
   currentSegment: {fileID: 0}
 --- !u!212 &1763577833
 SpriteRenderer:
@@ -10182,6 +10191,8 @@ MonoBehaviour:
   musicSource: {fileID: 0}
   sfxVolume: 1
   musicVolume: 1
+  levelMusics: []
+  autoPlayLevelMusicOnLoad: 1
 --- !u!4 &1941320289
 Transform:
   m_ObjectHideFlags: 0

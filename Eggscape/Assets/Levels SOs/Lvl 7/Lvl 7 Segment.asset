@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Lvl 7 Segment
   m_EditorClassIdentifier: 
   patternsToSpawn: 5
-  velocidade: 10.5
-  birdSpeed: 15.5
-  patternTier: {fileID: 11400000, guid: d47c7ee44501f8b45bd0d483a36dd826, type: 2}
+  velocidade: 11
+  birdSpeed: 16
+  patternTier: {fileID: 11400000, guid: 9b38d7c1b85c18349929bca2f48561ef, type: 2}

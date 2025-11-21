@@ -6527,6 +6527,8 @@ MonoBehaviour:
   musicSource: {fileID: 0}
   sfxVolume: 1
   musicVolume: 1
+  levelMusics: []
+  autoPlayLevelMusicOnLoad: 1
 --- !u!4 &1941320289
 Transform:
   m_ObjectHideFlags: 0
@@ -7918,6 +7920,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: obsMove
+      value: 
+      objectReference: {fileID: 2307795958833386355, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
+    - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
+      propertyPath: obstacleMove
+      value: 
+      objectReference: {fileID: 6634151051270932229, guid: ab0927cc7ee09224baa0c81ff73c6d14, type: 3}
     - target: {fileID: 5608292503772549751, guid: 1a32a42b18a2f3a4291e15f1e3fdb134, type: 3}
       propertyPath: attackSpinSpeed
       value: 1400
