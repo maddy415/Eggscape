@@ -64,6 +64,22 @@ public class BossController : MonoBehaviour
         [Tooltip("Velocidade da pulsação (ciclos por segundo)")]
         public float scalePulseSpeed = 4f;
 
+        [Header("Squash (Amassamento Vertical)")]
+        [Tooltip("Amassar o boss verticalmente durante windup? (bom para pulos)")]
+        public bool useSquash = false;
+        
+        [Tooltip("Escala Y no ponto máximo do amassamento (ex: 0.6 = 40% mais baixo)")]
+        [Range(0.3f, 1f)] public float squashScaleY = 0.7f;
+        
+        [Tooltip("Escala X quando amassado (ex: 1.3 = 30% mais largo para compensar)")]
+        [Range(1f, 2f)] public float squashScaleX = 1.2f;
+        
+        [Tooltip("Curva de animação do squash (0=normal, 1=amassado máximo)")]
+        public AnimationCurve squashCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+        
+        [Tooltip("Retornar à escala normal no final do windup? (false = mantém amassado)")]
+        public bool releaseSquashAtEnd = false;
+
         [Header("Animation")]
         [Tooltip("Nome do trigger/bool no Animator para ativar")]
         public string animatorTrigger = "";
@@ -552,9 +568,12 @@ public class BossController : MonoBehaviour
     /// </summary>
     private void CleanupWindupEffects(WindupEffects fx)
     {
+        if (fx == null) return;
+
         // Desativa GameObject específico
         if (fx.objectToActivate != null && fx.deactivateAfterWindup)
         {
+            Debug.Log($"[Boss Windup] Desativando objeto: {fx.objectToActivate.name}");
             fx.objectToActivate.SetActive(false);
         }
 
@@ -568,6 +587,7 @@ public class BossController : MonoBehaviour
                 ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
             
+            Debug.Log($"[Boss Windup] Destruindo efeito visual: {currentWindupEffect.name}");
             Destroy(currentWindupEffect);
             currentWindupEffect = null;
         }
