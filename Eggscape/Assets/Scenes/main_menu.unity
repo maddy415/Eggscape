@@ -1522,7 +1522,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "CR\xC9DITOS"
+  m_text: SAIR DO JOGO
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 62102bca9222e15489942397abccb453, type: 2}
   m_sharedMaterial: {fileID: -4661961131466843048, guid: 62102bca9222e15489942397abccb453, type: 2}
@@ -2991,7 +2991,7 @@ GameObject:
   - component: {fileID: 1560792028}
   - component: {fileID: 1560792027}
   m_Layer: 5
-  m_Name: Credits
+  m_Name: Quit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
