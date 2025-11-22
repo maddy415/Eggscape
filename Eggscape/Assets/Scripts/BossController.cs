@@ -287,6 +287,7 @@ public class BossController : MonoBehaviour
     private Color originalSpriteColor;
     private Vector3 originalScale;
     private Coroutine windupEffectCoroutine;
+    private WindupEffects currentWindupFX; // Armazena o windup atual para cleanup forçado
     #endregion
 
     #region Unity
@@ -339,6 +340,17 @@ public class BossController : MonoBehaviour
     public void StartBossFight()
     {
         if (dead) return;
+        
+        // ===== GARANTIA: RESETA COR E ESCALA ANTES DA LUTA =====
+        if (bossSprite != null)
+        {
+            bossSprite.color = originalSpriteColor;
+            Debug.Log($"[Boss Fight] Cor resetada para: {originalSpriteColor}");
+        }
+        transform.localScale = originalScale;
+        Debug.Log($"[Boss Fight] Escala resetada para: {originalScale}");
+        // =======================================================
+        
         BeginIntro();
     }
 
@@ -440,6 +452,10 @@ public class BossController : MonoBehaviour
             yield break;
         }
 
+        // Salva a cor ANTES do tutorial começar
+        Color colorBeforeTutorial = bossSprite != null ? bossSprite.color : originalSpriteColor;
+        Debug.Log($"[Boss Tutorial] Cor antes do tutorial: {colorBeforeTutorial}");
+
         float tutorialWindup = chargeAttack.windup * cutsceneManager.parryWindupMultiplier;
 
         // ===== INICIA EFEITOS DO WINDUP =====
@@ -500,13 +516,26 @@ public class BossController : MonoBehaviour
         isChargingDash = false;
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
-        // ===== FORÇA RESTAURAÇÃO DA COR ORIGINAL APÓS TUTORIAL =====
+        // ===== FORÇA RESTAURAÇÃO DA COR (GARANTIA SEGURA) =====
+        // 1. Tenta restaurar para a cor original do jogo
         if (bossSprite != null)
         {
             bossSprite.color = originalSpriteColor;
-            Debug.Log($"[Boss] Tutorial dash finalizado! Cor restaurada para: {originalSpriteColor}");
+            Debug.Log($"[Boss Tutorial] Cor restaurada para ORIGINAL: {originalSpriteColor}");
         }
-        // ===========================================================
+        
+        // 2. Garante que o GameObject de efeito foi destruído
+        if (currentWindupEffect != null)
+        {
+            Destroy(currentWindupEffect);
+            currentWindupEffect = null;
+            Debug.Log("[Boss Tutorial] Efeito visual destruído manualmente");
+        }
+        
+        // 3. Restaura escala original
+        transform.localScale = originalScale;
+        Debug.Log($"[Boss Tutorial] Escala restaurada para: {originalScale}");
+        // ========================================================
 
         Debug.Log("[Boss] Tutorial dash finalizado!");
     }
@@ -522,7 +551,18 @@ public class BossController : MonoBehaviour
     {
         if (fx == null) yield break;
 
-        // Salva a cor ATUAL (não a original!) para restaurar depois
+        // Armazena referência do windup atual para poder cancelar se necessário
+        currentWindupFX = fx;
+
+        // CRÍTICO: Sempre restaura para a cor ORIGINAL primeiro
+        // Isso evita que o boss fique "preso" em uma cor de windup anterior
+        if (bossSprite != null && fx.useColorTransition)
+        {
+            bossSprite.color = originalSpriteColor;
+            Debug.Log($"[Boss Windup] Resetando cor para ORIGINAL antes do windup: {originalSpriteColor}");
+        }
+
+        // Salva a cor ATUAL (agora sempre será a original) para restaurar depois
         Color colorBeforeWindup = bossSprite != null ? bossSprite.color : Color.white;
 
         // Ativa GameObject específico
@@ -649,6 +689,9 @@ public class BossController : MonoBehaviour
         // LIMPA EFEITOS IMEDIATAMENTE APÓS O WINDUP
         Debug.Log("[Boss Windup] Windup completo, limpando efeitos...");
         CleanupWindupEffects(fx, colorBeforeWindup);
+        
+        // Limpa referência
+        currentWindupFX = null;
     }
 
     /// <summary>
@@ -680,11 +723,12 @@ public class BossController : MonoBehaviour
             currentWindupEffect = null;
         }
 
-        // Restaura cor (usa a cor que foi salva ANTES do windup começar)
+        // SEMPRE restaura para a cor ORIGINAL (não a cor "anterior")
+        // Isso garante que o boss nunca fique preso em vermelho
         if (fx.useColorTransition && bossSprite != null)
         {
-            bossSprite.color = colorToRestore;
-            Debug.Log($"[Boss Windup] Restaurando cor para: {colorToRestore}");
+            bossSprite.color = originalSpriteColor;
+            Debug.Log($"[Boss Windup] Restaurando cor para ORIGINAL: {originalSpriteColor}");
         }
 
         // Restaura escala original (sempre restaura no cleanup)
@@ -1248,10 +1292,10 @@ public class BossController : MonoBehaviour
             yield break;
         }
 
-        // CRÍTICO: Salva a cor ATUAL (não a original!)
-        // Porque o boss pode estar vermelho, verde, etc.
-        Color colorBeforeFlash = bossSprite.color;
-        Debug.Log($"[Boss Flash] Iniciando! Cor ANTES do flash: {colorBeforeFlash}, cor de dano: {damageFlashColor}, blinks: {damageFlashBlinks}");
+        // CRÍTICO: Usa a cor ORIGINAL como base do flash
+        // Não importa se o boss está vermelho, verde, etc - sempre pisca da ORIGINAL
+        Color colorBeforeFlash = originalSpriteColor;
+        Debug.Log($"[Boss Flash] Iniciando! Cor base (ORIGINAL): {colorBeforeFlash}, cor de dano: {damageFlashColor}, blinks: {damageFlashBlinks}");
         
         float blinkTime = damageFlashDuration / (damageFlashBlinks * 2f);
         Debug.Log($"[Boss Flash] Tempo de cada blink: {blinkTime}s");
@@ -1263,13 +1307,13 @@ public class BossController : MonoBehaviour
             Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Mudando para cor de dano");
             yield return new WaitForSeconds(blinkTime);
             
-            // Volta para a cor que tinha antes
+            // Volta para a cor ORIGINAL (não a cor que estava antes!)
             bossSprite.color = colorBeforeFlash;
-            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Voltando para cor anterior");
+            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Voltando para cor ORIGINAL");
             yield return new WaitForSeconds(blinkTime);
         }
         
-        // Garante que termina na cor que tinha antes
+        // Garante que termina na cor ORIGINAL
         bossSprite.color = colorBeforeFlash;
         Debug.Log($"[Boss Flash] Flash de dano completo! Cor final: {colorBeforeFlash}");
     }
@@ -1503,6 +1547,17 @@ public class BossController : MonoBehaviour
         if (playerComp != null)
         {
             dmg = Mathf.Max(0f, playerComp.attackDamage);
+            
+            // ===== LIMPA EFEITOS DO WINDUP IMEDIATAMENTE =====
+            // Força limpeza dos efeitos visuais antes de aplicar dano
+            if (currentWindupFX != null)
+            {
+                Debug.Log("[Boss] Dash cancelado! Limpando efeitos do windup...");
+                CleanupWindupEffects(currentWindupFX, originalSpriteColor);
+                currentWindupFX = null;
+            }
+            // =================================================
+            
             TakeDamage(dmg);
             Debug.Log($"[Boss] Dash CANCELADO por ataque do player. Dano: {dmg} | HP: {currentHealth}/{maxHealth}");
         }
