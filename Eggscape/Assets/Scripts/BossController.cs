@@ -255,6 +255,20 @@ public class BossController : MonoBehaviour
     [Tooltip("Número de vezes que a cor pisca")]
     public int damageFlashBlinks = 2;
 
+    [Header("Death Sequence")]
+    [Tooltip("Animação de morte do boss (se usar Animator)")]
+    public string deathAnimationTrigger = "Death";
+    [Tooltip("Animação após o diálogo de morte")]
+    public string postDialogueAnimationTrigger = "PostDeath";
+    [Tooltip("Delay antes de iniciar o diálogo de morte")]
+    public float delayBeforeDeathDialogue = 1f;
+    [Tooltip("Diálogo que aparece quando o boss morre")]
+    public List<DialogueSystem.DialogueLine> deathDialogue;
+    [Tooltip("Nome ou índice da próxima cena (deixe vazio para próxima cena)")]
+    public string nextSceneName = "";
+    [Tooltip("Se true, usa nextSceneName. Se false, carrega próxima cena por índice")]
+    public bool useSceneName = false;
+
     #endregion
 
     #region Internals
@@ -486,6 +500,14 @@ public class BossController : MonoBehaviour
         isChargingDash = false;
         rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
+        // ===== FORÇA RESTAURAÇÃO DA COR ORIGINAL APÓS TUTORIAL =====
+        if (bossSprite != null)
+        {
+            bossSprite.color = originalSpriteColor;
+            Debug.Log($"[Boss] Tutorial dash finalizado! Cor restaurada para: {originalSpriteColor}");
+        }
+        // ===========================================================
+
         Debug.Log("[Boss] Tutorial dash finalizado!");
     }
 
@@ -499,6 +521,9 @@ public class BossController : MonoBehaviour
     private IEnumerator PlayWindupEffects(WindupEffects fx, float duration)
     {
         if (fx == null) yield break;
+
+        // Salva a cor ATUAL (não a original!) para restaurar depois
+        Color colorBeforeWindup = bossSprite != null ? bossSprite.color : Color.white;
 
         // Ativa GameObject específico
         if (fx.objectToActivate != null)
@@ -623,13 +648,13 @@ public class BossController : MonoBehaviour
 
         // LIMPA EFEITOS IMEDIATAMENTE APÓS O WINDUP
         Debug.Log("[Boss Windup] Windup completo, limpando efeitos...");
-        CleanupWindupEffects(fx);
+        CleanupWindupEffects(fx, colorBeforeWindup);
     }
 
     /// <summary>
     /// Remove todos os efeitos visuais criados no windup
     /// </summary>
-    private void CleanupWindupEffects(WindupEffects fx)
+    private void CleanupWindupEffects(WindupEffects fx, Color colorToRestore)
     {
         if (fx == null) return;
 
@@ -655,10 +680,11 @@ public class BossController : MonoBehaviour
             currentWindupEffect = null;
         }
 
-        // Restaura cor original
+        // Restaura cor (usa a cor que foi salva ANTES do windup começar)
         if (fx.useColorTransition && bossSprite != null)
         {
-            bossSprite.color = originalSpriteColor;
+            bossSprite.color = colorToRestore;
+            Debug.Log($"[Boss Windup] Restaurando cor para: {colorToRestore}");
         }
 
         // Restaura escala original (sempre restaura no cleanup)
@@ -1222,8 +1248,10 @@ public class BossController : MonoBehaviour
             yield break;
         }
 
-        Color originalColor = bossSprite.color;
-        Debug.Log($"[Boss Flash] Iniciando! Cor original: {originalColor}, cor de dano: {damageFlashColor}, blinks: {damageFlashBlinks}");
+        // CRÍTICO: Salva a cor ATUAL (não a original!)
+        // Porque o boss pode estar vermelho, verde, etc.
+        Color colorBeforeFlash = bossSprite.color;
+        Debug.Log($"[Boss Flash] Iniciando! Cor ANTES do flash: {colorBeforeFlash}, cor de dano: {damageFlashColor}, blinks: {damageFlashBlinks}");
         
         float blinkTime = damageFlashDuration / (damageFlashBlinks * 2f);
         Debug.Log($"[Boss Flash] Tempo de cada blink: {blinkTime}s");
@@ -1232,26 +1260,132 @@ public class BossController : MonoBehaviour
         {
             // Pisca para a cor de dano
             bossSprite.color = damageFlashColor;
-            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Cor branca");
+            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Mudando para cor de dano");
             yield return new WaitForSeconds(blinkTime);
             
-            // Volta para a cor original
-            bossSprite.color = originalColor;
-            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Cor original");
+            // Volta para a cor que tinha antes
+            bossSprite.color = colorBeforeFlash;
+            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Voltando para cor anterior");
             yield return new WaitForSeconds(blinkTime);
         }
         
-        // Garante que termina na cor original
-        bossSprite.color = originalColor;
-        Debug.Log("[Boss Flash] Flash de dano completo!");
+        // Garante que termina na cor que tinha antes
+        bossSprite.color = colorBeforeFlash;
+        Debug.Log($"[Boss Flash] Flash de dano completo! Cor final: {colorBeforeFlash}");
     }
 
     private void Die()
     {
+        if (dead) return; // Evita múltiplas chamadas
+        
         dead = true;
         StopAllCoroutines();
         rb.linearVelocity = Vector2.zero;
-        gameObject.SetActive(false);
+        
+        // NÃO desativa o GameObject - inicia sequência de morte
+        StartCoroutine(DeathSequence());
+    }
+
+    /// <summary>
+    /// Sequência completa de morte: animação → diálogo → animação final → transição
+    /// </summary>
+    private IEnumerator DeathSequence()
+    {
+        Debug.Log("[Boss] Iniciando sequência de morte...");
+
+        // Toca música de morte
+        if (deathTheme != null && AudioManager.audioInstance != null)
+        {
+            AudioManager.audioInstance.Crossfade(deathTheme, 1f);
+        }
+
+        // Desabilita controles do player
+        if (playerScript != null)
+        {
+            playerScript.CanMove = false;
+            playerScript.canAttack = false;
+        }
+
+        // Toca animação de morte
+        if (bossAnimator != null && !string.IsNullOrEmpty(deathAnimationTrigger))
+        {
+            bossAnimator.SetTrigger(deathAnimationTrigger);
+            Debug.Log($"[Boss] Tocando animação: {deathAnimationTrigger}");
+        }
+
+        // Delay antes do diálogo
+        yield return new WaitForSeconds(delayBeforeDeathDialogue);
+
+        // Inicia diálogo de morte (se existir)
+        if (deathDialogue != null && deathDialogue.Count > 0 && DialogueSystem.Instance != null)
+        {
+            Debug.Log("[Boss] Iniciando diálogo de morte...");
+            bool dialogueDone = false;
+            DialogueSystem.Instance.StartDialogue(deathDialogue, () => dialogueDone = true);
+            
+            // Aguarda o diálogo terminar
+            yield return new WaitUntil(() => dialogueDone);
+            Debug.Log("[Boss] Diálogo de morte concluído!");
+        }
+
+        // Toca animação pós-diálogo (se configurada)
+        if (bossAnimator != null && !string.IsNullOrEmpty(postDialogueAnimationTrigger))
+        {
+            bossAnimator.SetTrigger(postDialogueAnimationTrigger);
+            Debug.Log($"[Boss] Tocando animação pós-diálogo: {postDialogueAnimationTrigger}");
+            yield return new WaitForSeconds(1f); // Tempo para a animação começar
+        }
+
+        // Transição de cena com fade
+        LoadNextScene();
+    }
+
+    /// <summary>
+    /// Carrega a próxima cena com fade (usando SceneTransition)
+    /// </summary>
+    private void LoadNextScene()
+    {
+        Debug.Log("[Boss] Carregando próxima cena...");
+
+        if (SceneTransition.Instance != null)
+        {
+            if (useSceneName && !string.IsNullOrEmpty(nextSceneName))
+            {
+                Debug.Log($"[Boss] Carregando cena: {nextSceneName}");
+                SceneTransition.Instance.LoadScene(nextSceneName);
+            }
+            else
+            {
+                int currentIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+                int nextIndex = currentIndex + 1;
+                
+                if (nextIndex < UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings)
+                {
+                    Debug.Log($"[Boss] Carregando próxima cena (índice {nextIndex})");
+                    SceneTransition.Instance.LoadScene(nextIndex);
+                }
+                else
+                {
+                    Debug.LogWarning("[Boss] Não há próxima cena! Voltando para o menu principal...");
+                    SceneTransition.Instance.LoadScene(0); // Volta para a primeira cena (geralmente menu)
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("[Boss] SceneTransition não encontrado! Carregando cena sem fade.");
+            
+            if (useSceneName && !string.IsNullOrEmpty(nextSceneName))
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene(nextSceneName);
+            }
+            else
+            {
+                int currentIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+                int nextIndex = currentIndex + 1;
+                UnityEngine.SceneManagement.SceneManager.LoadScene(nextIndex);
+            }
+        }
     }
 
     #endregion
