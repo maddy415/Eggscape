@@ -8451,6 +8451,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4507772715556512425}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathTheme
+      value: 
+      objectReference: {fileID: 8300000, guid: 86cd773e10aacef4a817a75d8418be8b, type: 3}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: scythePool
       value: 
       objectReference: {fileID: 648080742}
@@ -8560,7 +8564,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.size
-      value: 9
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].timeLimit
@@ -8584,7 +8588,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[4].text
-      value: Cala boca.
+      value: Cala a boca.
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[5].text
@@ -8592,17 +8596,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[6].text
-      value: "A \xFAltima coisa que eu quero agora \xE9 a sua compaix\xE3o vazia."
+      value: "\xC9 at\xE9 engra\xE7ado, sabia? "
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[7].text
-      value: "\xC9 engra\xE7ado, sabia? Voc\xEA e suas irm\xE3s podem at\xE9 sairem
-        vitoriosas daqui."
+      value: "Voc\xEA e suas irm\xE3s podem at\xE9 sair vitoriosas daqui."
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[8].text
-      value: "Mas o que aconteceu aqui nunca vai sair da sua cabe\xE7a. O fato de
-        que voc\xEA me matou..."
+      value: "Mas voc\xEA nunca vai conseguir se livrar desse peso..."
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[9].text
+      value: Do peso de ter me matado.
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].hpThreshold
@@ -8642,6 +8648,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[8].speakerName
+      value: "Plum\xEDdia"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[9].speakerName
       value: "Plum\xEDdia"
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
