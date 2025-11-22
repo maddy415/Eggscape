@@ -67,6 +67,7 @@ public class Player : MonoBehaviour
     [SerializeField] private bool canMove = true;
     [HideInInspector] public bool canJump = true;
     [HideInInspector] public bool canAttack = true;  // PÚBLICO - controlado pela cutscene
+    [HideInInspector] public bool playerisAlive = true;
 
     [Header("Misc.")]
     [SerializeField] private float torqueForce;
@@ -563,8 +564,9 @@ public class Player : MonoBehaviour
             return;
         }
         // =======================
-
+        
         GameManager.Instance.playerAlive = false;
+        playerisAlive = false;
         Debug.Log("morreu burro");
         GameManager.Instance.StopScene();
         Death();

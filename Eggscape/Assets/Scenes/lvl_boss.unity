@@ -9422,6 +9422,10 @@ PrefabInstance:
       value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: playerDeathCanvas
+      value: 
+      objectReference: {fileID: 522583417}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: damageFlashColor.b
       value: 0.19215684
       objectReference: {fileID: 0}

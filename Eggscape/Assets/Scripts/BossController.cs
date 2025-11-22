@@ -12,6 +12,7 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Rigidbody2D))]
 public class BossController : MonoBehaviour
 {
+    public static BossController instance;
     #region Tipos de dados (Inspector)
 
     public enum AttackType { Charge, JumpSmash, JumpSuperHigh, BulletHell }
@@ -269,6 +270,10 @@ public class BossController : MonoBehaviour
     [Tooltip("Se true, usa nextSceneName. Se false, carrega próxima cena por índice")]
     public bool useSceneName = false;
 
+    [Header("Player Death")]
+    [Tooltip("Canvas de Game Over que aparece quando o player morre")]
+    public GameObject playerDeathCanvas;
+
     /// <summary>
     /// Extensão de DialogueLine com suporte para cor customizada do texto
     /// </summary>
@@ -364,6 +369,21 @@ public class BossController : MonoBehaviour
         if (playerScript == null && player != null)
         {
             playerScript = player.GetComponent<Player>();
+        }
+        
+        // Garante que o canvas de morte está desativado no início
+        if (playerDeathCanvas != null)
+        {
+            playerDeathCanvas.SetActive(false);
+        }
+    }
+
+    private void Update()
+    {
+        // Verifica se o player morreu durante a luta
+        if (playerScript != null && !playerScript.playerisAlive && !dead)
+        {
+            OnPlayerDeath();
         }
     }
 
@@ -1515,6 +1535,39 @@ public class BossController : MonoBehaviour
                 int nextIndex = currentIndex + 1;
                 UnityEngine.SceneManagement.SceneManager.LoadScene(nextIndex);
             }
+        }
+    }
+
+    #endregion
+
+    #region Player Death Handler
+
+    /// <summary>
+    /// Chamado quando o player morre durante a luta do boss
+    /// </summary>
+    public void OnPlayerDeath()
+    {
+        Debug.Log("[Boss] Player morreu! Mostrando canvas de morte...");
+        
+        // Para todos os ataques do boss
+        StopAllCoroutines();
+        rb.linearVelocity = Vector2.zero;
+        
+        // Mostra o canvas de morte
+        if (playerDeathCanvas != null)
+        {
+            playerDeathCanvas.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("[Boss] playerDeathCanvas não está configurado no Inspector!");
+        }
+        
+        // Para a música do boss (opcional)
+        if (AudioManager.audioInstance != null && deathTheme != null)
+        {
+            // Você pode tocar uma música de game over aqui se quiser
+            // AudioManager.audioInstance.Crossfade(gameOverMusic, 1f);
         }
     }
 
