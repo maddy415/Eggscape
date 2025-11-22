@@ -234,7 +234,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -616}
+  m_AnchoredPosition: {x: -534, y: -652}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &195461346
@@ -279,7 +279,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "CR\xC9DITOS"
+  m_text: "CR\xC9DITOS\n\n\n\nARTE: Lu\xEDs Philipe Dantas Maia\n\nPROGRAMA\xC7\xC3O:
+    Lu\xEDs Philipe Dantas Maia\n\nM\xDASICAS: Lu\xEDs Philipe Dantas Maia\n\nEFEITOS
+    SONOROS: Freesound.org e Bfxr"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 62102bca9222e15489942397abccb453, type: 2}
   m_sharedMaterial: {fileID: -4661961131466843048, guid: 62102bca9222e15489942397abccb453, type: 2}
@@ -313,7 +315,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -344,7 +346,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -478.8157, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -458,6 +460,7 @@ GameObject:
   - component: {fileID: 418744374}
   - component: {fileID: 418744373}
   - component: {fileID: 418744372}
+  - component: {fileID: 418744375}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -539,6 +542,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &418744375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418744371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &772784946
 GameObject:
   m_ObjectHideFlags: 0
@@ -844,7 +891,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creditsTextRect: {fileID: 195461345}
-  scrollSpeed: 100
+  totalScrollDuration: 5
   extraEndPadding: 400
   startOnAwake: 1
   centerMessages:
@@ -856,10 +903,9 @@ MonoBehaviour:
   - "Obrigado por jogar. Nos vemos na pr\xF3xima...?"
   centerFont: {fileID: 11400000, guid: 62102bca9222e15489942397abccb453, type: 2}
   centerFadeIn: 0.6
-  centerHold: 2
+  centerHold: 5
   centerFadeOut: 0.6
-  timeBetweenCenterMessages: 0.5
-  screenFadeCanvasGroup: {fileID: 0}
+  timeBetweenCenterMessages: 1
   centerTextPrefab: {fileID: 908658610309151326, guid: 4590e4fee37fbab4390a3e0adc191ad1, type: 3}
   mainMenuSceneName: main_menu
   skipKey: 27
