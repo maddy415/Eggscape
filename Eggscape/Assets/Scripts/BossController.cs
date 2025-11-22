@@ -263,11 +263,45 @@ public class BossController : MonoBehaviour
     [Tooltip("Delay antes de iniciar o diálogo de morte")]
     public float delayBeforeDeathDialogue = 1f;
     [Tooltip("Diálogo que aparece quando o boss morre")]
-    public List<DialogueSystem.DialogueLine> deathDialogue;
+    public List<DialogueLineWithColor> deathDialogue;
     [Tooltip("Nome ou índice da próxima cena (deixe vazio para próxima cena)")]
     public string nextSceneName = "";
     [Tooltip("Se true, usa nextSceneName. Se false, carrega próxima cena por índice")]
     public bool useSceneName = false;
+
+    /// <summary>
+    /// Extensão de DialogueLine com suporte para cor customizada do texto
+    /// </summary>
+    [System.Serializable]
+    public class DialogueLineWithColor
+    {
+        public string speakerName;
+        [TextArea(3, 6)]
+        public string text;
+        public string emotion;
+        
+        [Header("Text Color (opcional)")]
+        [Tooltip("Se marcado, usa a cor customizada abaixo")]
+        public bool useCustomTextColor = false;
+        [Tooltip("Cor do texto principal (não afeta o nome do speaker)")]
+        public Color textColor = Color.white;
+        
+        public float delayAfter = 0f;
+        
+        /// <summary>
+        /// Converte para DialogueLine padrão do DialogueSystem
+        /// </summary>
+        public DialogueSystem.DialogueLine ToDialogueLine()
+        {
+            return new DialogueSystem.DialogueLine
+            {
+                speakerName = this.speakerName,
+                text = this.text,
+                emotion = this.emotion,
+                delayAfter = this.delayAfter
+            };
+        }
+    }
 
     #endregion
 
@@ -1365,7 +1399,9 @@ public class BossController : MonoBehaviour
         {
             Debug.Log("[Boss] Iniciando diálogo de morte...");
             bool dialogueDone = false;
-            DialogueSystem.Instance.StartDialogue(deathDialogue, () => dialogueDone = true);
+            
+            // Converte DialogueLineWithColor para DialogueLine e aplica cores
+            StartCoroutine(PlayDeathDialogueWithColors(() => dialogueDone = true));
             
             // Aguarda o diálogo terminar
             yield return new WaitUntil(() => dialogueDone);
@@ -1382,6 +1418,56 @@ public class BossController : MonoBehaviour
 
         // Transição de cena com fade
         LoadNextScene();
+    }
+
+    /// <summary>
+    /// Executa o diálogo de morte com suporte para cores customizadas
+    /// </summary>
+    private IEnumerator PlayDeathDialogueWithColors(Action onComplete)
+    {
+        if (DialogueSystem.Instance == null || deathDialogue == null || deathDialogue.Count == 0)
+        {
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        // Salva a cor original do texto do diálogo
+        TMPro.TextMeshProUGUI tmpText = DialogueSystem.Instance.dialogueText;
+        Color originalTextColor = tmpText != null ? tmpText.color : Color.white;
+
+        for (int i = 0; i < deathDialogue.Count; i++)
+        {
+            var line = deathDialogue[i];
+            
+            // Aplica cor customizada se configurada
+            if (line.useCustomTextColor && tmpText != null)
+            {
+                tmpText.color = line.textColor;
+                Debug.Log($"[Boss Dialogue] Aplicando cor customizada na linha {i+1}: {line.textColor}");
+            }
+            
+            // Converte para DialogueLine padrão e inicia
+            var dialogueLines = new List<DialogueSystem.DialogueLine> { line.ToDialogueLine() };
+            bool lineDone = false;
+            DialogueSystem.Instance.StartDialogue(dialogueLines, () => lineDone = true);
+            
+            // Aguarda essa linha terminar
+            yield return new WaitUntil(() => lineDone);
+            
+            // Restaura cor original entre linhas
+            if (tmpText != null)
+            {
+                tmpText.color = originalTextColor;
+            }
+        }
+
+        // Restaura cor original ao final
+        if (tmpText != null)
+        {
+            tmpText.color = originalTextColor;
+        }
+
+        onComplete?.Invoke();
     }
 
     /// <summary>

@@ -8619,40 +8619,160 @@ PrefabInstance:
       value: "Plum\xEDdia"
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[0].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[0].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[0].textColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[1].speakerName
       value: "Plum\xEDdia"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[1].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[1].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[1].textColor.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[2].speakerName
       value: "Plum\xEDdia"
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[2].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[2].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[2].textColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[3].speakerName
       value: Chicken
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[3].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[3].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[3].textColor.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[4].speakerName
       value: "Plum\xEDdia"
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[4].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[4].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[4].textColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[5].speakerName
       value: "Plum\xEDdia"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[5].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[5].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[5].textColor.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[6].speakerName
       value: "Plum\xEDdia"
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[6].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[6].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[6].textColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[7].speakerName
       value: "Plum\xEDdia"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[7].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[7].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[7].textColor.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[8].speakerName
       value: "Plum\xEDdia"
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[8].textColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[8].textColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[8].textColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: deathDialogue.Array.data[9].speakerName
       value: "Plum\xEDdia"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[9].textColor.b
+      value: 0.032395888
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[9].textColor.g
+      value: 0.032395888
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: deathDialogue.Array.data[9].textColor.r
+      value: 0.9811321
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: phases.Array.data[0].attacks.Array.size
