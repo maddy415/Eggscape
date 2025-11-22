@@ -13,6 +13,7 @@ TagManager:
   - TutorialEgg
   - JumpDetector
   - CloudReset
+  - CreditsTrigger
   layers:
   - Default
   - TransparentFX
@@ -28,7 +29,7 @@ TagManager:
   - ScytheBH
   - PlayerLayer
   - JumpTrigger
-  - 
+  - Credits
   - 
   - 
   - 

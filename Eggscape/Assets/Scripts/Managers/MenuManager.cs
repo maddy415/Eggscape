@@ -206,7 +206,7 @@ public class MenuManager : MonoBehaviour
     //   HELPERS
     // =====================================================
 
-    private void LoadSceneByName(string sceneName)
+    public void LoadSceneByName(string sceneName)
     {
         if (transition != null) 
             transition.LoadScene(sceneName);

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 170c11544466b394f86b787b23aa014a, type: 3}
+  m_Name: Lvl 8 Tier
+  m_EditorClassIdentifier: 
+  patterns:
+  - {fileID: 8232251528394940728, guid: fd680cf0da318ca48a182385f2aca690, type: 3}
+  - {fileID: 8232251528394940728, guid: d12476380dd877b47b0a22a17329e193, type: 3}
+  - {fileID: 8232251528394940728, guid: a147700fbd35ec943a8493d728e1687b, type: 3}
+  - {fileID: 8232251528394940728, guid: 8551fb481fbad4b4aa3d770c22e732f5, type: 3}
+  - {fileID: 8232251528394940728, guid: 2d1f76d8e34ead24980f28cb7cffa7b7, type: 3}
+  - {fileID: 8232251528394940728, guid: 46c42c41c6bebff41a840b9be910676b, type: 3}

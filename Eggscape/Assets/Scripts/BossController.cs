@@ -109,6 +109,7 @@ public class BossController : MonoBehaviour
         public float recovery = 0.5f;
 
         [Header("Windup Effects")]
+        [Tooltip("Efeitos do windup principal (ou segundo windup no caso do Charge com âncora)")]
         public WindupEffects windupEffects = new WindupEffects();
 
         [Header("One-hit on touch")]
@@ -764,7 +765,13 @@ public class BossController : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
 
             FacePlayerX();
-            if (chargePreDashHold > 0f) yield return new WaitForSeconds(chargePreDashHold);
+            
+            // ===== EFEITOS DO SEGUNDO WINDUP (após pousar na âncora) =====
+            if (chargePreDashHold > 0f)
+            {
+                yield return StartCoroutine(PlayWindupEffects(a.windupEffects, chargePreDashHold));
+            }
+            // ==============================================================
 
             float elapsedA = 0f;
             Vector2 dirA = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
@@ -820,7 +827,13 @@ public class BossController : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
 
         FacePlayerX();
-        if (chargePreDashHold > 0f) yield return new WaitForSeconds(chargePreDashHold);
+        
+        // ===== EFEITOS DO SEGUNDO WINDUP (após pousar na âncora) =====
+        if (chargePreDashHold > 0f)
+        {
+            yield return StartCoroutine(PlayWindupEffects(a.windupEffects, chargePreDashHold));
+        }
+        // ==============================================================
 
         float elapsed = 0f;
         Vector2 dir = transform.localScale.x >= 0 ? Vector2.right : Vector2.left;
@@ -1176,11 +1189,26 @@ public class BossController : MonoBehaviour
         }
         else
         {
-            if (bossSprite == null) Debug.LogWarning("[Boss] bossSprite está NULL, não pode fazer flash!");
-            if (damageFlashDuration <= 0f) Debug.LogWarning("[Boss] damageFlashDuration está 0 ou negativo!");
+            if (bossSprite == null) Debug.LogError("[Boss] bossSprite está NULL, não pode fazer flash!");
+            if (damageFlashDuration <= 0f) Debug.LogError("[Boss] damageFlashDuration está 0 ou negativo!");
         }
         
         if (currentHealth <= 0) Die();
+    }
+
+    /// <summary>
+    /// Método de teste público para verificar se o flash funciona
+    /// </summary>
+    [ContextMenu("Test Damage Flash")]
+    public void TestDamageFlash()
+    {
+        Debug.Log("[Boss TEST] Testando damage flash manualmente...");
+        if (bossSprite == null)
+        {
+            Debug.LogError("[Boss TEST] bossSprite está NULL!");
+            return;
+        }
+        StartCoroutine(DamageFlash());
     }
 
     /// <summary>
@@ -1188,18 +1216,29 @@ public class BossController : MonoBehaviour
     /// </summary>
     private IEnumerator DamageFlash()
     {
+        if (bossSprite == null)
+        {
+            Debug.LogWarning("[Boss Flash] bossSprite é NULL!");
+            yield break;
+        }
+
         Color originalColor = bossSprite.color;
-        Debug.Log($"[Boss Flash] Cor original: {originalColor}, cor de dano: {damageFlashColor}");
+        Debug.Log($"[Boss Flash] Iniciando! Cor original: {originalColor}, cor de dano: {damageFlashColor}, blinks: {damageFlashBlinks}");
+        
+        float blinkTime = damageFlashDuration / (damageFlashBlinks * 2f);
+        Debug.Log($"[Boss Flash] Tempo de cada blink: {blinkTime}s");
         
         for (int i = 0; i < damageFlashBlinks; i++)
         {
             // Pisca para a cor de dano
             bossSprite.color = damageFlashColor;
-            yield return new WaitForSeconds(damageFlashDuration / (damageFlashBlinks * 2f));
+            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Cor branca");
+            yield return new WaitForSeconds(blinkTime);
             
             // Volta para a cor original
             bossSprite.color = originalColor;
-            yield return new WaitForSeconds(damageFlashDuration / (damageFlashBlinks * 2f));
+            Debug.Log($"[Boss Flash] Blink {i+1}/{damageFlashBlinks} - Cor original");
+            yield return new WaitForSeconds(blinkTime);
         }
         
         // Garante que termina na cor original

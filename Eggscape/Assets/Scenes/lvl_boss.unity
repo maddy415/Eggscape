@@ -8236,11 +8236,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: telegraphColor.b
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: telegraphColor.g
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: telegraphColor.r
@@ -8253,6 +8253,18 @@ PrefabInstance:
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: chargePreDashHold
       value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: damageFlashColor.b
+      value: 0.19215684
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: damageFlashColor.g
+      value: 0.31142077
+      objectReference: {fileID: 0}
+    - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
+      propertyPath: damageFlashColor.r
+      value: 0.90588236
       objectReference: {fileID: 0}
     - target: {fileID: 3642927169920026913, guid: ea67a25cb8f621b4e916a0cdb1598979, type: 3}
       propertyPath: chargeAnchorTrigger
