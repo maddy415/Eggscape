@@ -12,6 +12,7 @@ public class BossCutsceneManager : MonoBehaviour
     public Player player;
     public Transform bossSpawnPoint;
     public MobileInputBridge mobileInput;
+    public GameObject barreira, barreira2;
 
     [Header("Chicken Walk Settings")]
     public float chickenWalkDuration = 3f;
@@ -164,6 +165,8 @@ public class BossCutsceneManager : MonoBehaviour
 
     public IEnumerator ParryTutorial()
     {
+        barreira.SetActive(true);
+        barreira2.SetActive(true);
         if (!boss || !player) yield break;
 
         parryTutorialComplete = false;
