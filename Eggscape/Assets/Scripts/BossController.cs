@@ -12,7 +12,6 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Rigidbody2D))]
 public class BossController : MonoBehaviour
 {
-    public static BossController instance;
     #region Tipos de dados (Inspector)
 
     public enum AttackType { Charge, JumpSmash, JumpSuperHigh, BulletHell }
@@ -1545,7 +1544,7 @@ public class BossController : MonoBehaviour
     /// <summary>
     /// Chamado quando o player morre durante a luta do boss
     /// </summary>
-    public void OnPlayerDeath()
+    private void OnPlayerDeath()
     {
         Debug.Log("[Boss] Player morreu! Mostrando canvas de morte...");
         
