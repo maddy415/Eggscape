@@ -533,17 +533,21 @@ public class Player : MonoBehaviour
         rb.freezeRotation = false;
         rb.AddTorque(torqueForce);
 
-        // se estava girando no ataque, desativa para evitar soma dupla
         attackSpinActive = false;
 
-        // inicia spin de morte a partir do ângulo atual do sprite (fica suave)
         if (sprite != null)
         {
             currentSpriteRotation = sprite.transform.localEulerAngles.z;
         }
 
-        // ativa giro apenas no SPRITE (o corpo/colisor pode rodar pela física)
         spinOnDeathActive = true;
+    
+        // ===== ADICIONE ESTAS 3 LINHAS AQUI =====
+        if (BossController.instance != null)
+        {
+            BossController.instance.NotifyPlayerDeath();
+        }
+        // ========================================
     }
 
     #endregion

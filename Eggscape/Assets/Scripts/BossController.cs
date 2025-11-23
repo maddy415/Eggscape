@@ -12,6 +12,7 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(Rigidbody2D))]
 public class BossController : MonoBehaviour
 {
+    public static BossController instance;
     #region Tipos de dados (Inspector)
 
     public enum AttackType { Charge, JumpSmash, JumpSuperHigh, BulletHell }
@@ -340,6 +341,16 @@ public class BossController : MonoBehaviour
 
     private void Awake()
     {
+        // Singleton
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("[Boss] Múltiplas instâncias de BossController detectadas!");
+        }
+        
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         if (!col) col = GetComponentInChildren<Collider2D>();
@@ -1733,6 +1744,19 @@ public class BossController : MonoBehaviour
 
     #endregion
 
+    private bool playerDeathHandled = false;
+
+    /// <summary>
+    /// Método público que o Player pode chamar diretamente ao morrer
+    /// </summary>
+    public void NotifyPlayerDeath()
+    {
+        if (!playerDeathHandled && !dead)
+        {
+            OnPlayerDeath();
+        }
+    }
+
     #region Gizmos (debug)
 
 #if UNITY_EDITOR
@@ -1781,6 +1805,8 @@ public class BossController : MonoBehaviour
 
     #endregion
 }
+
+
 
 /// <summary> ReadOnly no Inspector (cosmético). </summary>
 public class ReadOnlyAttribute : PropertyAttribute {}
