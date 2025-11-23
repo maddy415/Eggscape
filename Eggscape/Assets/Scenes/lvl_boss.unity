@@ -3206,7 +3206,7 @@ MonoBehaviour:
   bossSpawnPoint: {fileID: 779371756}
   mobileInput: {fileID: 0}
   barreira: {fileID: 815860785}
-  barreira2: {fileID: 0}
+  barreira2: {fileID: 1116629751}
   chickenWalkDuration: 1.7
   chickenWalkSpeed: 5
   bossEntranceForce: 15
