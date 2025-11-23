@@ -895,12 +895,15 @@ MonoBehaviour:
   extraEndPadding: 400
   startOnAwake: 1
   centerMessages:
-  - "A cria\xE7\xE3o de Eggscape foi uma jornada d\xEDficil para mim"
+  - "A cria\xE7\xE3o de Eggscape foi uma jornada extremamente dif\xEDcil para mim"
   - "Dias, semanas e meses quebrando a cabe\xE7a e tendo ideias novas permitiram
     a consolida\xE7\xE3o desse projeto"
+  - "Sinceramente, tive vontade de largar tudo diversas vezes, mas fico feliz que
+    decidi pelo contr\xE1rio"
   - "Agrade\xE7o imensamente a todos que acreditaram que um dia Eggscape seria algo
-    al\xE9m de um simples conceito."
-  - "Obrigado por jogar. Nos vemos na pr\xF3xima...?"
+    al\xE9m de uma simples ideia boba sobre galinhas revolucion\xE1rias tida por
+    mim de \xFAltima hora"
+  - "Obrigado por jogar. Quem sabe a gente se v\xEA na pr\xF3xima? :)"
   centerFont: {fileID: 11400000, guid: 62102bca9222e15489942397abccb453, type: 2}
   centerFadeIn: 0.6
   centerHold: 5

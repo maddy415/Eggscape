@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject vicCanvas;
     public FrogIdleJumper frogJumper;
-    public GameObject barn;
+    public GameObject barn; 
     public GameObject frog;
     public GameObject spawnerLog;
     public GameObject spawnerBird;
