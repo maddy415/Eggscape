@@ -215,6 +215,11 @@ public class MenuManager : MonoBehaviour
 
         Debug.Log($"[MenuManager] {sceneName} carregado");
     }
+    
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 
     private string GetSceneNameByIndex(int index)
     {

@@ -7,6 +7,7 @@ public class TutorialEgg : MonoBehaviour
     public float walkTime = 2f;          // Duração da caminhada antes da "voada"
     private float walkTimer;
     public bool isWalkingCutscene = true;
+    public GameObject barreira;
 
     [Header("Componentes")]
     private SpriteRenderer sprite;
@@ -46,6 +47,7 @@ public class TutorialEgg : MonoBehaviour
         // Quando acabar o tempo de caminhada, ele vira e para
         if (walkTimer > walkTime)
         {
+            barreira.SetActive(true);
             isWalkingCutscene = false;   
             walkTimer = 0;
             sprite.flipX = true;
