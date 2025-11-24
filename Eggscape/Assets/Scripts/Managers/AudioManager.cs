@@ -109,7 +109,21 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded_AutoPlay(Scene scene, LoadSceneMode mode)
     {
-        // tenta tocar música configurada para a cena recém carregada
+        // ALTERAÇÃO: verifica se já está tocando a música correta antes de tentar tocar
+        LevelMusic lm = GetLevelMusicForScene(scene.name);
+        
+        // Se já está tocando a música desta cena, não faz nada (mantém tocando)
+        if (lm != null && 
+            currentLevelMusic != null && 
+            currentLevelMusic.sceneName == lm.sceneName && 
+            musicSource.isPlaying && 
+            musicSource.clip == lm.musicClip)
+        {
+            Debug.Log($"[AudioManager] Música da cena '{scene.name}' já está tocando. Continuando sem reiniciar.");
+            return;
+        }
+        
+        // Caso contrário, toca a música configurada para a cena
         PlayLevelMusic(scene.name);
     }
 

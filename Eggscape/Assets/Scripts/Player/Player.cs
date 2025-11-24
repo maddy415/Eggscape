@@ -338,15 +338,19 @@ public class Player : MonoBehaviour
 
     private void HandleAttackInput()
     {
+        // ADICIONE ESTA LINHA NO INÍCIO DO MÉTODO:
+        if (PauseMenu.IsPaused)
+            return;
+    
         // Detecta input de ataque
         bool attackInput = ReadAttackPressed();
-        
+    
         // DEBUG
         if (attackInput)
         {
             Debug.Log($"[Player] Input detectado! attackReady={attackReady}, canAttack={canAttack}");
         }
-        
+    
         if (attackInput && attackReady && canAttack)
         {
             Debug.Log("[Player] ATAQUE INICIADO!");
