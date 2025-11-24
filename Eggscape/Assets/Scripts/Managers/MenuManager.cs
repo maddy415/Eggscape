@@ -17,7 +17,9 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Button newGameButton;          // Botão "New Game" - sempre visível
 
     [Header("Configuração")]
-    [SerializeField] private string storySceneName = "story";      // Nome da cena de lore
+    [SerializeField] private string storySceneName = "story";  
+    [SerializeField] private string controlsSceneName = "controls";      // Nome da cena de lore
+    // Nome da cena de lore
     [SerializeField] private string tutorialSceneName = "tutorial"; // Nome da cena de tutorial
     [SerializeField] private int tutorialSceneIndex = 1;            // Índice do tutorial no Build Settings
 
@@ -44,6 +46,7 @@ public class MenuManager : MonoBehaviour
     void Start()
     {
         RefreshMenuButtons();
+        
     }
 
     // =====================================================
@@ -125,6 +128,11 @@ public class MenuManager : MonoBehaviour
         }
 
         LoadSceneByName(storySceneName);
+    }
+    
+    public void LoadControlsGame()
+    {
+        LoadSceneByName(controlsSceneName);
     }
 
     /// <summary>

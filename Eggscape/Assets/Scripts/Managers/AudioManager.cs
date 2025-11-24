@@ -65,6 +65,7 @@ public class AudioManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        
         audioInstance = this;
         DontDestroyOnLoad(gameObject);
 
@@ -77,6 +78,8 @@ public class AudioManager : MonoBehaviour
         musicSource.loop        = true;
 
         // ====== Carrega volumes salvos de forma segura ======
+
+        
 
         sfxVolume = PlayerPrefs.GetFloat(KEY_SFX, 1f);
         musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC, 1f);
