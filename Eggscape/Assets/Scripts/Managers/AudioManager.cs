@@ -22,24 +22,15 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float sfxVolume = 1f;
     [Range(0f, 1f)] public float musicVolume = 1f;
 
-    // ==== PlayerPrefs Keys ====
     private const string KEY_SFX = "sfxVolume";
     private const string KEY_MUSIC = "musicVolume";
     private const string KEY_EXPLOSIONS = "explosionsEnabled";
 
-    // Flag global pra outros scripts checarem
-    public static bool ExplosionsEnabled
-    {
-        get { return PlayerPrefs.GetInt(KEY_EXPLOSIONS, 1) != 0; }
-    }
+    public static bool ExplosionsEnabled => PlayerPrefs.GetInt(KEY_EXPLOSIONS, 1) != 0;
 
-    // ===========================
-    // NOVO: MÚSICAS POR FASE
-    // ===========================
     [System.Serializable]
     public class LevelMusic
     {
-        [Tooltip("Nome da cena como em Build Settings (ex: 'Level_1').")]
         public string sceneName;
         public AudioClip musicClip;
         [Range(0f, 1f)] public float targetVolume = 1f;
@@ -47,122 +38,79 @@ public class AudioManager : MonoBehaviour
     }
 
     [Header("Level Musics (configurar no Inspector)")]
-    [Tooltip("Lista de músicas associadas a nomes de cena (use o mesmo nome que está em Build Settings).")]
     public List<LevelMusic> levelMusics = new List<LevelMusic>();
-
-    [Tooltip("Se true, o AudioManager tentará tocar a música configurada para a cena automaticamente no carregamento.")]
     public bool autoPlayLevelMusicOnLoad = true;
 
-    // referência para a música de nível atualmente ativa (pode ser usada para evitar replays)
     private LevelMusic currentLevelMusic = null;
 
-    // ===========================
-
-    void Awake()
+    private void Awake()
     {
         if (audioInstance != null && audioInstance != this)
         {
             Destroy(gameObject);
             return;
         }
-        
+
         audioInstance = this;
         DontDestroyOnLoad(gameObject);
 
-        // Cria/garante as fontes
-        if (!sfxSource)   sfxSource   = gameObject.AddComponent<AudioSource>();
+        if (!sfxSource) sfxSource = gameObject.AddComponent<AudioSource>();
         if (!musicSource) musicSource = gameObject.AddComponent<AudioSource>();
 
-        sfxSource.playOnAwake   = false;
+        sfxSource.playOnAwake = false;
         musicSource.playOnAwake = false;
-        musicSource.loop        = true;
 
-        // ====== Carrega volumes salvos de forma segura ======
+        sfxSource.clip = null;
+        musicSource.clip = null;
 
-        
+        sfxVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(KEY_SFX, 1f));
+        musicVolume = Mathf.Clamp01(PlayerPrefs.GetFloat(KEY_MUSIC, 1f));
 
-        sfxVolume = PlayerPrefs.GetFloat(KEY_SFX, 1f);
-        musicVolume = PlayerPrefs.GetFloat(KEY_MUSIC, 1f);
-
-        sfxVolume = Mathf.Clamp01(sfxVolume);
-        musicVolume = Mathf.Clamp01(musicVolume);
-
-        if (!PlayerPrefs.HasKey(KEY_EXPLOSIONS))
-        {
-            PlayerPrefs.SetInt(KEY_EXPLOSIONS, 1);
-        }
-
-        sfxSource.volume   = sfxVolume;
+        sfxSource.volume = sfxVolume;
         musicSource.volume = musicVolume;
 
-        Debug.Log($"[AudioManager] music={musicVolume}, sfx={sfxVolume}, explosions={ExplosionsEnabled}");
+        if (!PlayerPrefs.HasKey(KEY_EXPLOSIONS))
+            PlayerPrefs.SetInt(KEY_EXPLOSIONS, 1);
+
+        SceneManager.sceneLoaded += OnSceneLoaded_AutoPlay;
+
+        Debug.Log($"[AudioManager] Awake: music={musicVolume}, sfx={sfxVolume}, explosions={ExplosionsEnabled}");
     }
 
-    private void OnEnable()
+    private void Start()
     {
-        if (autoPlayLevelMusicOnLoad)
-            SceneManager.sceneLoaded += OnSceneLoaded_AutoPlay;
+        // evita que qualquer clip residual toque no início
+        StartCoroutine(PlayMusicNextFrame());
     }
 
-    private void OnDisable()
+    private IEnumerator PlayMusicNextFrame()
     {
+        yield return null; // espera 1 frame
         if (autoPlayLevelMusicOnLoad)
-            SceneManager.sceneLoaded -= OnSceneLoaded_AutoPlay;
+        {
+            PlayLevelMusic(SceneManager.GetActiveScene().name, 0f);
+        }
     }
 
     private void OnSceneLoaded_AutoPlay(Scene scene, LoadSceneMode mode)
     {
-        // ALTERAÇÃO: verifica se já está tocando a música correta antes de tentar tocar
+        if (!autoPlayLevelMusicOnLoad) return;
+
         LevelMusic lm = GetLevelMusicForScene(scene.name);
-        
-        // Se já está tocando a música desta cena, não faz nada (mantém tocando)
-        if (lm != null && 
-            currentLevelMusic != null && 
-            currentLevelMusic.sceneName == lm.sceneName && 
-            musicSource.isPlaying && 
-            musicSource.clip == lm.musicClip)
-        {
-            Debug.Log($"[AudioManager] Música da cena '{scene.name}' já está tocando. Continuando sem reiniciar.");
-            return;
-        }
-        
-        // Caso contrário, toca a música configurada para a cena
+        if (lm == null) return;
+
+        if (currentLevelMusic != null && currentLevelMusic.sceneName == lm.sceneName &&
+            musicSource.isPlaying && musicSource.clip == lm.musicClip) return;
+
         PlayLevelMusic(scene.name);
     }
 
-    // ======= SFX =======
-    public void JumpSFX()
+    private LevelMusic GetLevelMusicForScene(string sceneName)
     {
-        if (jumpSFX) sfxSource.PlayOneShot(jumpSFX, sfxVolume);
+        if (string.IsNullOrEmpty(sceneName)) return null;
+        return levelMusics.Find(lm => lm.sceneName == sceneName);
     }
 
-    public void LogSFX()
-    {
-        if (logSFX) sfxSource.PlayOneShot(logSFX, sfxVolume);
-    }
-
-    public void DeathSFX()
-    {
-        if (deathSFX) sfxSource.PlayOneShot(deathSFX, sfxVolume);
-    }
-
-    public void ExplodeSFX()
-    {
-        if (!ExplosionsEnabled) return;
-        if (explosionSFX) sfxSource.PlayOneShot(explosionSFX, sfxVolume);
-    }
-
-    public void BossParrySFX()
-    {
-        if (parrySFX) sfxSource.PlayOneShot(parrySFX, sfxVolume);
-    }
-
-    // ======= BGM / Música de fase =======
-
-    /// <summary>
-    /// Toca a música configurada para um nome de cena (se existir).
-    /// Se não encontrar, não faz nada (mantém música atual).
-    /// </summary>
     public bool PlayLevelMusic(string sceneName, float crossfadeTime = 0.5f)
     {
         if (string.IsNullOrEmpty(sceneName)) return false;
@@ -170,7 +118,6 @@ public class AudioManager : MonoBehaviour
         LevelMusic lm = GetLevelMusicForScene(sceneName);
         if (lm == null || lm.musicClip == null) return false;
 
-        // já está tocando essa música? atualiza volume/loop e retorna
         if (currentLevelMusic != null && currentLevelMusic.sceneName == lm.sceneName && musicSource.clip == lm.musicClip)
         {
             musicSource.loop = lm.loop;
@@ -179,26 +126,11 @@ public class AudioManager : MonoBehaviour
             return true;
         }
 
-        // crossfade para a música de nível
         Crossfade(lm.musicClip, crossfadeTime, lm.loop, lm.targetVolume);
         currentLevelMusic = lm;
         return true;
     }
 
-    /// <summary>
-    /// Play por buildIndex (pega o nome da cena do BuildSettings)
-    /// </summary>
-    public bool PlayLevelMusic(int buildIndex, float crossfadeTime = 0.5f)
-    {
-        if (buildIndex < 0 || buildIndex >= SceneManager.sceneCountInBuildSettings) return false;
-        string path = SceneUtility.GetScenePathByBuildIndex(buildIndex);
-        string sceneName = System.IO.Path.GetFileNameWithoutExtension(path);
-        return PlayLevelMusic(sceneName, crossfadeTime);
-    }
-
-    /// <summary>
-    /// Para a música de nível atual (opcional crossfade out)
-    /// </summary>
     public void StopLevelMusic(float fadeOutTime = 0.5f)
     {
         currentLevelMusic = null;
@@ -206,37 +138,12 @@ public class AudioManager : MonoBehaviour
         else StopMusic();
     }
 
-    /// <summary>
-    /// Crossfade para a música passada (utilitário que preserva compatibilidade).
-    /// </summary>
-    public void CrossfadeToLevelMusic(string sceneName, float time = 0.5f)
-    {
-        LevelMusic lm = GetLevelMusicForScene(sceneName);
-        if (lm != null && lm.musicClip != null)
-            Crossfade(lm.musicClip, time, lm.loop, lm.targetVolume);
-    }
-
-    private LevelMusic GetLevelMusicForScene(string sceneName)
-    {
-        if (string.IsNullOrEmpty(sceneName)) return null;
-        for (int i = 0; i < levelMusics.Count; i++)
-        {
-            if (!string.IsNullOrEmpty(levelMusics[i].sceneName) &&
-                levelMusics[i].sceneName == sceneName)
-            {
-                return levelMusics[i];
-            }
-        }
-        return null;
-    }
-
-    // Mantive seus métodos públicos originais para retrocompatibilidade
     public void PlayMusic(AudioClip clip, bool loop = true, float volume01 = -1f)
     {
         if (!clip) return;
-        musicSource.loop = loop;
-        if (volume01 >= 0f) musicSource.volume = Mathf.Clamp01(volume01);
         musicSource.clip = clip;
+        musicSource.loop = loop;
+        musicSource.volume = (volume01 >= 0f ? Mathf.Clamp01(volume01) : musicSource.volume);
         musicSource.Play();
     }
 
@@ -267,14 +174,21 @@ public class AudioManager : MonoBehaviour
         PlayerPrefs.SetInt(KEY_EXPLOSIONS, enabled ? 1 : 0);
     }
 
-    // Fade out/in da música atual
     public void FadeOutMusic(float time = 0.5f) =>
         StartCoroutine(FadeVolume(musicSource, musicSource.volume, 0f, time));
 
-    public void FadeInMusic(float target = 1f, float time = 0.5f) =>
-        StartCoroutine(FadeVolume(musicSource, musicSource.volume, Mathf.Clamp01(target), time));
+    private IEnumerator FadeVolume(AudioSource src, float from, float to, float time)
+    {
+        float t = 0f;
+        while (t < time)
+        {
+            t += Time.unscaledDeltaTime;
+            src.volume = Mathf.Lerp(from, to, Mathf.Clamp01(t / time));
+            yield return null;
+        }
+        src.volume = to;
+    }
 
-    // Crossfade público (usa rotina interna)
     public void Crossfade(AudioClip newClip, float time = 0.5f, bool loop = true, float targetVolume = -1f)
     {
         StartCoroutine(CrossfadeRoutine(newClip, time, loop, targetVolume));
@@ -286,6 +200,7 @@ public class AudioManager : MonoBehaviour
 
         float startVol = musicSource.volume;
         AudioSource ghost = null;
+
         if (musicSource.isPlaying && musicSource.clip != null)
         {
             ghost = gameObject.AddComponent<AudioSource>();
@@ -302,28 +217,24 @@ public class AudioManager : MonoBehaviour
 
         float t = 0f;
         float endVol = (targetVolume >= 0f ? Mathf.Clamp01(targetVolume) : startVol);
+
         while (t < time)
         {
-            t += Time.deltaTime;
+            t += Time.unscaledDeltaTime;
             float k = Mathf.Clamp01(t / time);
             musicSource.volume = Mathf.Lerp(0f, endVol, k);
             if (ghost) ghost.volume = Mathf.Lerp(startVol, 0f, k);
             yield return null;
         }
+
         musicSource.volume = endVol;
         if (ghost) Destroy(ghost);
     }
 
-    private IEnumerator FadeVolume(AudioSource src, float from, float to, float time)
-    {
-        float t = 0f;
-        while (t < time)
-        {
-            t += Time.deltaTime;
-            float k = Mathf.Clamp01(t / time);
-            src.volume = Mathf.Lerp(from, to, k);
-            yield return null;
-        }
-        src.volume = to;
-    }
+    // ===== SFX =====
+    public void JumpSFX() { if (jumpSFX) sfxSource.PlayOneShot(jumpSFX, sfxVolume); }
+    public void LogSFX() { if (logSFX) sfxSource.PlayOneShot(logSFX, sfxVolume); }
+    public void DeathSFX() { if (deathSFX) sfxSource.PlayOneShot(deathSFX, sfxVolume); }
+    public void ExplodeSFX() { if (ExplosionsEnabled && explosionSFX) sfxSource.PlayOneShot(explosionSFX, sfxVolume); }
+    public void BossParrySFX() { if (parrySFX) sfxSource.PlayOneShot(parrySFX, sfxVolume); }
 }
