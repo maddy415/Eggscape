@@ -357,7 +357,9 @@ MonoBehaviour:
   m_text: "CR\xC9DITOS\n\n\n\nARTE: Lu\xEDs Philipe Dantas Maia\n\nPROGRAMA\xC7\xC3O:
     Lu\xEDs Philipe Dantas Maia\n\nM\xDASICAS: Lu\xEDs Philipe Dantas Maia\n\nEFEITOS
     SONOROS: Freesound.org e Bfxr\n\nSOM DE EXPLOS\xC3O: Explosion 5.wav por jobro
-    -- https://freesound.org/s/35462/ -- License: Attribution 3.0"
+    -- https://freesound.org/s/35462/ -- License: Attribution 3.0\n\nFONTE DOS TEXTOS:
+    Grape Soda por jeti -- https://www.dafont.com/grapesoda-2.font -- License: Attribution
+    4.0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 62102bca9222e15489942397abccb453, type: 2}
   m_sharedMaterial: {fileID: -4661961131466843048, guid: 62102bca9222e15489942397abccb453, type: 2}
@@ -621,6 +623,7 @@ MonoBehaviour:
   levelSelectButton: {fileID: 0}
   newGameButton: {fileID: 0}
   storySceneName: story
+  controlsSceneName: controls
   tutorialSceneName: tutorial
   tutorialSceneIndex: 1
 --- !u!4 &772784948

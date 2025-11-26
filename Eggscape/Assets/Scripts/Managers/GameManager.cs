@@ -187,13 +187,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // ... (mantenha todo o código anterior até o método ResetScene)
+
     public void ResetScene()
     {
         if (playerAlive == false)
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                // antes: SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                // ===== NOVO: Preserva a música antes de recarregar =====
+                if (AudioManager.audioInstance != null)
+                {
+                    AudioManager.audioInstance.PreserveMusicPosition();
+                }
+                
                 LoadWithTransitionByIndex(SceneManager.GetActiveScene().buildIndex);
                 return;
             }
@@ -201,24 +208,31 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.H))
         {
-            // antes: SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            // ===== NOVO: Preserva a música antes de recarregar =====
+            if (AudioManager.audioInstance != null)
+            {
+                AudioManager.audioInstance.PreserveMusicPosition();
+            }
+            
             LoadWithTransitionByIndex(SceneManager.GetActiveScene().buildIndex);
         }
-    }
-
-    public void ContinueVictoryFromUI()
-    {
-        mobileVictoryContinueRequested = true;
     }
 
     public void RestartFromUI()
     {
         if (playerAlive == false)
         {
+            // ===== NOVO: Preserva a música antes de recarregar =====
+            if (AudioManager.audioInstance != null)
+            {
+                AudioManager.audioInstance.PreserveMusicPosition();
+            }
+            
             LoadWithTransitionByIndex(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
+// ... (resto do código permanece igual)
     // ==========================================
 //   SUBSTITUA O MÉTODO Victory() NO GameManager.cs
 // ==========================================

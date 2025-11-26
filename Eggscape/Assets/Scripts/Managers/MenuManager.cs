@@ -138,12 +138,17 @@ public class MenuManager : MonoBehaviour
     /// <summary>
     /// Continue - vai para a última fase que o jogador parou.
     /// </summary>
+    // ... (mantenha todo o código anterior até os métodos de navegação)
+
+    /// <summary>
+    /// Continue - vai para a última fase que o jogador parou.
+    /// </summary>
     public void Continue()
     {
         if (SaveManager.Instance == null)
         {
             Debug.LogWarning("[MenuManager] SaveManager não encontrado!");
-            NewGame(); // Fallback
+            NewGame();
             return;
         }
 
@@ -152,48 +157,68 @@ public class MenuManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(sceneName))
         {
+            // ===== NOVO: Limpa preservação ao ir para outra fase =====
+            if (AudioManager.audioInstance != null)
+            {
+                AudioManager.audioInstance.ClearPreservedMusicPosition();
+            }
+            
             LoadSceneByName(sceneName);
             Debug.Log($"[MenuManager] Continue: Carregando {sceneName} (Index: {lastLevel})");
         }
         else
         {
             Debug.LogWarning($"[MenuManager] Cena com índice {lastLevel} não encontrada!");
-            NewGame(); // Fallback
+            NewGame();
         }
     }
 
-    /// <summary>
-    /// Abre o menu de seleção de fases.
-    /// </summary>
-    public void OpenLevelSelect()
-    {
-        LoadSceneByName("lvl_selector");
-    }
-
-    // =====================================================
-    //   MÉTODOS ORIGINAIS (mantidos para compatibilidade)
-    // =====================================================
-
+    // ===== MÉTODO ORIGINAL LOADGAME (atualizado) =====
     public void LoadGame()
     {
+        // ===== NOVO: Limpa preservação ao carregar nova fase =====
+        if (AudioManager.audioInstance != null)
+        {
+            AudioManager.audioInstance.ClearPreservedMusicPosition();
+        }
+        
         LoadSceneByName("lvl_1");
     }
 
     public void LoadStory()
     {
+        // ===== NOVO: Limpa preservação =====
+        if (AudioManager.audioInstance != null)
+        {
+            AudioManager.audioInstance.ClearPreservedMusicPosition();
+        }
+        
         LoadSceneByName(storySceneName);
     }
 
     public void LoadTutorial()
     {
+        // ===== NOVO: Limpa preservação =====
+        if (AudioManager.audioInstance != null)
+        {
+            AudioManager.audioInstance.ClearPreservedMusicPosition();
+        }
+        
         LoadSceneByName(tutorialSceneName);
     }
 
     public void LoadGame2()
     {
+        // ===== NOVO: Limpa preservação =====
+        if (AudioManager.audioInstance != null)
+        {
+            AudioManager.audioInstance.ClearPreservedMusicPosition();
+        }
+        
         LoadSceneByName("lvl_2");
     }
 
+// ... (resto do código permanece igual)
     // =====================================================
     //   CONFIGURAÇÕES
     // =====================================================

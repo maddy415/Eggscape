@@ -42,6 +42,10 @@ public class AudioManager : MonoBehaviour
     public bool autoPlayLevelMusicOnLoad = true;
 
     private LevelMusic currentLevelMusic = null;
+    
+    // ===== NOVO: Armazena o timestamp da música atual =====
+    private float savedMusicTime = 0f;
+    private bool preserveMusicTime = false;
 
     private void Awake()
     {
@@ -79,13 +83,12 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        // evita que qualquer clip residual toque no início
         StartCoroutine(PlayMusicNextFrame());
     }
 
     private IEnumerator PlayMusicNextFrame()
     {
-        yield return null; // espera 1 frame
+        yield return null;
         if (autoPlayLevelMusicOnLoad)
         {
             PlayLevelMusic(SceneManager.GetActiveScene().name, 0f);
@@ -99,9 +102,31 @@ public class AudioManager : MonoBehaviour
         LevelMusic lm = GetLevelMusicForScene(scene.name);
         if (lm == null) return;
 
-        if (currentLevelMusic != null && currentLevelMusic.sceneName == lm.sceneName &&
-            musicSource.isPlaying && musicSource.clip == lm.musicClip) return;
+        // ===== MUDANÇA: Verifica se é a mesma música =====
+        bool isSameMusic = (currentLevelMusic != null && 
+                           currentLevelMusic.musicClip == lm.musicClip &&
+                           musicSource.clip == lm.musicClip);
 
+        if (isSameMusic && musicSource.isPlaying)
+        {
+            // Música já está tocando - apenas ajusta configurações
+            Debug.Log($"[AudioManager] Mesma música detectada ({lm.musicClip.name}) - mantendo reprodução contínua");
+            musicSource.loop = lm.loop;
+            musicSource.volume = Mathf.Clamp01(lm.targetVolume * musicVolume);
+            currentLevelMusic = lm;
+            
+            // ===== NOVO: Restaura o tempo se estava preservando =====
+            if (preserveMusicTime && savedMusicTime > 0f)
+            {
+                musicSource.time = savedMusicTime;
+                Debug.Log($"[AudioManager] Tempo da música restaurado: {savedMusicTime:F2}s");
+            }
+            
+            preserveMusicTime = false;
+            return;
+        }
+
+        // Música diferente - toca normalmente
         PlayLevelMusic(scene.name);
     }
 
@@ -118,10 +143,13 @@ public class AudioManager : MonoBehaviour
         LevelMusic lm = GetLevelMusicForScene(sceneName);
         if (lm == null || lm.musicClip == null) return false;
 
-        if (currentLevelMusic != null && currentLevelMusic.sceneName == lm.sceneName && musicSource.clip == lm.musicClip)
+        // ===== MUDANÇA: Verifica se já é a música atual =====
+        if (currentLevelMusic != null && currentLevelMusic.musicClip == lm.musicClip && 
+            musicSource.clip == lm.musicClip && musicSource.isPlaying)
         {
+            Debug.Log($"[AudioManager] PlayLevelMusic: Já tocando {lm.musicClip.name} - mantendo");
             musicSource.loop = lm.loop;
-            musicSource.volume = Mathf.Clamp01(lm.targetVolume);
+            musicSource.volume = Mathf.Clamp01(lm.targetVolume * musicVolume);
             currentLevelMusic = lm;
             return true;
         }
@@ -229,6 +257,31 @@ public class AudioManager : MonoBehaviour
 
         musicSource.volume = endVol;
         if (ghost) Destroy(ghost);
+    }
+
+    // ===== NOVO: Métodos para preservar a posição da música =====
+    
+    /// <summary>
+    /// Salva o tempo atual da música para ser restaurado após reload.
+    /// Chame isso ANTES de recarregar a cena (ex: ao morrer).
+    /// </summary>
+    public void PreserveMusicPosition()
+    {
+        if (musicSource != null && musicSource.isPlaying && musicSource.clip != null)
+        {
+            savedMusicTime = musicSource.time;
+            preserveMusicTime = true;
+            Debug.Log($"[AudioManager] Posição da música preservada: {savedMusicTime:F2}s de {musicSource.clip.length:F2}s");
+        }
+    }
+
+    /// <summary>
+    /// Cancela a preservação da música (útil se quiser resetar a música propositalmente).
+    /// </summary>
+    public void ClearPreservedMusicPosition()
+    {
+        savedMusicTime = 0f;
+        preserveMusicTime = false;
     }
 
     // ===== SFX =====
