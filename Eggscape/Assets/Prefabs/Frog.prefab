@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 8684860172501905007}
   - component: {fileID: 2351768960470681736}
   - component: {fileID: -6432850150247976287}
+  - component: {fileID: 1606749565134282555}
   m_Layer: 9
   m_Name: Frog
   m_TagString: Obstacle
@@ -62,7 +63,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.26, y: -0.02, z: 0}
-  m_LocalScale: {x: 1.3182, y: 1.3182, z: 1.3182}
+  m_LocalScale: {x: 1.726051, y: 1.726051, z: 1.726051}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8675247128193317049}
@@ -112,8 +113,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.8207547, g: 0.20518868, b: 0.22929087, a: 1}
+  m_Sprite: {fileID: -8200787528238950913, guid: dc577e3785560894da4db79eb1731e88, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -184,17 +185,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.04230714, y: -0.15125215}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 1.2, y: 1.2}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.75869226, y: 0.8088343}
   m_EdgeRadius: 0
 --- !u!114 &2351768960470681736
 MonoBehaviour:
@@ -209,6 +210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
+  speedMultiplier: 1
   currentSegment: {fileID: 0}
 --- !u!114 &-6432850150247976287
 MonoBehaviour:
@@ -237,3 +239,25 @@ MonoBehaviour:
   animTriggerPreJump: PreJump
   animTriggerJump: Jump
   animBoolGrounded: Grounded
+--- !u!95 &1606749565134282555
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672838025917734753}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7c274dc6eae4b9d4ab290636bce5f5d6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
