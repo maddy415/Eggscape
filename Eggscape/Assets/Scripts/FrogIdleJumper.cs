@@ -36,6 +36,9 @@ public class FrogIdleJumper : MonoBehaviour
     private float timer;
     private bool grounded;
     private bool chargingJump;
+    
+    // NOVO: Flag para controlar se o movimento horizontal está ativo
+    public bool canMoveHorizontally = true;
 
     private void Awake()
     {
@@ -59,7 +62,6 @@ public class FrogIdleJumper : MonoBehaviour
 
     private void Update()
     {
-        
         grounded = IsGrounded();
 
         if (animator)
@@ -79,13 +81,18 @@ public class FrogIdleJumper : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var v = new Vector2(-Mathf.Abs(speed), rb.linearVelocity.y);
-        rb.linearVelocity = v;
+        // MODIFICADO: Só aplica movimento horizontal se canMoveHorizontally for true
+        if (canMoveHorizontally)
+        {
+            var v = new Vector2(-Mathf.Abs(speed), rb.linearVelocity.y);
+            rb.linearVelocity = v;
+        }
+        else
+        {
+            // Quando parado, mantém apenas a velocidade vertical (para pulos)
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        }
     }
-
-    
-
-
 
     private IEnumerator PrepareJump()
     {
@@ -103,7 +110,7 @@ public class FrogIdleJumper : MonoBehaviour
 
     private void DoJump()
     {
-        // zera só o Y pra pulo consistente, mantendo a velocidade pra esquerda
+        // zera só o Y pra pulo consistente
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 
@@ -144,5 +151,17 @@ public class FrogIdleJumper : MonoBehaviour
             GameManager.Instance.objsOnScene.Remove(gameObject);
             Destroy(gameObject);
         }
+    }
+    
+    // NOVO: Método público para parar o movimento horizontal
+    public void StopHorizontalMovement()
+    {
+        canMoveHorizontally = false;
+    }
+    
+    // NOVO: Método público para retomar o movimento horizontal
+    public void ResumeHorizontalMovement()
+    {
+        canMoveHorizontally = true;
     }
 }

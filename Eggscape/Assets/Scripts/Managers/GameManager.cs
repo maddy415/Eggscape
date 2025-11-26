@@ -156,6 +156,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // ========= MODIFICADO: StopScene() =========
     public void StopScene()
     {
         if (playerAlive == false)
@@ -168,26 +169,29 @@ public class GameManager : MonoBehaviour
             if (ground) ground.GetComponent<GroundGen>().enabled = false;
             if (fence) fence.GetComponent<GroundGen>().enabled = false;
             if (barn) barn.GetComponent<ObstacleMove>().enabled = false;
-            //if (frog) frog.GetComponent<FrogIdleJumper>().enabled = false;
 
             foreach (GameObject obj in GameManager.Instance.objsOnScene)
             {
                 if (obj == null) continue;
 
-                if (obj.layer == 9 && frogJumper != null)
+                // MODIFICADO: Para sapos (layer 9), para o movimento horizontal mas continua pulando
+                if (obj.layer == 9)
                 {
-                    frogJumper.speed = 0;
+                    var frogComponent = obj.GetComponent<FrogIdleJumper>();
+                    if (frogComponent != null)
+                    {
+                        frogComponent.StopHorizontalMovement();
+                    }
                 }
-                if (obj.layer != 8)
+                // Para outros obstáculos normalmente
+                else if (obj.layer != 8)
                 {
                     var mv = obj.GetComponent<ObstacleMove>();
-                    if (mv) mv.enabled = false; //Isso potencialmente ta mal otimizado pra caralho
+                    if (mv) mv.enabled = false;
                 }
             }
         }
     }
-
-    // ... (mantenha todo o código anterior até o método ResetScene)
 
     public void ResetScene()
     {
@@ -232,11 +236,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-// ... (resto do código permanece igual)
-    // ==========================================
-//   SUBSTITUA O MÉTODO Victory() NO GameManager.cs
-// ==========================================
-
     void Victory()
     {
         victoryTriggered = true;
@@ -267,7 +266,6 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("⏳ Vitória iniciada. Esperando limpar a cena...");
     }
-
 
     public void Debug_SaveNow()
     {
