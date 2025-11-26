@@ -253,6 +253,11 @@ public class MenuManager : MonoBehaviour
     {
         Application.Quit();
     }
+    
+    public void LoadSelector()
+    {
+        LoadSceneByName("lvl_selector");
+    }
 
     private string GetSceneNameByIndex(int index)
     {
