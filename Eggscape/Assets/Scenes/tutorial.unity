@@ -3730,6 +3730,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 639618208}
   m_CullTransparentMesh: 1
+--- !u!1 &698841601
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 698841603}
+  - component: {fileID: 698841602}
+  m_Layer: 0
+  m_Name: SaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &698841602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 698841601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95b9ebdfe3e35db4a9d61b792f971fa7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  totalLevels: 10
+--- !u!4 &698841603
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 698841601}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 870.2869, y: 552.9312, z: -5.398277}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &726681197
 GameObject:
   m_ObjectHideFlags: 0
@@ -12105,6 +12150,7 @@ MonoBehaviour:
   animTriggerPreJump: PreJump
   animTriggerJump: Jump
   animBoolGrounded: Grounded
+  canMoveHorizontally: 1
 --- !u!50 &2035011615
 Rigidbody2D:
   serializedVersion: 5
@@ -12559,7 +12605,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: "APERTE ESPA\xC7O"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 62102bca9222e15489942397abccb453, type: 2}
   m_sharedMaterial: {fileID: -4661961131466843048, guid: 62102bca9222e15489942397abccb453, type: 2}
@@ -12568,7 +12614,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281456895
+    rgba: 4279046107
   m_fontColor: {r: 0.85882354, g: 0.060568668, b: 0.05098039, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -12864,3 +12910,4 @@ SceneRoots:
   - {fileID: 116345875}
   - {fileID: 976560700}
   - {fileID: 1673210476}
+  - {fileID: 698841603}

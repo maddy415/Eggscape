@@ -18,27 +18,40 @@ MonoBehaviour:
     backgroundOverride: {fileID: 0}
     localTypeSpeed: 0
     endHold: 0
-  - text: "\"Galinhas, patos e outras aves trabalham sem descanso, presas em um ciclo
-      intermin\xE1vel.\""
+  - text: "\"Voc\xEAs falam. Pensam. Sonham com liberdade. Mas s\xE3o ignorados.\""
     backgroundOverride: {fileID: 0}
     localTypeSpeed: 0
     endHold: 0
-  - text: "\"Mas um dia, algo mudou. Sussurros de rebeli\xE3o come\xE7aram a se espalhar
-      pelos galinheiros.\"\n"
+  - text: '"Aves mais velhas guardavam segredos. Rotas de fuga. Brechas no sistema."'
     backgroundOverride: {fileID: 0}
     localTypeSpeed: 0
     endHold: 0
-  - text: "\"A F.A.R.O.F.A. - Frente de Aves Revolucion\xE1rias Organizadas pela
-      Fuga Agr\xE1ria - foi formada.\"\n"
+  - text: "\"Desses sussurros nasceu a F.A.R.O.F.A. - Frente de Aves Revolucion\xE1rias
+      Organizadas pela Fuga Agr\xE1ria - uma organiza\xE7\xE3o de resist\xEAncia.\""
     backgroundOverride: {fileID: 0}
     localTypeSpeed: 0
     endHold: 0
-  - text: "\"Hoje, uma galinha comum lidera a revolu\xE7\xE3o e decide que n\xE3o
-      vai mais aceitar esse destino.\"\n"
+  - text: '"Liderada pela Tenente Clara, planejaram esta fuga por anos."'
     backgroundOverride: {fileID: 0}
     localTypeSpeed: 0
     endHold: 0
-  - text: "\"Seu nome \xE9 Chicken. E esta \xE9 sua fuga.\""
+  - text: "\"Voc\xEA, Chicken, foi escolhida para liderar a opera\xE7\xE3o definitiva.\""
+    backgroundOverride: {fileID: 0}
+    localTypeSpeed: 0
+    endHold: 0
+  - text: "\"Clara te avisou: o caminho est\xE1 tra\xE7ado, mas algo bloqueia a sa\xEDda.\""
+    backgroundOverride: {fileID: 0}
+    localTypeSpeed: 0
+    endHold: 0
+  - text: "\"Algu\xE9m que voc\xEAs conhecem. Algu\xE9m que voc\xEAs feriram.\""
+    backgroundOverride: {fileID: 0}
+    localTypeSpeed: 0
+    endHold: 0
+  - text: "\"Voc\xEA n\xE3o entende ainda. Mas vai descobrir.\""
+    backgroundOverride: {fileID: 0}
+    localTypeSpeed: 0
+    endHold: 0
+  - text: "\"Corra, Chicken. As outras contam com voc\xEA.\""
     backgroundOverride: {fileID: 0}
     localTypeSpeed: 0
     endHold: 0
