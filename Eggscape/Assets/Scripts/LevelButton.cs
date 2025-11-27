@@ -29,19 +29,41 @@ public class LevelButton : MonoBehaviour
     private bool isUnlocked;
     private bool isCompleted;
     private LevelSelectManager manager;
+    private bool isInitialized = false;
+
+    void Awake()
+    {
+        // Verificar componentes obrigatórios
+        if (button == null)
+        {
+            button = GetComponent<Button>();
+            if (button == null)
+            {
+                Debug.LogError($"[LevelButton] Botão {levelIndex} ({gameObject.name}) não tem componente Button!", this);
+            }
+        }
+
+        if (buttonImage == null)
+        {
+            buttonImage = GetComponent<Image>();
+        }
+
+        // Adicionar listener uma única vez no Awake
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(OnButtonClick);
+            Debug.Log($"[LevelButton] Listener adicionado ao botão {levelIndex} ({gameObject.name})");
+        }
+    }
 
     void Start()
     {
-        // Auto-setup se o manager estiver na cena
-        manager = FindObjectOfType<LevelSelectManager>();
-        
-        if (manager != null)
+        // NÃO inicializar aqui - deixar o LevelSelectManager fazer isso
+        // Apenas garantir que temos referência ao manager
+        if (manager == null)
         {
-            RefreshFromSave();
-        }
-        else
-        {
-            Debug.LogWarning($"[LevelButton] LevelSelectManager não encontrado! Botão {levelIndex} não será configurado automaticamente.");
+            manager = FindObjectOfType<LevelSelectManager>();
         }
     }
 
@@ -55,16 +77,23 @@ public class LevelButton : MonoBehaviour
         isUnlocked = unlocked;
         isCompleted = completed;
         manager = selectManager;
+        isInitialized = true;
 
         // Configurar interatividade
         if (button != null)
         {
             button.interactable = unlocked;
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(OnButtonClick);
+            
+            // NÃO remover listeners aqui - eles já foram adicionados no Awake
+            // Apenas garantir que existe um
+            if (button.onClick.GetPersistentEventCount() == 0)
+            {
+                button.onClick.RemoveAllListeners();
+                button.onClick.AddListener(OnButtonClick);
+            }
         }
 
-        Debug.Log($"[LevelButton] Fase {levelIndex} configurada - Unlocked: {unlocked}, Completed: {completed}");
+        Debug.Log($"[LevelButton] Fase {levelIndex} ({gameObject.name}) configurada - Unlocked: {unlocked}, Completed: {completed}, Button Interactable: {button?.interactable}");
     }
 
     /// <summary>
@@ -109,6 +138,8 @@ public class LevelButton : MonoBehaviour
             else
                 levelText.text = "???";
         }
+
+        Debug.Log($"[LevelButton] Visuais atualizados para fase {levelIndex} - Unlocked: {unlocked}, Completed: {completed}");
     }
 
     /// <summary>
@@ -116,21 +147,40 @@ public class LevelButton : MonoBehaviour
     /// </summary>
     private void OnButtonClick()
     {
-        if (!isUnlocked)
+        Debug.Log($"[LevelButton] Botão {levelIndex} ({gameObject.name}) CLICADO! Unlocked: {isUnlocked}, Initialized: {isInitialized}");
+
+        if (!isInitialized)
         {
-            Debug.LogWarning($"[LevelButton] Tentativa de clicar em fase bloqueada: {levelIndex}");
-            // Opcional: tocar som de "erro" ou mostrar mensagem
+            Debug.LogError($"[LevelButton] Botão {levelIndex} não foi inicializado pelo LevelSelectManager!");
             return;
         }
 
-        if (manager != null && !string.IsNullOrEmpty(sceneName))
+        if (!isUnlocked)
         {
-            manager.LoadLevel(levelIndex, sceneName);
+            Debug.LogWarning($"[LevelButton] Fase {levelIndex} está bloqueada!");
+            return;
         }
-        else
+
+        if (string.IsNullOrEmpty(sceneName))
         {
-            Debug.LogError($"[LevelButton] Manager ou sceneName não configurado! Fase {levelIndex}");
+            Debug.LogError($"[LevelButton] sceneName não configurado para fase {levelIndex}!");
+            return;
         }
+
+        if (manager == null)
+        {
+            Debug.LogError($"[LevelButton] Manager não encontrado! Tentando encontrar...");
+            manager = FindObjectOfType<LevelSelectManager>();
+            
+            if (manager == null)
+            {
+                Debug.LogError($"[LevelButton] LevelSelectManager não existe na cena!");
+                return;
+            }
+        }
+
+        Debug.Log($"[LevelButton] Carregando fase {levelIndex} - Cena: {sceneName}");
+        manager.LoadLevel(levelIndex, sceneName);
     }
 
     /// <summary>
@@ -147,23 +197,40 @@ public class LevelButton : MonoBehaviour
         bool unlocked = SaveManager.Instance.IsLevelUnlocked(levelIndex);
         bool completed = SaveManager.Instance.IsLevelCompleted(levelIndex);
 
-        // Pegar cores do manager se existir
-        if (manager != null)
+        if (manager == null)
         {
-            Setup(levelIndex, unlocked, completed, manager);
-            // Nota: as cores serão aplicadas pelo LevelSelectManager
+            manager = FindObjectOfType<LevelSelectManager>();
         }
-        else
-        {
-            // Fallback: usar cores padrão
-            Setup(levelIndex, unlocked, completed, null);
-            UpdateVisuals(unlocked, completed, Color.white, Color.gray, Color.green);
-        }
+
+        Setup(levelIndex, unlocked, completed, manager);
+        
+        // Aplicar visuais com cores padrão
+        UpdateVisuals(unlocked, completed, Color.white, Color.gray, Color.green);
     }
 
     // ==========================================
-    //   MÉTODOS ÚTEIS (OPCIONAL)
+    //   MÉTODOS DE DEBUG
     // ==========================================
+
+    /// <summary>
+    /// Testa se o botão está funcionando.
+    /// </summary>
+    [ContextMenu("Debug: Test Click")]
+    public void DebugTestClick()
+    {
+        Debug.Log($"=== DEBUG CLICK - Fase {levelIndex} ===");
+        Debug.Log($"GameObject: {gameObject.name}");
+        Debug.Log($"Button existe: {button != null}");
+        Debug.Log($"Button interactable: {button?.interactable}");
+        Debug.Log($"isUnlocked: {isUnlocked}");
+        Debug.Log($"isCompleted: {isCompleted}");
+        Debug.Log($"isInitialized: {isInitialized}");
+        Debug.Log($"sceneName: {sceneName}");
+        Debug.Log($"Manager existe: {manager != null}");
+        Debug.Log($"Listeners count: {button?.onClick.GetPersistentEventCount()}");
+        
+        OnButtonClick();
+    }
 
     /// <summary>
     /// Força o desbloqueio do botão (útil para testes).

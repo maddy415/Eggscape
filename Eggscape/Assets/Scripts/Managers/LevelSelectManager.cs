@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections;
 using TMPro;
 
 /// <summary>
@@ -17,12 +18,78 @@ public class LevelSelectManager : MonoBehaviour
     [SerializeField] private Color lockedColor = Color.gray;
     [SerializeField] private Color completedColor = Color.green;
 
+    [Header("Layout Fix")]
+    [SerializeField] private bool forceLayoutRebuild = true;
+    [SerializeField] private RectTransform layoutContainer; // Container com Layout Group (opcional)
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugLogs = true;
+
     private SceneTransition transition;
+
+    void Awake()
+    {
+        // Encontrar ou buscar componentes
+        transition = FindObjectOfType<SceneTransition>();
+        
+        // Se não especificou manualmente, buscar todos os LevelButtons na cena
+        if (levelButtons == null || levelButtons.Length == 0)
+        {
+            levelButtons = FindObjectsOfType<LevelButton>();
+            Debug.Log($"[LevelSelect] Encontrados automaticamente {levelButtons.Length} botões na cena");
+        }
+    }
 
     void Start()
     {
-        transition = FindObjectOfType<SceneTransition>();
+        // Corrigir layout antes de inicializar os botões
+        if (forceLayoutRebuild)
+        {
+            StartCoroutine(InitializeWithLayoutFix());
+        }
+        else
+        {
+            RefreshLevelButtons();
+        }
+    }
+
+    /// <summary>
+    /// Inicializa os botões após corrigir o layout.
+    /// </summary>
+    private IEnumerator InitializeWithLayoutFix()
+    {
+        // Forçar rebuild do Canvas
+        Canvas.ForceUpdateCanvases();
+
+        // Se tem um container específico, rebuildar ele
+        if (layoutContainer != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layoutContainer);
+        }
+        else
+        {
+            // Tentar encontrar automaticamente
+            LayoutGroup[] layoutGroups = GetComponentsInChildren<LayoutGroup>();
+            foreach (var layout in layoutGroups)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(layout.GetComponent<RectTransform>());
+            }
+        }
+
+        // Aguardar 2 frames para garantir que tudo está renderizado
+        yield return null;
+        yield return null;
+
+        // Agora inicializar os botões
         RefreshLevelButtons();
+
+        // Forçar rebuild final
+        Canvas.ForceUpdateCanvases();
+
+        if (showDebugLogs)
+        {
+            Debug.Log("[LevelSelect] Layout reconstruído e botões inicializados!");
+        }
     }
 
     /// <summary>
@@ -36,16 +103,36 @@ public class LevelSelectManager : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < levelButtons.Length; i++)
+        if (levelButtons == null || levelButtons.Length == 0)
         {
-            bool unlocked = SaveManager.Instance.IsLevelUnlocked(i);
-            bool completed = SaveManager.Instance.IsLevelCompleted(i);
-
-            levelButtons[i].Setup(i, unlocked, completed, this);
-            levelButtons[i].UpdateVisuals(unlocked, completed, unlockedColor, lockedColor, completedColor);
+            Debug.LogError("[LevelSelect] Nenhum botão de fase configurado!");
+            return;
         }
 
-        Debug.Log($"[LevelSelect] Botões atualizados! Fases desbloqueadas até: {SaveManager.Instance.GetLevelReached()}");
+        Debug.Log($"[LevelSelect] Atualizando {levelButtons.Length} botões...");
+
+        for (int i = 0; i < levelButtons.Length; i++)
+        {
+            if (levelButtons[i] == null)
+            {
+                Debug.LogWarning($"[LevelSelect] Botão no índice {i} está null!");
+                continue;
+            }
+
+            int buttonIndex = levelButtons[i].levelIndex;
+            bool unlocked = SaveManager.Instance.IsLevelUnlocked(buttonIndex);
+            bool completed = SaveManager.Instance.IsLevelCompleted(buttonIndex);
+
+            levelButtons[i].Setup(buttonIndex, unlocked, completed, this);
+            levelButtons[i].UpdateVisuals(unlocked, completed, unlockedColor, lockedColor, completedColor);
+
+            if (showDebugLogs)
+            {
+                Debug.Log($"[LevelSelect] Botão {i} (Fase {buttonIndex}): Unlocked={unlocked}, Completed={completed}");
+            }
+        }
+
+        Debug.Log($"[LevelSelect] ✓ Botões atualizados! Progresso: Fase {SaveManager.Instance.GetLevelReached()}/{levelButtons.Length}");
     }
 
     /// <summary>
@@ -53,20 +140,38 @@ public class LevelSelectManager : MonoBehaviour
     /// </summary>
     public void LoadLevel(int levelIndex, string sceneName)
     {
+        Debug.Log($"[LevelSelect] LoadLevel chamado - Index: {levelIndex}, Scene: {sceneName}");
+
+        if (SaveManager.Instance == null)
+        {
+            Debug.LogError("[LevelSelect] SaveManager não encontrado!");
+            return;
+        }
+
         if (!SaveManager.Instance.IsLevelUnlocked(levelIndex))
         {
             Debug.LogWarning($"[LevelSelect] Tentativa de carregar fase bloqueada: {levelIndex}");
             return;
         }
 
+        if (string.IsNullOrEmpty(sceneName))
+        {
+            Debug.LogError($"[LevelSelect] Nome da cena vazio para fase {levelIndex}!");
+            return;
+        }
+
         SaveManager.Instance.SetCurrentLevel(levelIndex);
 
-        if (transition != null)
-            transition.LoadScene(sceneName);
-        else
-            SceneManager.LoadScene(sceneName);
+        Debug.Log($"[LevelSelect] ✓ Carregando fase {levelIndex}: {sceneName}");
 
-        Debug.Log($"[LevelSelect] Carregando fase: {sceneName} (Level Index: {levelIndex})");
+        if (transition != null)
+        {
+            transition.LoadScene(sceneName);
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneName);
+        }
     }
 
     /// <summary>
@@ -75,90 +180,85 @@ public class LevelSelectManager : MonoBehaviour
     public void BackToMainMenu()
     {
         if (transition != null)
-            transition.LoadScene("MainMenu"); // Ajuste o nome da sua cena de menu principal
+            transition.LoadScene("MainMenu");
         else
             SceneManager.LoadScene("MainMenu");
     }
-}
 
-// ==========================================
-//   CLASSE DO BOTÃO DE FASE
-// ==========================================
+    // ==========================================
+    //   MÉTODOS DE DEBUG
+    // ==========================================
 
-/*[System.Serializable]*/
-/*public class LevelButton : MonoBehaviour
-{
-    [Header("Configuração")]
-    public int levelIndex;                          // Índice da fase (0, 1, 2...)
-    public string sceneName;                        // Nome da cena a carregar (ex: "lvl_1")
-
-    [Header("Componentes UI")]
-    public Button button;
-    public Image buttonImage;
-    public TextMeshProUGUI levelText;               // Texto "Fase 1", "Fase 2"...
-    public GameObject lockIcon;                     // Ícone de cadeado (opcional)
-    public GameObject checkIcon;                    // Ícone de checkmark (opcional)
-
-    private bool isUnlocked;
-    private bool isCompleted;
-    private LevelSelectManager manager;
-
-    /// <summary>
-    /// Inicializa o botão com suas informações.
-    /// </summary>
-    public void Setup(int index, bool unlocked, bool completed, LevelSelectManager selectManager)
+    [ContextMenu("Debug: Force Layout Rebuild")]
+    public void DebugForceLayoutRebuild()
     {
-        levelIndex = index;
-        isUnlocked = unlocked;
-        isCompleted = completed;
-        manager = selectManager;
-
-        // Configurar interatividade
-        if (button != null)
-        {
-            button.interactable = unlocked;
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(OnButtonClick);
-        }
+        StartCoroutine(InitializeWithLayoutFix());
     }
 
-    /// <summary>
-    /// Atualiza a aparência visual do botão.
-    /// </summary>
-    public void UpdateVisuals(bool unlocked, bool completed, Color unlockedCol, Color lockedCol, Color completedCol)
+    [ContextMenu("Debug: List All Buttons")]
+    public void DebugListButtons()
     {
-        // Atualizar cor do botão
-        if (buttonImage != null)
+        Debug.Log("=== LISTA DE BOTÕES ===");
+        for (int i = 0; i < levelButtons.Length; i++)
         {
-            if (completed)
-                buttonImage.color = completedCol;
-            else if (unlocked)
-                buttonImage.color = unlockedCol;
+            if (levelButtons[i] != null)
+            {
+                var btn = levelButtons[i];
+                var rectTransform = btn.GetComponent<RectTransform>();
+                Debug.Log($"Botão {i}: Name={btn.gameObject.name}, LevelIndex={btn.levelIndex}, Scene={btn.sceneName}, " +
+                         $"Position={rectTransform.anchoredPosition}, Size={rectTransform.sizeDelta}, HasButton={btn.button != null}");
+            }
             else
-                buttonImage.color = lockedCol;
-        }
-
-        // Ícones
-        if (lockIcon != null)
-            lockIcon.SetActive(!unlocked);
-
-        if (checkIcon != null)
-            checkIcon.SetActive(completed);
-
-        // Texto do nível
-        if (levelText != null)
-        {
-            levelText.text = unlocked ? $"Fase {levelIndex + 1}" : "???";
+            {
+                Debug.Log($"Botão {i}: NULL");
+            }
         }
     }
 
-    /// <summary>
-    /// Chamado quando o botão é clicado.
-    /// </summary>
-    private void OnButtonClick()
+    [ContextMenu("Debug: Check Raycast Targets")]
+    public void DebugCheckRaycastTargets()
     {
-        if (isUnlocked && manager != null)
+        Debug.Log("=== VERIFICAÇÃO DE RAYCAST TARGETS ===");
+        foreach (var btn in levelButtons)
         {
-            manager.LoadLevel(levelIndex, sceneName);
+            if (btn != null)
+            {
+                Image[] images = btn.GetComponentsInChildren<Image>();
+                Debug.Log($"Botão {btn.levelIndex} ({btn.gameObject.name}):");
+                foreach (var img in images)
+                {
+                    Debug.Log($"  - Image em '{img.gameObject.name}': Raycast Target = {img.raycastTarget}");
+                }
+            }
         }
-    }*/
+    }
+
+    [ContextMenu("Debug: Unlock All Levels")]
+    public void DebugUnlockAll()
+    {
+        if (SaveManager.Instance == null)
+        {
+            Debug.LogError("SaveManager não encontrado!");
+            return;
+        }
+
+        for (int i = 0; i < levelButtons.Length; i++)
+        {
+            SaveManager.Instance.CompleteLevel(i, 0);
+        }
+
+        RefreshLevelButtons();
+        Debug.Log("[LevelSelect] Todas as fases desbloqueadas!");
+    }
+
+    [ContextMenu("Debug: Reset Progress")]
+    public void DebugResetProgress()
+    {
+        if (SaveManager.Instance != null)
+        {
+            SaveManager.Instance.ResetProgress();
+            RefreshLevelButtons();
+            Debug.Log("[LevelSelect] Progresso resetado!");
+        }
+    }
+}
