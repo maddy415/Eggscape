@@ -3091,35 +3091,35 @@ MonoBehaviour:
     loop: 1
   - sceneName: lvl_1
     musicClip: {fileID: 8300000, guid: bc67c64bee9e0f644825656d620d7391, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: lvl_2
     musicClip: {fileID: 8300000, guid: bc67c64bee9e0f644825656d620d7391, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: lvl_3
     musicClip: {fileID: 8300000, guid: bc67c64bee9e0f644825656d620d7391, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: lvl_4
     musicClip: {fileID: 8300000, guid: 67ea1fdf218404945b2ae9402ec5932f, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: lvl_5
     musicClip: {fileID: 8300000, guid: 67ea1fdf218404945b2ae9402ec5932f, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: lvl_6
     musicClip: {fileID: 8300000, guid: 67ea1fdf218404945b2ae9402ec5932f, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: lvl_7
     musicClip: {fileID: 8300000, guid: 67ea1fdf218404945b2ae9402ec5932f, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: lvl_8
     musicClip: {fileID: 8300000, guid: 67ea1fdf218404945b2ae9402ec5932f, type: 3}
-    targetVolume: 1
+    targetVolume: 0.5
     loop: 1
   - sceneName: main_menu
     musicClip: {fileID: 8300000, guid: 679c85732bcdd794c812b17713032ee2, type: 3}
